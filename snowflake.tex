@@ -1,0 +1,37 @@
+\documentclass[letterpaper,twocolumn]{article}
+
+\usepackage{newtxtext}
+\usepackage{newtxmath}
+
+% Load hyperref after other packages.
+\usepackage[pdfa,hidelinks,pdfcreator={},pdfproducer={}]{hyperref}
+\urlstyle{same}
+
+% Disable metadata for reproducible PDF.
+% https://tex.stackexchange.com/a/313605
+\usepackage{ifpdf}
+\ifpdf
+\pdfinfoomitdate=1
+\pdftrailerid{}
+\pdfsuppressptexinfo=-1
+\fi
+
+\begin{document}
+
+\date{}
+
+\title{Snowflake, a peer-to-peer censorship circumvention system}
+
+\author{}
+
+\maketitle
+
+\begin{abstract}
+\end{abstract}
+
+\nocite{arxiv.2008.03254}
+
+\bibliographystyle{plainurl}
+\bibliography{snowflake}
+
+\end{document}
