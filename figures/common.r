@@ -1,11 +1,11 @@
 # Without this, things like month names in axis labels are locale-dependent.
 Sys.setlocale("LC_ALL", "C")
 
-# \the\textwidth → 469.0pt
-DOCUMENT_TEXTWIDTH <- 469.0 / 72.27
+# \the\textwidth → 505.89pt
+DOCUMENT_TEXTWIDTH <- 505.89 / 72.27
 
-# \the\textwidth → 229.5pt
-DOCUMENT_LINEWIDTH <- 229.5 / 72.27
+# \the\textwidth → 247.94499pt
+DOCUMENT_LINEWIDTH <- 247.94499 / 72.27
 
 FONT_FAMILY <- "Times"
 

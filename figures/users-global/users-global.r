@@ -12,7 +12,7 @@ source("../common.r")
 
 DATE_LIMITS <- lubridate::ymd(c(
 	"2020-12-31",
-	"2022-05-15"
+	"2022-05-14"
 ))
 
 LINE_SIZE <- 0.2
