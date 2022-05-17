@@ -1,7 +1,8 @@
 PDFLATEX = pdflatex -halt-on-error -file-line-error -interaction=nonstopmode
 BIBTEX = bibtex
 
-FIGURES =
+FIGURES = \
+	figures/users-global/users-global.pdf
 
 snowflake.pdf: *.tex *.bib $(FIGURES)
 
