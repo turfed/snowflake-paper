@@ -37,7 +37,7 @@ EVENTS <- tribble(
 	# "2020-05-22 19:51:29",  1000, "Tor Browser 9.5a13\nadds Turbo Tunnel",       # https://blog.torproject.org/new-release-tor-browser-95a13
 	# "2020-06-02 18:09:48",  1000, "Tor Browser 10.0a1\nSnowflake for Android",   # https://blog.torproject.org/new-release-tor-browser-100a1
 	"2021-07-06 16:56:37",  5200, "Tor Browser 10.5 (stable)\nincludes Snowflake", # https://blog.torproject.org/new-release-tor-browser-105
-	"2021-12-01 00:00:00",  7200, "Tor blocking in Russia",                        # https://bugs.torproject.org/tpo/community/support/40050
+	"2021-12-01 00:00:00",  7200, "Onset of Tor blocking in Russia",               # https://bugs.torproject.org/tpo/community/support/40050
 	"2021-12-14 00:00:00",  8200, "",                                              # https://blog.torproject.org/new-release-tor-browser-115a1/
 	"2021-12-20 00:00:00", 10500, "Tor Browser 11.5a1 and 11.0.3\nalter DTLS fingerprint", # https://blog.torproject.org/new-release-tor-browser-1103/
 	"2022-01-25 17:41:00", 12500, "Load balancing of bridge",                      # https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40095#note_2772325
