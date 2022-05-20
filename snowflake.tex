@@ -77,6 +77,7 @@ WebRTC
 - importantly: built into browsers
 
 flash proxy~\cite{Fifield2012a} (\url{https://bugs.torproject.org/legacy/trac/5578})
+% flashproxy.pdf §5.2: "New technologies like WebRTC [24] may fill this need in the future, if they become sufficiently popular that flash proxies' use of them does not stand out as unusual."
 uProxy (\url{https://serene.cx/snowflake/})
 
 Comparison with MassBrowser~\cite{Nasr2020a}
@@ -125,6 +126,10 @@ Domain fronting remains an important element of circumvention systems,
 though since the reaction by cloud providers
 to the attempted blocking of Telegram in Russia in 2018,
 % TODO: cite something
+% From https://gitlab.torproject.org/tpo/network-health/metrics/timeline:
+% |2018-04-13 16:00:00|||snowflake|Snowflake client registrations (based on domain fronting) stop working, because of a Google infrastructure change that stops domain fronting from working. The time of the change is between 2018-04-13 14:00:00 and 2018-04-13 18:00:00, based on when the bandwidth graph of the Snowflake bridge [5481936581E23D2D178105D44DB6915AB06BFB7F](https://metrics.torproject.org/rs.html#details/5481936581E23D2D178105D44DB6915AB06BFB7F) went to zero.|[ticket](https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/25804)||
+% |2018-04-16|||snowflake|Moved the Snowflake broker from App Engine to a standalone server.|[comment](https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/22874#note_2591708)||
+% |2018-05-09 20:46:16|||snowflake|Release of Tor Browser 8.0a7, which changes the default Snowflake rendezvous to use an Azure domain front, instead of the Google one that had been non-functional since 2018-04-13.|[blog post](https://blog.torproject.org/tor-browser-80a7-released) [ticket](https://bugs.torproject.org/tpo/applications/tor-browser/26010)||
 it is recognized that domain fronting should not be relied on exclusively.
 
 
@@ -439,6 +444,9 @@ scaling
 - load balancing
 - multi-bridge
 
+% Safe Browsing / zip bomb problem (2019)
+% https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/issues/31250
+
 
 \subsection{Blocking in Turkmenistan}
 \label{sec:block-tm}
@@ -452,6 +460,8 @@ around blocking events.
 \label{fig:user-counts-tm-ru}
 \end{figure}
 
+% |2021-10-24||tm|snowflake|Snowflake users in Turkmenistan drop to zero, possibly as a result of blocking of the broker's domain-fronting channel.|[issue](https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40024) [comment](https://bugs.torproject.org/tpo/community/support/40030#note_2759213) [discussion](http://meetbot.debian.net/tor-meeting/2021/tor-meeting.2021-11-04-15.59.log.html#l-55)|X|
+
 \url{https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40024}
 
 \autoref{fig:user-counts-tm-ru}
@@ -462,6 +472,10 @@ Hard to get testers/volunteers
 
 \subsection{Blocking in Russia}
 \label{sec:block-ru}
+
+% https://gitlab.torproject.org/tpo/community/support/-/issues/40050#note_2796770
+
+% mention the creeping block of VPNs? https://github.com/net4people/bbs/issues/76
 
 % david
 
