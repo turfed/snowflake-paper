@@ -21,7 +21,7 @@ GAPS <- tribble(
 	~begin, ~end, ~y,
 	# https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40033#note_2735468
 	# https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/merge_requests/43#note_2740276
-	"2021-05-12 14:13:56", "2021-06-21 14:22:24", 1800
+	"2021-05-12 14:13:56", "2021-06-21 14:22:24", 2200
 ) %>% mutate(
 	begin = lubridate::ymd_hms(begin) %>% lubridate::as_date(),
 	end = lubridate::ymd_hms(end) %>% lubridate::as_date()
@@ -36,11 +36,11 @@ EVENTS <- tribble(
 	# "2019-10-01 00:00:00",  1000, "Tor Browser 9.0a7\nSnowflake for Windows",    # https://blog.torproject.org/new-release-tor-browser-90a7
 	# "2020-05-22 19:51:29",  1000, "Tor Browser 9.5a13\nadds Turbo Tunnel",       # https://blog.torproject.org/new-release-tor-browser-95a13
 	# "2020-06-02 18:09:48",  1000, "Tor Browser 10.0a1\nSnowflake for Android",   # https://blog.torproject.org/new-release-tor-browser-100a1
-	"2021-07-06 16:56:37",  4300, "Tor Browser 10.5 (stable)\nincludes Snowflake", # https://blog.torproject.org/new-release-tor-browser-105
-	"2021-12-01 00:00:00",  5600, "Tor blocking in Russia",                        # https://bugs.torproject.org/tpo/community/support/40050
-	"2021-12-14 00:00:00",  6500, "",                                              # https://blog.torproject.org/new-release-tor-browser-115a1/
-	"2021-12-20 00:00:00",  8300, "Tor Browser 11.5a1 and 11.0.3\nalter DTLS fingerprint", # https://blog.torproject.org/new-release-tor-browser-1103/
-	"2022-01-25 17:41:00", 10500, "Load balancing of bridge",                      # https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40095#note_2772325
+	"2021-07-06 16:56:37",  5200, "Tor Browser 10.5 (stable)\nincludes Snowflake", # https://blog.torproject.org/new-release-tor-browser-105
+	"2021-12-01 00:00:00",  7200, "Tor blocking in Russia",                        # https://bugs.torproject.org/tpo/community/support/40050
+	"2021-12-14 00:00:00",  8200, "",                                              # https://blog.torproject.org/new-release-tor-browser-115a1/
+	"2021-12-20 00:00:00", 10500, "Tor Browser 11.5a1 and 11.0.3\nalter DTLS fingerprint", # https://blog.torproject.org/new-release-tor-browser-1103/
+	"2022-01-25 17:41:00", 12500, "Load balancing of bridge",                      # https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40095#note_2772325
 	# "2022-01-31 18:20:00", 12000, "Back to production bridge, now load-balanced",# https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40095#note_2773704
 	"2022-02-24 00:00:00", 19500, "Russian invasion of Ukraine",
 	"2022-03-16 16:51:35", 21000, "Bridge hardware upgrade"                        # https://bugs.torproject.org/tpo/tpa/team/40664#note_2787624
@@ -81,7 +81,7 @@ text_annotation <- function(data) {
 			label.r = unit(0, "lines"),
 			label.padding = unit(0.05, "lines"),
 			family = FONT_FAMILY,
-			size = 2,
+			size = 2.5,
 			hjust = 1,
 			nudge_x = -2,
 			vjust = 1,
