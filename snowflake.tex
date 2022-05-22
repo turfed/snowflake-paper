@@ -420,6 +420,10 @@ As of May 2022, about 65\% of Snowflake users come from Russia.
 $X$ TB of user data transferred
 
 % cecylia
+The deployment of Snowflake proxies began with a bare minimum deployment of three standalone Go proxies all on the same IP address as the Snowflake bridge, as well as a few proxies from deployed Snowflake badges. We began to collect metrics on the number of deployed proxies on \mbox{2019-06-29}. Figure~\ref{fig:total-proxy-counts} shows the total count of unique proxy IP addresses from the beginning of our collection to the writing of this paper. The majority of the growth in Snowflake proxies over the last three years comes from the success of the Snowflake browser add-on. The add-on was released for Firefox on \mbox{2019-06-26} and Chrome on \mbox{2019-07-03}, but the first major spike in proxy counts was thanks to the integration of Snowflake with the existing flash proxy add-on, Cupcake. The number of Cupcake proxies dropped off completely later that year, but Snowflake add-on usage had already risen to compensate. Currently, the vast majority of Snowflake proxies are from the browser add-on, as shown in Figure~\ref{fig:proxy-type-counts}.
+
+While early growth in the number of unique Snowflake proxy IPs was due to the development of easier deployment methods and UX features for proxy volunteers, the later growth in proxy counts were due to outreach and follow the increase in demand for Snowflake proxy capacity from the increase in client usage. 
+
 Counts of web badge vs. browser add-on vs. standalone daemon
 Timeline of proxy + webext deployment
 % |2019-06-26|||snowflake|Deployed version 0.0.1 of the Snowflake WebExtension for Firefox.|[comment](https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/30931#note_2593598)||
