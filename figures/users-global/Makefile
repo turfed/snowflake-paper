@@ -1,3 +1,5 @@
+PYTHON = python3
+
 # https://metrics.torproject.org/collector/archive/bridge-descriptors/extra-infos/
 BRIDGE_EXTRA_INFOS = \
 	bridge-extra-infos-2017-01.tar.xz \
@@ -70,6 +72,6 @@ users-global.pdf: users-global.r ../common.r userstats-bridge-transport.csv
 	Rscript users-global.r userstats-bridge-transport.csv "$@"
 
 userstats-bridge-transport.csv: userstats-bridge-transport $(BRIDGE_EXTRA_INFOS)
-	./userstats-bridge-transport $(BRIDGE_EXTRA_INFOS) > "$@"
+	$(PYTHON) userstats-bridge-transport $(BRIDGE_EXTRA_INFOS) > "$@"
 
 .DELETE_ON_ERROR:
