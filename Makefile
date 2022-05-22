@@ -1,4 +1,4 @@
-PDFLATEX = pdflatex -halt-on-error -file-line-error -interaction=nonstopmode
+PDFLATEX = max_print_line=10000 pdflatex -halt-on-error -file-line-error -interaction=nonstopmode
 BIBTEX = bibtex
 
 FIGURES = \
