@@ -93,7 +93,7 @@ text_annotation <- function(data) {
 (function() {
 	args <- commandArgs(trailingOnly = TRUE)
 	if (length(args) != 2) {
-		stop(sprintf("usage: Rscript %s userstats-bridge-transport.csv users-global.pdf", commandArgs()[[1]]))
+		stop("usage: Rscript users-global.r userstats-bridge-transport.csv users-global.pdf")
 	}
 	bridge_transport_csv_path <<- args[[1]]
 	output_path <<- args[[2]]
