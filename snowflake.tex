@@ -85,8 +85,6 @@ Comparison with MassBrowser~\cite{Nasr2020a}
 
 \section{How it works}
 
-% serene, arlo
-
 \begin{figure*}
 \framebox[\textwidth]{\vbox to 2in{\vfil\centering TODO\vfil}}
 \caption{
@@ -95,32 +93,80 @@ Architecture of Snowflake.
 \label{fig:architecture}
 \end{figure*}
 
+A~Snowflake session proceeds in two phases.
+First, there is the rendezvous, where a client
+signals its need for circumvention service
+and is matched with a temporary proxy.
+Next, there is data transfer,
+where the client uses the WebRTC connection to
+its temporary proxy to
+communicate with a remote service,
+namely a Tor bridge.
 \autoref{fig:architecture}
+illustrates the process.
 
-Centralized broker, manages associations between clients and proxies
+There is an ambient population of temporary Snowflake proxies.
+For the most part, these proxies are the web browsers of people who have
+installed the Snowflake proxy WebExtension,
+or a functionally equivalent headless command-line version.
+The proxies periodically poll a centralized server, the broker,
+to inquire whether there are any clients that need service.
+The broker is responsible for matching and
+keeping track of associations between clients and proxies.
 
-% hooman
-Centralized bridge
-- (notionally centralized, though may be realized as multiple instances for performance reasons, see \autoref{sec:experience})
+A~client begins a Snowflake session by
+sending a rendezvous message to the broker.
+The rendezvous message must be sent over a blocking-resistant channel,
+which may however be slow or expensive; see \autoref{sec:rendezvous} for some examples.
+When a client rendezvous message arrives,
+the broker chooses one of the immediately available proxies,
+subject to NAT compatibility and other matching criteria, % TODO: are there other matching criteria?
+forwards the client's rendezvous message to that proxy,
+and conveys the client's downstream answer to the rendezvous back to the client.
+The client and proxy then initiate a WebRTC connection
+with each other; the broker is no longer involved.
+Fuller details on rendezvous are in \autoref{sec:rendezvous}.
 
-Decentralized proxies
-- Clients do not touch the bridge directly, but only through a proxy
-- No risk if the bridge itself is blocked
-- Proxies can be blocked---even in the middle of an ongoing connection---and clients can adapt by switching to another proxy
-- In practice, realized as browser add-ons or standalone executables
+The temporary proxy connects both to its assigned client
+and to a centralized bridge,
+and begins to copy bytes between the client and the bridge
+in both directions.
+This continues until the client ends its session by disconnecting,
+or the proxy goes offline
+(which happens, for example, when the web browser where a proxy is running is closed).
+When a proxy goes offline,
+it does not spell the end of the client's session:
+the client and the bridge share end-to-end session state
+that persists beyond the lifetime of any single proxy.
+The client sends another rendezvous message to the broker,
+is assigned another proxy,
+and picks up where it left off.
+More information about the data transfer phase is in \autoref{sec:data-transfer}.
 
-Many moving parts, managing complexity is a consideration
+Nowhere does the client ever communicate directly with the broker or the bridge.
+Both the broker and the bridge may be blocked,
+from the perspective of the client.
+The client only communicates with the broker over an indirect rendezvous channel
+that is assumed to be difficult and expensive for a censor to block.
+The client only communicates with the bridge via a temporary proxy.
+No single temporary proxy is critical to the operation of the system.
+A~proxy may be blocked---even while it is in active use by a client---and
+clients can adapt by using a different proxy.
 
 \subsection{Rendezvous}
+\label{sec:rendezvous}
 
 % serene
 
 Communication with broker has different anti-blocking requirements,
 can be slower / more expensive
+``Why don't they build the whole plane out of the black box?''
 
 Contents of rendezvous messages
 WebRTC signaling, ICE as part of WebRTC
+The broker is acting as a signaling server, a necessary component of any WebRTC-based communication system, albeit a covert one.
 requires bidirectional
+STUN
 
 Domain fronting remains an important element of circumvention systems,
 though since the reaction by cloud providers
@@ -141,18 +187,29 @@ others?
 
 long polling
 
-\subsection{Temporary proxying}
-\label{sec:proxying}
+NAT matching
+
+\subsection{Data transfer}
+\label{sec:data-transfer}
 
 % cecylia
 
 Proxies are simple conduits, transferring a reliable stream between endpoints
 End-to-end security between client and bridge, proxies untrusted
 
+% hooman
+Centralized bridge
+- (notionally centralized, though may be realized as multiple instances for performance reasons, see \autoref{sec:experience})
+
+Choice of WebSocket on the proxy--bridge link is somewhat arbitrary
+Needs to be something supported by browsers
+WebSocket easier to use than WebRTC
+
 % david
 Turbo Tunnel~\cite{Fifield2020a}
 KCP/smux
 - session layer independent of the circumvention channel, permits switching proxies on the fly
+- proxy handoff is invisible to upper layers
 - the protocol layering generally
 
 Web badge vs. browser add-on vs. standalone daemon
@@ -162,7 +219,7 @@ majority browser add-on, more effective at gaining popularity than web badge
 NAT type matching (necessity of, and how it works)
 probetest
 
-\subsection{Protocol fingerprinting}
+\section{Protocol fingerprinting}
 
 % kyle, david
 
@@ -449,6 +506,20 @@ scaling
 - load balancing
 - multi-bridge
 
+The Snowflake system
+admittedly contains a lot of moving parts.
+Some complexity is inherent in the nature
+of what we are building:
+Snowflake is more complicated than a static encrypted proxy
+and always will be.
+Complexity is the enemy of security and robustness, however,
+and in a system meant for real production use
+could even be considered an existential risk,
+if the demands of maintenance exceed what the maintainers can provide.
+Managing complexity and designing for low maintenance
+are material concerns,
+and must sometimes take priority over speed of development.
+
 % Safe Browsing / zip bomb problem (2019)
 % https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/issues/31250
 
@@ -534,6 +605,8 @@ Need a new experiment for this
 
 Distributed bridge architecture
 \url{https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40129}
+
+Multiplexing?
 
 % ANON
 % \section*{Availability}
