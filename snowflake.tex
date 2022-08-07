@@ -93,17 +93,28 @@ Architecture of Snowflake.
 \label{fig:architecture}
 \end{figure*}
 
-A~Snowflake session proceeds in two phases.
+A~Snowflake proxy connection proceeds in three phases.
 First, there is the rendezvous, where a client
 signals its need for circumvention service
 and is matched with a temporary proxy.
-Next, there is data transfer,
-where the client uses the WebRTC connection to
-its temporary proxy to
-communicate with a remote service,
-namely a Tor bridge.
+Then, there is connection establishment,
+where the client and its temporary proxy connect to one another
+with WebRTC, using information exchanged during rendezvous.
+Finally, there is data transfer,
+where the proxy ferries data back and forth
+between the client and a remote service
+(i.e., a Tor bridge).
 \autoref{fig:architecture}
 illustrates the process.
+
+The client's circumvention session
+does not begin and end with any particular temporary proxy.
+Rather, the client strings together
+a series of proxies, switching to a new one
+whenever an old one goes offline.
+This proxy handoff is hidden from the upper-layer protocols
+(i.e., the web browser) that use the circumvention tunnel:
+to them the Snowflake session appears as one long unbroken connection.
 
 There is an ambient population of temporary Snowflake proxies.
 For the most part, these proxies are the web browsers of people who have
@@ -131,6 +142,7 @@ The temporary proxy connects both to its assigned client
 and to a centralized bridge,
 and begins to copy bytes between the client and the bridge
 in both directions.
+Details about how the connections are established are in \autoref{sec:ice}.
 This continues until the client ends its session by disconnecting,
 or the proxy goes offline
 (which happens, for example, when the web browser where a proxy is running is closed).
@@ -190,7 +202,28 @@ others?
 
 long polling
 
-NAT matching
+\subsection{Peer-to-peer connection establishment}
+\label{sec:ice}
+
+ICE (Interactive Connectivity Establishment)~\cite{rfc8445}
+STUN
+DTLS
+key exchange
+DTLS fingerprint~\cite[\S 5]{rfc8842}
+
+% cecylia
+NAT type matching (necessity of, and how it works)
+cannot use TURN server as choice of server would be distinguisher
+self-measured with the help of STUN server
+- unknown
+- restricted
+- unrestricted
+probetest
+
+WebSocket on the proxy--bridge link
+Choice is somewhat arbitrary
+Needs to be something supported by browsers
+WebSocket easier to use than WebRTC
 
 \subsection{Data transfer}
 \label{sec:data-transfer}
@@ -204,9 +237,9 @@ End-to-end security between client and bridge, proxies untrusted
 Centralized bridge
 - (notionally centralized, though may be realized as multiple instances for performance reasons, see \autoref{sec:experience})
 
-Choice of WebSocket on the proxy--bridge link is somewhat arbitrary
-Needs to be something supported by browsers
-WebSocket easier to use than WebRTC
+data channels
+DTLS
+\cite[\S 1]{rfc8831}
 
 % david
 Turbo Tunnel~\cite{Fifield2020a}
@@ -214,13 +247,10 @@ KCP/smux
 - session layer independent of the circumvention channel, permits switching proxies on the fly
 - proxy handoff is invisible to upper layers
 - the protocol layering generally
+browser does not have access to the SCTP layer
 
 Web badge vs. browser add-on vs. standalone daemon
 majority browser add-on, more effective at gaining popularity than web badge
-
-% cecylia
-NAT type matching (necessity of, and how it works)
-probetest
 
 \section{Protocol fingerprinting}
 
