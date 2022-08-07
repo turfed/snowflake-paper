@@ -83,6 +83,13 @@ uProxy (\url{https://serene.cx/snowflake/})
 Comparison with MassBrowser~\cite{Nasr2020a}
 % https://github.com/net4people/bbs/issues/32
 
+unfortunate tendency to emphasize the negative aspects of other systems
+paints an unnecessarily dire picture
+not what we are trying for here
+circumvention works, existing systems are successful,
+it is a common part of many people's everyday access to the Internet
+with Snowflake, we are exploring a different point in the design space
+
 \section{How it works}
 
 \begin{figure*}
@@ -136,7 +143,7 @@ forwards the client's rendezvous message to that proxy,
 and conveys the client's downstream answer to the rendezvous back to the client.
 The client and proxy then initiate a WebRTC connection
 with each other; the broker is no longer involved.
-Fuller details on rendezvous are in \autoref{sec:rendezvous}.
+Further details on rendezvous will be presented in \autoref{sec:rendezvous}.
 
 The temporary proxy connects both to its assigned client
 and to a centralized bridge,
@@ -155,7 +162,7 @@ is assigned another proxy,
 and picks up where it left off.
 More information about the data transfer phase is in \autoref{sec:data-transfer}.
 
-Nowhere does the client ever communicate directly with the broker or the bridge.
+Never does the client communicate with the broker or bridge directly.
 Both the broker and the bridge may be blocked,
 from the perspective of the client.
 The client only communicates with the broker over an indirect rendezvous channel
@@ -414,6 +421,7 @@ Web badge vs. browser add-on vs. standalone daemon
 majority browser add-on, more effective at gaining popularity than web badge
 
 \section{Protocol fingerprinting}
+\label{sec:fingerprinting}
 
 % kyle, david
 
@@ -542,7 +550,7 @@ had not risen above~40.
 %   <date>     <chr>     <dbl> <dbl>
 % 1 2020-04-01 snowflake  34.0   100
 The Turbo Tunnel session persistence feature
-described in \autoref{sec:proxying}
+described in \autoref{sec:data-transfer}
 became available to users in Tor Browser 9.5a13
 on \mbox{2020-05-22}.
 % https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/issues/33745 "Merge a turbotunnel branch"
@@ -556,6 +564,7 @@ Tor Browser 10.0a1 on \mbox{2020-06-02}.
 % https://gitlab.torproject.org/tpo/applications/tor-browser/-/issues/28672 "Android reproducible build of Snowflake"
 
 \begin{figure}
+% TODO: update users-global chart
 \includegraphics{figures/users-global/users-global}
 % TODO: bandwidth chart? ideally with aligned horizontal axis.
 \caption{
@@ -565,7 +574,7 @@ the beginning of 2021, is about~60.
 At this point, Snowflake was available in the Tor Browser alpha release series
 for desktop platforms and Android,
 and it had the Turbo Tunnel session persistence feature.
-% Loesing~\cite{tor-tr-2012-10-001} describes how user counts is estimated.
+% Loesing~\cite{tor-tr-2012-10-001} describes how user counts are estimated.
 The maximum value in the part of the graph not shown
 is 133, on \mbox{2020-12-09}.
 % > filtered[which.max(filter(filtered, date < "2021-01-01")$users), ]
@@ -694,6 +703,8 @@ Difficulty of using WebRTC outside a browser
 
 Reproducible builds
 - difficulty of cross-compiling go-webrtc extracted from Chromium
+
+History of changing domain fronts
 
 scaling
 % david
