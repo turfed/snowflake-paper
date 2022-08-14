@@ -12,7 +12,7 @@ source("../common.r")
 
 DATE_LIMITS <- lubridate::ymd(c(
 	"2020-12-31",
-	"2022-05-14"
+	"2022-08-10"
 ))
 
 LINE_SIZE <- 0.2
@@ -43,9 +43,10 @@ EVENTS <- tribble(
 	"2022-01-25 17:41:00", 12500, "Load balancing of bridge",                      # https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40095#note_2772325
 	# "2022-01-31 18:20:00", 12000, "Back to production bridge, now load-balanced",# https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40095#note_2773704
 	"2022-02-24 00:00:00", 19500, "Russian invasion of Ukraine",
-	"2022-03-16 16:51:35", 21000, "Bridge hardware upgrade"                        # https://bugs.torproject.org/tpo/tpa/team/40664#note_2787624
+	"2022-03-16 16:51:35", 21000, "Bridge hardware upgrade",                       # https://bugs.torproject.org/tpo/tpa/team/40664#note_2787624
 	# "2022-03-18 03:21:45", 22000, "Fixed problem with onion keys"                # https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40110#note_2788622
 	# "2022-04-11 15:49:30", 22000, "Bridge server migration"                      # https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40111#note_2794860
+	"2022-07-14 00:00:00",  3000, "Tor Browser 11.5\nautomatic configuration"      # https://blog.torproject.org/new-release-tor-browser-115/
 ) %>% mutate(date = lubridate::ymd_hms(date) %>% lubridate::as_date())
 
 missing_dates_fill_na <- function(tb) {
@@ -60,12 +61,25 @@ date_labels <- function(breaks) {
 	ifelse(!is.na(breaks) & lubridate::month(breaks) == 1, paste(mon, year, sep = "\n"), mon)
 }
 
+# For each element of `at`, returns the minimum element of `values` whose
+# corresponding element of `x` is within `radius` of the `at` element.
+min_nearby <- function(x, values, at, radius) {
+	in_radius <- abs(outer(x, at, `-`)) <= radius
+	values_in_radius <- apply(in_radius, 2, function(x) values[x])
+	apply(values_in_radius, 2, min, na.rm = TRUE)
+}
+
 # For each element of `at`, returns the maximum element of `values` whose
 # corresponding element of `x` is within `radius` of the `at` element.
 max_nearby <- function(x, values, at, radius) {
 	in_radius <- abs(outer(x, at, `-`)) <= radius
 	values_in_radius <- apply(in_radius, 2, function(x) values[x])
 	apply(values_in_radius, 2, max, na.rm = TRUE)
+}
+
+# Returns which of a1 and a2 is closer to x in absolute value.
+closer <- function(x, a1, a2) {
+	ifelse(abs(x - a1) < abs(x - a2), a1, a2)
 }
 
 # Draw a vertical line from ymin to ymax at x, and draw a label next to the line.
@@ -81,10 +95,10 @@ text_annotation <- function(data) {
 			label.r = unit(0, "lines"),
 			label.padding = unit(0.05, "lines"),
 			family = FONT_FAMILY,
-			size = 2.5,
+			size = 2.0,
 			hjust = 1,
 			nudge_x = -2,
-			vjust = 1,
+			vjust = ifelse(data$ymin <= data$ymax, 1, 0),
 			lineheight = 0.8
 		)
 	)
@@ -134,8 +148,10 @@ p <- ggplot() +
 	# Event annotations.
 	text_annotation(EVENTS %>% mutate(
 		x = date,
-		# Place the bottom of the indicator line 1% of the data range above the maximum nearby value.
-		ymin = max_nearby(bridge_transport$date, bridge_transport$users, date, 2) + max_users * 0.01,
+		# Place the bottom of the indicator line 1% of the data range above or below nearby values.
+		ymin = closer(y,
+			max_nearby(bridge_transport$date, bridge_transport$users, date, 2) + max_users * 0.01,
+			min_nearby(bridge_transport$date, bridge_transport$users, date, 2) - max_users * 0.01),
 		ymax = y,
 		label = label
 	)) +

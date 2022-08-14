@@ -462,6 +462,7 @@ But we can anticipate possible reactions
 % |2021-12-14|||snowflake|Release of Tor Browser 11.5a1, with an altered DTLS fingerprint in Snowflake to counteract blocking in Russia.|[blog post](https://blog.torproject.org/new-release-tor-browser-115a1/) [issue](https://bugs.torproject.org/tpo/applications/tor-browser-build/40393) [NTC post](https://ntc.party/t/ooni-reports-of-tor-blocking-in-certain-isps-since-2021-12-01/1477/59)||
 % |2022-01-25 17:41:00|||snowflake|Switched the snowflake bridge to a temporary load-balanced staging server. Debugged connection problems until 2022-01-25 18:47:00.|[issue](https://bugs.torproject.org/tpo/tpa/team/40598#note_2772287) [comment](https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40095#note_2772325) [post](https://forum.torproject.net/t/tor-relays-how-to-reduce-tor-cpu-load-on-a-single-bridge/1483/16) [comment](https://github.com/net4people/bbs/issues/103#issuecomment-1033067920)||
 % |2022-03-16 16:51:35|||snowflake|Moved Snowflake traffic to the interim bridge running instances flakey1–flakey8.|[comment](https://bugs.torproject.org/tpo/tpa/team/40664#note_2787624)||
+% |2022-07-14|||bridge|Release of Tor Browser 11.5, with a new feature of automatic censorship circumvention configuration.|[blog post](https://blog.torproject.org/new-release-tor-browser-115/)||
 
 The deployment of Snowflake to end users was gradual,
 reflecting its development.
@@ -672,6 +673,8 @@ As of May 2022, about 65\% of Snowflake users come from Russia.
 % 0.6727047146401985
 % >>> 16720 / 26264 # bridge-ips=ru / bridge-ip-transports=snowflake
 % 0.7137978142076503
+
+% TODO 2022-07-14 Tor Browser 11.5 automatic circumvention configuration https://blog.torproject.org/new-release-tor-browser-115/
 
 % ANON
 % The Tor Metrics Timeline~\cite{tor-metrics-timeline}
