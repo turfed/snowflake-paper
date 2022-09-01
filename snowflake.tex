@@ -449,7 +449,7 @@ to include only those that do. We worked with the maintainers of
 the pion stun library\footnote{https://github.com/pion/stun} to implement the client side logic
 for NAT behaviour discovery, and use this to sort clients into one of two groups.
 If the NAT discovery protocol fails, a client will self-report their NAT
-type as "unknown" to the broker, and the broker assumes these clients to have a symmetric NAT.
+type as ``unknown'' to the broker, and the broker assumes these clients to have a symmetric NAT.
 Most clients work well with the majority of Snowflake proxies, as
 shown in Figure~\ref{fig:clients-by-nat}. However, approximately one quarter of client polls self
 report having a symmetric NAT.
@@ -473,9 +473,9 @@ environment.
 
 We have a number of
 mechanisms in place to avoid too much reliance on single points of failure. If a
-proxy is unable to determine its NAT type, we label it as "unknown" and assign it only to clients without symmetric NATs. If a proxy
+proxy is unable to determine its NAT type, we label it as ``unknown'' and assign it only to clients without symmetric NATs. If a proxy
 was able to previously determine its NAT type and then fails, it will not transition from a known
-NAT type to an "unknown" designation. A proxy that has been categorized as suitable for clients
+NAT type to an ``unknown'' designation. A proxy that has been categorized as suitable for clients
 with symmetric NATs, but then fails to connect to too many clients in a row will update its NAT type
 and only assigned to clients without symmetric NATs until its next successful NAT check.
 
