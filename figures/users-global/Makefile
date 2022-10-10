@@ -69,7 +69,9 @@ BRIDGE_EXTRA_INFOS = \
 	bridge-extra-infos-2022-05.tar.xz \
 	bridge-extra-infos-2022-06.tar.xz \
 	bridge-extra-infos-2022-07.tar.xz \
-	bridge-extra-infos-2022-08.tar.xz
+	bridge-extra-infos-2022-08.tar.xz \
+	bridge-extra-infos-2022-09.tar.xz \
+	bridge-extra-infos-2022-10.tar.xz
 
 users-global.pdf: users-global.r ../common.r userstats-bridge-transport.csv
 	Rscript users-global.r userstats-bridge-transport.csv "$@"

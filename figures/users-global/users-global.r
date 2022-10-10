@@ -12,7 +12,7 @@ source("../common.r")
 
 DATE_LIMITS <- lubridate::ymd(c(
 	"2020-12-31",
-	"2022-08-10"
+	"2022-10-15"
 ))
 
 LINE_SIZE <- 0.2
@@ -21,7 +21,7 @@ GAPS <- tribble(
 	~begin, ~end, ~y,
 	# https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40033#note_2735468
 	# https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/merge_requests/43#note_2740276
-	"2021-05-12 14:13:56", "2021-06-21 14:22:24", 2200
+	"2021-05-12 14:13:56", "2021-06-21 14:22:24", 8800
 ) %>% mutate(
 	begin = lubridate::ymd_hms(begin) %>% lubridate::as_date(),
 	end = lubridate::ymd_hms(end) %>% lubridate::as_date()
@@ -36,17 +36,19 @@ EVENTS <- tribble(
 	# "2019-10-01 00:00:00",  1000, "Tor Browser 9.0a7\nSnowflake for Windows",    # https://blog.torproject.org/new-release-tor-browser-90a7
 	# "2020-05-22 19:51:29",  1000, "Tor Browser 9.5a13\nadds Turbo Tunnel",       # https://blog.torproject.org/new-release-tor-browser-95a13
 	# "2020-06-02 18:09:48",  1000, "Tor Browser 10.0a1\nSnowflake for Android",   # https://blog.torproject.org/new-release-tor-browser-100a1
-	"2021-07-06 16:56:37",  5200, "Tor Browser 10.5 (stable)\nincludes Snowflake", # https://blog.torproject.org/new-release-tor-browser-105
-	"2021-12-01 00:00:00",  7200, "Onset of Tor blocking in Russia",               # https://bugs.torproject.org/tpo/community/support/40050
-	"2021-12-14 00:00:00",  8200, "",                                              # https://blog.torproject.org/new-release-tor-browser-115a1/
-	"2021-12-20 00:00:00", 10500, "Tor Browser 11.5a1 and 11.0.3\nalter DTLS fingerprint", # https://blog.torproject.org/new-release-tor-browser-1103/
-	"2022-01-25 17:41:00", 12500, "Load balancing of bridge",                      # https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40095#note_2772325
+	"2021-07-06 16:56:37", 21000, "Tor Browser 10.5\nincludes Snowflake",          # https://blog.torproject.org/new-release-tor-browser-105
+	"2021-12-01 00:00:00", 28800, "Onset of Tor blocking in Russia",               # https://bugs.torproject.org/tpo/community/support/40050
+	"2021-12-14 00:00:00", 32800, "",                                              # https://blog.torproject.org/new-release-tor-browser-115a1/
+	"2021-12-20 00:00:00", 42000, "Tor Browser 11.5a1 and 11.0.3\nalter DTLS fingerprint", # https://blog.torproject.org/new-release-tor-browser-1103/
+	"2022-01-25 17:41:00", 50000, "Load balancing of bridge",                      # https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40095#note_2772325
 	# "2022-01-31 18:20:00", 12000, "Back to production bridge, now load-balanced",# https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40095#note_2773704
-	"2022-02-24 00:00:00", 19500, "Russian invasion of Ukraine",
-	"2022-03-16 16:51:35", 21000, "Bridge hardware upgrade",                       # https://bugs.torproject.org/tpo/tpa/team/40664#note_2787624
-	# "2022-03-18 03:21:45", 22000, "Fixed problem with onion keys"                # https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40110#note_2788622
-	# "2022-04-11 15:49:30", 22000, "Bridge server migration"                      # https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40111#note_2794860
-	"2022-07-14 00:00:00",  3000, "Tor Browser 11.5\nautomatic configuration"      # https://blog.torproject.org/new-release-tor-browser-115/
+	"2022-02-24 00:00:00", 60000, "Russian invasion of Ukraine",
+	"2022-03-16 16:51:35", 67000, "Bridge hardware upgrade",                       # https://bugs.torproject.org/tpo/tpa/team/40664#note_2787624
+	# "2022-03-18 03:21:45", 22000, "Fixed problem with onion keys",               # https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40110#note_2788622
+	# "2022-04-11 15:49:30", 22000, "Bridge server migration",                     # https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40111#note_2794860
+	"2022-07-14 00:00:00", 80000, "Tor Browser 11.5\nautomatic configuration",     # https://blog.torproject.org/new-release-tor-browser-115/
+	"2022-09-20 00:00:00", 90000, "Protests in Iran",                              # https://lists.torproject.org/pipermail/anti-censorship-team/2022-September/000247.html
+	"2022-10-04 17:15:00",115000, "Unexplained\ndisruption"                        # https://github.com/net4people/bbs/issues/131
 ) %>% mutate(date = lubridate::ymd_hms(date) %>% lubridate::as_date())
 
 missing_dates_fill_na <- function(tb) {
@@ -142,7 +144,7 @@ p <- ggplot() +
 			max_nearby(bridge_transport$date, bridge_transport$users, end, 2)
 		) + max_users * 0.02,
 		ymax = y,
-		label = "Data collection error"
+		label = "Data error"
 	)) +
 
 	# Event annotations.
@@ -160,8 +162,8 @@ p <- ggplot() +
 	geom_line(data = bridge_transport, aes(x = date, y = users), size = LINE_SIZE) +
 
 	scale_y_continuous(
-		limits = c(0, 21500),
-		breaks = 2000*0:(max_users %/% 2000 + 1),
+		limits = c(0, 121500),
+		breaks = 10000*0:(max_users %/% 10000 + 1),
 		minor_breaks = NULL,
 		labels = scales::comma
 	) +
