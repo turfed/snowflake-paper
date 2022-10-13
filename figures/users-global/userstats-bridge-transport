@@ -21,7 +21,6 @@ import stem.descriptor.reader
 import stem.descriptor.networkstatus
 import stem.descriptor.extrainfo_descriptor
 
-import numpy as np
 import pandas as pd
 
 def usage(f = sys.stdout):
