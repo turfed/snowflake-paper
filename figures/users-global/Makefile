@@ -73,10 +73,12 @@ BRIDGE_EXTRA_INFOS = \
 	bridge-extra-infos-2022-09.tar.xz \
 	bridge-extra-infos-2022-10.tar.xz
 
-users-global.pdf: users-global.r ../common.r userstats-bridge-transport.csv
-	Rscript users-global.r userstats-bridge-transport.csv "$@"
+users-global.pdf: .EXTRA_PREREQS = users-global.r ../common.r
+users-global.pdf: userstats-bridge-transport.csv
+	Rscript users-global.r $^ "$@"
 
-userstats-bridge-transport.csv: userstats-bridge-transport $(BRIDGE_EXTRA_INFOS)
-	$(PYTHON) userstats-bridge-transport $(BRIDGE_EXTRA_INFOS) > "$@"
+userstats-bridge-transport.csv: .EXTRA_PREREQS = userstats-bridge-transport
+userstats-bridge-transport.csv: $(BRIDGE_EXTRA_INFOS)
+	$(PYTHON) userstats-bridge-transport $^ > "$@"
 
 .DELETE_ON_ERROR:
