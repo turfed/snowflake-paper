@@ -72,6 +72,7 @@ BRIDGE_EXTRA_INFOS = \
 	bridge-extra-infos-2022-08.tar.xz \
 	bridge-extra-infos-2022-09.tar.xz \
 	bridge-extra-infos-2022-10.tar.xz
+.SECONDARY: $(BRIDGE_EXTRA_INFOS)
 
 users-global.pdf: .EXTRA_PREREQS = users-global.r ../common.r
 users-global.pdf: userstats-bridge-transport.csv
