@@ -12,7 +12,7 @@ source("../common.r")
 
 DATE_LIMITS <- lubridate::ymd(c(
 	"2020-12-31",
-	"2022-10-15"
+	"2022-12-01"
 ))
 
 LINE_SIZE <- 0.2
@@ -48,7 +48,9 @@ EVENTS <- tribble(
 	# "2022-04-11 15:49:30", 22000, "Bridge server migration",                     # https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40111#note_2794860
 	"2022-07-14 00:00:00", 80000, "Tor Browser 11.5\nautomatic configuration",     # https://blog.torproject.org/new-release-tor-browser-115/
 	"2022-09-20 00:00:00", 90000, "Protests in Iran",                              # https://lists.torproject.org/pipermail/anti-censorship-team/2022-September/000247.html
-	"2022-10-04 17:15:00",115000, "Unexplained\ndisruption"                        # https://github.com/net4people/bbs/issues/131
+	"2022-10-04 17:15:00",110000, "TLS fingerprint blocking in Iran",              # https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40207#note_2849437
+	"2022-10-27 00:00:00",117500, "Tor Browser 11.5.6 fixes TLS fingerprint",      # https://blog.torproject.org/new-release-tor-browser-1156/
+	# "2022-11-01 00:00:00",130000, "Orbot 16.6.3-RC-1-tor.0.4.7.10 fixes TLS fingerprint"               # https://github.com/guardianproject/orbot/releases/tag/16.6.3-RC-1-tor.0.4.7.10
 ) %>% mutate(date = lubridate::ymd_hms(date) %>% lubridate::as_date())
 
 missing_dates_fill_na <- function(tb) {
@@ -162,8 +164,8 @@ p <- ggplot() +
 	geom_line(data = bridge_transport, aes(x = date, y = users), size = LINE_SIZE) +
 
 	scale_y_continuous(
-		limits = c(0, 121500),
-		breaks = 10000*0:(max_users %/% 10000 + 1),
+		limits = c(0, 123000),
+		breaks = 10000*0:ceiling(123000 / 10000),
 		minor_breaks = NULL,
 		labels = scales::comma
 	) +
