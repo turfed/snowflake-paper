@@ -41,7 +41,6 @@
 
 \title{Snowflake, a peer-to-peer censorship circumvention system}
 
-% ANON
 \author{}
 
 \maketitle
@@ -793,9 +792,8 @@ As of May 2022, about 65\% of Snowflake users come from Russia.
 
 \todo{2022-07-14 Tor Browser 11.5 \href{https://blog.torproject.org/new-release-tor-browser-115/}{automatic circumvention configuration}.}
 
-% ANON
-% The Tor Metrics Timeline~\cite{tor-metrics-timeline}
-% has a detailed list of events over the course of Snowflake deployment.
+The Tor Metrics Timeline~\cite{tor-metrics-timeline}
+has a detailed list of events over the course of Snowflake deployment.
 
 % david
 $X$ TB of user data transferred\todo{Compute this, make it reproducible.}
@@ -975,28 +973,35 @@ To protect the proxy against a compromised broker that lead to send unsolicited 
 
 Multiplexing?
 
-% ANON
-% \section*{Availability}
-%
-% \url{https://snowflake.torproject.org/}
+\section*{Availability}
 
-% ANON
-% \section*{Acknowledgements}
-%
-% Griffin Boyce
-% Chris Ball
-% Tor Project
-% Sukhbir Singh
-% Ivan Markin (AMP cache)
-% Pion (who at Pion?)
-% ValdikSS (fingerprinting research during Russia blocking)
-% Vern Paxson, CDT, OTF, anyone else Serene was involved with?
-% Greenhost (eclips.is)
-% Arthur Edelstein
-% Linus Nordberg
-% Mullvad (donated bridge hardware)
-% volunteers running snowflake proxies
-% anonymous donors
+The project web site,
+\url{https://snowflake.torproject.org/},
+has links to source code
+and instructions for installing the proxy browser extensions.
+
+\section*{Acknowledgements}
+
+The Snowflake project has been made possible
+by the cooperation and support of many people
+and organizations.
+We want to thank particularly:
+Chris Ball, % Earliest work on extracting a WebRTC library: https://bugs.torproject.org/legacy/trac/5578#note_2111217
+Griffin Boyce, % Cupcake
+Arthur Edelstein, % Helped set up crowdfunding in 2022 (even though we later decided not to go that route): https://forum.torproject.net/t/tor-project-more-resources-required-for-snowflake-bridge/2353/4
+Ivan Markin, % First AMP cache implementation: https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/25985 (username twim)
+Linus Nordberg, % Bridge operator; helped coordinate donations and infrastructure
+Vern Paxson,\todo{Anyone else Serene worked with?} % Supervisor of Serene's fellowship at ICSI: https://www.opentech.fund/about/people/serene-han/
+Sukhbir Singh, % Helped with Windows reproducible build in 2018: https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/25483#note_2591991
+ValdikSS, % Fingerprinting research during Russia blocking: https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40014#note_2765074
+\todo{China Digital Times?}
+Greenhost, % Early hosting of bridge and continued hosting of broker
+Mullvad, % Donation of hardware for snowflake-01 bridge
+the Open Technology Fund, % Serene's ICFP fellowship, rapid response bridge funding April–September 2022
+Pion,\todo{Anyone in particular at Pion?}
+the Tor Project,
+financial donors,
+and volunteers everywhere who run Snowflake proxies.
 
 \bibliographystyle{plainurl}
 \bibliography{snowflake}
