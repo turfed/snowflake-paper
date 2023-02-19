@@ -177,4 +177,4 @@ p <- ggplot() +
 	coord_cartesian(xlim = DATE_LIMITS, expand = FALSE) +
 	COMMON_THEME +
 	labs(x = NULL, y = "Average simultaneous users")
-ggsave(output_path, p, width = DOCUMENT_LINEWIDTH, height = 2)
+ggsave(output_path, p, width = DOCUMENT_TEXTWIDTH, height = 2)
