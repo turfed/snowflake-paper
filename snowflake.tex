@@ -636,39 +636,46 @@ had also been a problem in flash proxy~\cite[\S 5.2]{Fifield2012a}.)
 Probably because of this, by early 2020,
 the number of simultaneous users of Snowflake
 had not risen above~40.
-% > library(tidyverse)
-% > userstats <- read_csv("figures/users-global/userstats-bridge-transport.csv") %>% filter(transport == "snowflake")
+% > library("tidyverse")
+% > WANTED_FINGERPRINTS <- c(
+%     "5481936581E23D2D178105D44DB6915AB06BFB7F" = "snowflake-01",
+%     "91DA221A149007D0FD9E5515F5786C3DD07E4BB0" = "snowflake-02"
+%   )
+% > userstats <- read_csv("figures/users-global/userstats-bridge-transport-multi.csv") %>%
+%     filter(transport == "snowflake" & fingerprint %in% names(WANTED_FINGERPRINTS)) %>%
+%     mutate(users = users * frac / 100, frac = NULL) %>%
+%     group_by(date, transport) %>% summarize(users = sum(users, na.rm = TRUE), .groups = "drop")
 %
 % Ignoring two apparently anomalous spikes before 2021.
 % One on 2020-05-21 and 2020-05-22 (the day of the Turbo Tunnel release):
 % > filter(userstats, "2020-05-19" <= date & date <= "2020-05-24")
-% # A tibble: 6 x 4
-%   date       transport  users  frac
-%   <date>     <chr>      <dbl> <dbl>
-% 1 2020-05-19 snowflake   9.16   100
-% 2 2020-05-20 snowflake  13.6    100
-% 3 2020-05-21 snowflake 134.     100
-% 4 2020-05-22 snowflake 388.     100
-% 5 2020-05-23 snowflake   7.9    100
-% 6 2020-05-24 snowflake  13.9    100
+% # A tibble: 6 x 3
+%   date       transport  users
+%   <date>     <chr>      <dbl>
+% 1 2020-05-19 snowflake   9.16
+% 2 2020-05-20 snowflake  13.6
+% 3 2020-05-21 snowflake 134.
+% 4 2020-05-22 snowflake 388.
+% 5 2020-05-23 snowflake   7.9
+% 6 2020-05-24 snowflake  13.9
 % One on 2020-06-25 and 2020-06-26 (not sure what this one is about):
 % > filter(userstats, "2020-06-23" <= date & date <= "2020-06-28")
-% # A tibble: 6 x 4
-%   date       transport users  frac
-%   <date>     <chr>     <dbl> <dbl>
-% 1 2020-06-23 snowflake  17.0   100
-% 2 2020-06-24 snowflake  20.2   100
-% 3 2020-06-25 snowflake  71.7   100
-% 4 2020-06-26 snowflake 211.    100
-% 5 2020-06-27 snowflake  22.5   100
-% 6 2020-06-28 snowflake  33.7   100
+% # A tibble: 6 x 3
+%   date       transport users
+%   <date>     <chr>     <dbl>
+% 1 2020-06-23 snowflake  17.0
+% 2 2020-06-24 snowflake  20.2
+% 3 2020-06-25 snowflake  71.7
+% 4 2020-06-26 snowflake 211.
+% 5 2020-06-27 snowflake  22.5
+% 6 2020-06-28 snowflake  33.7
 %
-% > filtered <- filter(userstats, !(date %in% c("2020-05-21", "2020-05-22", "2020-06-25", "2020-06-26")))
+% > filtered <- filter(userstats, !(date %in% as.Date(c("2020-05-21", "2020-05-22", "2020-06-25", "2020-06-26"))))
 % > filtered[which.max(filter(filtered, date < "2020-05-21")$users), ]
-% # A tibble: 1 x 4
-%   date       transport users  frac
-%   <date>     <chr>     <dbl> <dbl>
-% 1 2020-04-01 snowflake  34.0   100
+% # A tibble: 1 x 3
+%   date       transport users
+%   <date>     <chr>     <dbl>
+% 1 2020-04-01 snowflake  34.0
 The Turbo Tunnel session persistence feature
 described in \autoref{sec:data-transfer}
 became available to users in Tor Browser 9.5a13
@@ -695,10 +702,10 @@ and it had the Turbo Tunnel session persistence feature.
 The maximum value in the part of the graph not shown
 is 133, on \mbox{2020-12-09}.
 % > filtered[which.max(filter(filtered, date < "2021-01-01")$users), ]
-% # A tibble: 1 x 4
-%   date       transport users  frac
-%   <date>     <chr>     <dbl> <dbl>
-% 1 2020-12-09 snowflake  133.   100
+% # A tibble: 1 x 3
+%   date       transport users
+%   <date>     <chr>     <dbl>
+% 1 2020-12-09 snowflake  133.
 \todo[inline]{Bandwidth chart? Ideally with aligned horizontal axis.}
 }
 \label{fig:user-counts}

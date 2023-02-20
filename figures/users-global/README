@@ -1,0 +1,5 @@
+Graph of Snowflake users globally.
+
+Requires, as input, the file userstats-bridge-transport-multi.csv,
+which is produced by the scripts in this external repository:
+https://gitlab.torproject.org/dcf/snowflake-graphs

@@ -1,10 +1,8 @@
-# Makes a graph showing the estimated number of simultaneous Snowflake users.
+# Makes a graph showing the estimated number of simultaneous Snowflake users
+# worldwide.
 #
 # Usage:
-#   Rscript users-global.r userstats-bridge-transport.csv users-global.pdf
-#
-# userstats-bridge-transport.csv comes from the program
-# userstats-bridge-transport.
+#   Rscript users-global.r userstats-bridge-transport-multi.csv users-global.pdf
 
 library("tidyverse")
 
@@ -12,8 +10,13 @@ source("../common.r")
 
 DATE_LIMITS <- lubridate::ymd(c(
 	"2020-12-31",
-	"2022-12-01"
+	"2023-02-14"
 ))
+
+WANTED_FINGERPRINTS <- c(
+	"5481936581E23D2D178105D44DB6915AB06BFB7F" = "snowflake-01",
+	"91DA221A149007D0FD9E5515F5786C3DD07E4BB0" = "snowflake-02"
+)
 
 LINE_SIZE <- 0.2
 
@@ -36,33 +39,34 @@ EVENTS <- tribble(
 	# "2019-10-01 00:00:00",  1000, "Tor Browser 9.0a7\nSnowflake for Windows",    # https://blog.torproject.org/new-release-tor-browser-90a7
 	# "2020-05-22 19:51:29",  1000, "Tor Browser 9.5a13\nadds Turbo Tunnel",       # https://blog.torproject.org/new-release-tor-browser-95a13
 	# "2020-06-02 18:09:48",  1000, "Tor Browser 10.0a1\nSnowflake for Android",   # https://blog.torproject.org/new-release-tor-browser-100a1
-	"2021-07-06 16:56:37", 21000, "Tor Browser 10.5\nincludes Snowflake",          # https://blog.torproject.org/new-release-tor-browser-105
-	"2021-12-01 00:00:00", 28800, "Onset of Tor blocking in Russia",               # https://bugs.torproject.org/tpo/community/support/40050
-	"2021-12-14 00:00:00", 32800, "",                                              # https://blog.torproject.org/new-release-tor-browser-115a1/
+	"2021-07-06 16:56:37", 25000, "Tor Browser 10.5\nincludes Snowflake",          # https://blog.torproject.org/new-release-tor-browser-105
+	"2021-12-01 00:00:00", 25000, "Onset of Tor blocking in Russia",               # https://bugs.torproject.org/tpo/community/support/40050
+	"2021-12-14 00:00:00", 28000, "",                                              # https://blog.torproject.org/new-release-tor-browser-115a1/
 	"2021-12-20 00:00:00", 42000, "Tor Browser 11.5a1 and 11.0.3\nalter DTLS fingerprint", # https://blog.torproject.org/new-release-tor-browser-1103/
-	"2022-01-25 17:41:00", 50000, "Load balancing of bridge",                      # https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40095#note_2772325
+	"2022-01-25 17:41:00", 54000, "Load balancing of bridge",                      # https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40095#note_2772325
 	# "2022-01-31 18:20:00", 12000, "Back to production bridge, now load-balanced",# https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40095#note_2773704
-	"2022-02-24 00:00:00", 60000, "Russian invasion of Ukraine",
-	"2022-03-16 16:51:35", 67000, "Bridge hardware upgrade",                       # https://bugs.torproject.org/tpo/tpa/team/40664#note_2787624
+	"2022-02-24 00:00:00", 64000, "Russian invasion of Ukraine",
+	"2022-03-16 16:51:35", 74000, "Bridge hardware upgrade",                       # https://bugs.torproject.org/tpo/tpa/team/40664#note_2787624
 	# "2022-03-18 03:21:45", 22000, "Fixed problem with onion keys",               # https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40110#note_2788622
 	# "2022-04-11 15:49:30", 22000, "Bridge server migration",                     # https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40111#note_2794860
-	"2022-07-14 00:00:00", 80000, "Tor Browser 11.5\nautomatic configuration",     # https://blog.torproject.org/new-release-tor-browser-115/
-	"2022-09-20 00:00:00", 90000, "Protests in Iran",                              # https://lists.torproject.org/pipermail/anti-censorship-team/2022-September/000247.html
-	"2022-10-04 17:15:00",110000, "TLS fingerprint blocking in Iran",              # https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40207#note_2849437
-	"2022-10-27 00:00:00",117500, "Tor Browser 11.5.6 fixes TLS fingerprint",      # https://blog.torproject.org/new-release-tor-browser-1156/
-	# "2022-11-01 00:00:00",130000, "Orbot 16.6.3-RC-1-tor.0.4.7.10 fixes TLS fingerprint"               # https://github.com/guardianproject/orbot/releases/tag/16.6.3-RC-1-tor.0.4.7.10
+	"2022-07-14 00:00:00", 40000, "Tor Browser 11.5\nautomatic configuration",     # https://blog.torproject.org/new-release-tor-browser-115/
+	"2022-09-20 00:00:00",100000, "Protests in Iran",                              # https://lists.torproject.org/pipermail/anti-censorship-team/2022-September/000247.html
+	"2022-10-04 17:15:00",112000, "TLS fingerprint blocking in Iran",              # https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40207#note_2849437
+	"2022-10-27 00:00:00",114000, "",                                              # https://blog.torproject.org/new-release-tor-browser-1156/
+	"2022-11-01 00:00:00",128000, "Tor Browser 11.5.6 and Orbot 16.6.3\nfix TLS fingerprint", # https://github.com/guardianproject/orbot/releases/tag/16.6.3-RC-1-tor.0.4.7.10
+	"2022-12-07 00:00:00",138000, "Tor Browser 12.0 adds a second Snowflake bridge", # https://blog.torproject.org/new-release-tor-browser-120/
+	"2023-01-16 00:00:00", 33000, "",                                              # https://bugs.torproject.org/tpo/anti-censorship/team/115
+	"2023-01-24 00:00:00",  8000, "Domain fronting\nrendezvous\ntemporarily\nblocked in Iran", # https://bugs.torproject.org/tpo/anti-censorship/team/115
+	# "2023-01-31 00:00:00", 33000, "",                                            # https://bugs.torproject.org/tpo/anti-censorship/team/115#note_2876012
+	# "2023-02-02 00:00:00",  8000, "Domain fronting rendezvous again blocked in Iran", # https://bugs.torproject.org/tpo/anti-censorship/team/115#note_2876012
+	# "2023-02-10 00:00:00", 33000, "",                                            # https://explorer.ooni.org/chart/mat?probe_cc=IR&since=2023-01-20&until=2023-02-20&time_grain=day&axis_x=measurement_start_day&test_name=web_connectivity&domain=cdn.sstatic.net
+	# "2023-02-14 00:00:00",  8000, "Domain fronting rendezvous again blocked in Iran", # https://explorer.ooni.org/chart/mat?probe_cc=IR&since=2023-01-20&until=2023-02-20&time_grain=day&axis_x=measurement_start_day&test_name=web_connectivity&domain=cdn.sstatic.net
+	# "2023-02-19 00:00:00",  8000, "Domain fronting rendezvous again blocked in Iran", # https://explorer.ooni.org/chart/mat?probe_cc=IR&since=2023-01-20&until=2023-02-20&time_grain=day&axis_x=measurement_start_day&test_name=web_connectivity&domain=cdn.sstatic.net
 ) %>% mutate(date = lubridate::ymd_hms(date) %>% lubridate::as_date())
 
-missing_dates_fill_na <- function(tb) {
-	right_join(tb, tibble(date = seq.Date(min(tb$date), max(tb$date), "days")), by = c("date"))
-}
-
-# Return a one-letter abbreviation for the month, followed by a year for
-# January only.
+# Return an abbreviation for the month, followed by a year for January only.
 date_labels <- function(breaks) {
-	mon <- substr(strftime(breaks, "%b"), 1, 1)
-	year <- strftime(breaks, "%Y")
-	ifelse(!is.na(breaks) & lubridate::month(breaks) == 1, paste(mon, year, sep = "\n"), mon)
+	strftime(breaks, ifelse(!is.na(breaks) & lubridate::month(breaks) == 1, "%b\n%Y", "%b"))
 }
 
 # For each element of `at`, returns the minimum element of `values` whose
@@ -113,14 +117,27 @@ text_annotation <- function(data) {
 	if (length(args) != 2) {
 		stop("usage: Rscript users-global.r userstats-bridge-transport.csv users-global.pdf")
 	}
-	bridge_transport_csv_path <<- args[[1]]
+	bridge_transport_multi_csv_path <<- args[[1]]
 	output_path <<- args[[2]]
 })()
 
-bridge_transport <- read_csv(bridge_transport_csv_path, comment = "#") %>%
-	filter(transport == "snowflake") %>%
-	missing_dates_fill_na %>%
+bridge_transport_multi <- read_csv(bridge_transport_multi_csv_path, comment = "#") %>%
+	# Keep only the transports and bridges we care about.
+	filter(transport == "snowflake" & fingerprint %in% names(WANTED_FINGERPRINTS)) %>%
+
+	# Adjust users by frac, and forget frac. This is just for completeness,
+	# as we expect the input files to have frac == 100 everywhere.
 	mutate(users = users * frac / 100, frac = NULL)
+
+bridge_transport <- bridge_transport_multi %>%
+	# Sum the contributions of all bridge fingerprints by day.
+	group_by(date, transport) %>%
+	summarize(users = sum(users, na.rm = TRUE), .groups = "drop") %>%
+
+	# Fill in entirely missing dates with NA.
+	group_by(transport) %>%
+	complete(date = seq.Date(min(date), max(date), "days")) %>%
+	ungroup()
 
 max_users <- max(bridge_transport$users, na.rm = TRUE)
 
@@ -164,8 +181,8 @@ p <- ggplot() +
 	geom_line(data = bridge_transport, aes(x = date, y = users), size = LINE_SIZE) +
 
 	scale_y_continuous(
-		limits = c(0, 123000),
-		breaks = 10000*0:ceiling(123000 / 10000),
+		limits = c(0, 144000),
+		breaks = 20000*0:ceiling(144000 / 20000),
 		minor_breaks = NULL,
 		labels = scales::comma
 	) +
