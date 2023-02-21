@@ -46,14 +46,32 @@
 \maketitle
 
 \begin{abstract}
-\begin{itemize}
-\item temporary proxies using WebRTC
-\item central matching of proxies and clients
-\item JavaScript browser add-on, or command-line proxies
-\item deployed in Tor Browser
-\item history of deployment and blocking attempts
-\item observations for circumvention
-\end{itemize}
+Snowflake is a system for circumventing Internet censorship.
+It~derives its blocking resistance from
+the use of numerous, ultra-light, temporary proxies (``snowflakes''),
+which accept traffic from censored clients using peer-to-peer WebRTC protocols
+and forward it to a centralized bridge,
+which does the real work of directing traffic to its destination.
+The temporary proxies are lightweight enough to be implemented in JavaScript,
+in a web page or browser extension,
+making them vastly cheaper to set up than
+a traditional proxy or VPN server.
+The proxies are not assumed to have stable network addresses
+or be online all the time,
+and even the blocking of currently in-use proxy
+is not fatal to a circumvention session,
+as the system permits clients to switch proxies on the fly.
+
+% Need anything about broker, centralization here?
+
+Snowflake has been deployed with success
+in Tor Browser and Orbot for several years.
+It has been significant for circumvention
+during high-profile network disruptions,
+including in Russia in~2021 and Iran in~2022.
+In this paper, we explain the composition of Snowflake's many parts,
+give a history of deployment and attempts to block~it,
+and reflect on implications for circumvention generally.
 \end{abstract}
 
 % General references:
