@@ -140,6 +140,7 @@ with Snowflake, we are exploring a different point in the design space
 strengths and weaknesses, tradeoffs
 
 \section{How it works}
+\label{sec:mechanics}
 
 \begin{figure*}
 \framebox[\textwidth]{\vbox to 2in{\vfil\centering TODO\vfil}}
@@ -209,6 +210,7 @@ that persists beyond the lifetime of any single proxy.
 The client sends another rendezvous message to the broker,
 is assigned another proxy,
 and picks up where it left off.
+\todo{Cite ``Untrusted messenger delivery'' here or in \autoref{sec:data-transfer}.}
 More information about the data transfer phase is in \autoref{sec:data-transfer}.
 
 Never does the client communicate with the broker or bridge directly.
