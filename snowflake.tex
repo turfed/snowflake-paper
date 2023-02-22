@@ -81,24 +81,48 @@ and reflect on implications for circumvention generally.
 \section{Introduction}
 \label{sec:intro}
 
-Put Snowflake in context
+Censorship circumvention systems
+may be characterized on multiple axes.
+There are those that seek to avoid blocking
+by imitating some common, high-value protocol;
+and those that randomize their protocols
+in order not to look like any other protocol in particular.
+Some concentrate their traffic into one, or a few,
+well-known proxies, somehow entangled with other traffic
+such that a censor cannot easily block them;
+and others that spread their traffic out over
+hundreds or thousands of proxies,
+none of which is individually difficult to block,
+but which are difficult for a censor to discover and block in their entirety.
+What all circumvention systems have in common
+is that they strive to increase the \emph{cost}
+to the censor of blocking them---whether that be
+in the form of research and development,
+human resources, and hardware,
+or in the inevitable overblocking that results
+when a censor tries to block circumvention traffic
+that is difficult to distinguish from other traffic
+the censor values highly.
+On the spectrum of mimickry to randomization,
+Snowflake falls more on the mimickry side;
+on the scale of concentrated to diffuse,
+it is diffuse.
+In fact, if Snowflake has a single distinguishing characteristic,
+it is that it pushes the idea of distributed, disposable
+proxies further than has been done before,
+by making proxies extremely cheap to run,
+in web browsers, using WebRTC to communicate.
 
-Spectrum of looks-like-nothing to looks-like-something
+WebRTC is\ldots\ 
+interacting suite of multiple protocols\ldots\ 
+example applications\ldots\ 
+importantly: built into browsers\ldots\ 
 
-Spectrum of few, valuable proxies with careful distribution to
-many, cheap proxies with less emphasis on secrecy
+As is typical in circumvention research,
+we assume a threat model where\ldots
 
-\section{Background}
-\label{sec:background}
-
-% serene, david
-
-WebRTC
-
-% hooman
-- interacting suite of multiple protocols
-- example applications
-- importantly: built into browsers
+more than just an idea and design
+actual deployment experience, at least half the richness
 
 flash proxy~\cite{Fifield2012a} (\url{https://bugs.torproject.org/legacy/trac/5578})
 % flashproxy.pdf §5.2: "New technologies like WebRTC [24] may fill this need in the future, if they become sufficiently popular that flash proxies' use of them does not stand out as unusual."
@@ -113,6 +137,7 @@ not what we are trying for here
 circumvention works, existing systems are successful,
 it is a common part of many people's everyday access to the Internet
 with Snowflake, we are exploring a different point in the design space
+strengths and weaknesses, tradeoffs
 
 \section{How it works}
 
