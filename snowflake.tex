@@ -616,7 +616,41 @@ Historically overvalued in research (cf. \cite{Tschantz2016a})
 Practicality is paramount; censors are hard to predict
 But we can anticipate possible reactions
 
-\cite{Chen2023a}
+Chen et~al.~\cite{Chen2023a}
+have the good idea of prefiltering by DNS queries:
+the Snowflake client's default selection of STUN servers
+on its own may be unexceptional,
+and its default server used for domain fronting rendezvous
+on its own may be exceptional,
+but DNS queries for all of these within a short time span
+is likely characteristic of Snowflake and little else.
+After DNS prefiltering, they identify Snowflake connections
+by DTLS fingerprinting of the Pion implementation of DTLS
+used in the Snowflake client.
+The authors acknowledge that DTLS fingerprinting
+is fragile, as the DTLS fingerprint is, in principle,
+a~controllable feature.
+But principle and practice are different,
+and in practice,
+the world of circumvention development
+lacks a tool that does for DTLS fingerprints
+what uTLS does for TCP-based~TLS~\cite[\S VII]{Frolov2019a}.
+The present way of altering the Snowflake client's DTLS fingerprint
+is submitting pull requests to the Pion project.
+\todo{Media channel also would not use DTLS.}
+The DNS query prefilter may perhaps be mitigated
+by alternative rendezvous methods (\autoref{sec:rendezvous}),
+or by smarter selection of STUN servers by the client.
+
+\todo{Mention traffic shaping?}
+% The Snowflake protocol supports traffic shaping (inside the WebRTC layer),
+% but it is currently disabled.
+% As \autoref{sec:experience} shows,
+% censors are still going after easier targets.
+% Circumvention research awaits a good treatment of
+% exactly what is a good strategy for traffic shaping to
+% best mitigate attacks of this nature,
+% and an analysis of how well such attacks work outside the laboratory.
 
 \section{Experience}
 \label{sec:experience}
