@@ -113,10 +113,22 @@ proxies further than has been done before,
 by making proxies extremely cheap to run,
 in web browsers, using WebRTC to communicate.
 
-WebRTC is\ldots\ 
-interacting suite of multiple protocols\ldots\ 
-example applications\ldots\ 
-importantly: built into browsers\ldots\ 
+WebRTC is a suite of interacting protocols
+intended to enable real-time communication applications
+in web browsers~\cite{rfc8825}.
+Video and voice chat are familiar and typical examples
+of WebRTC applications.
+Snowflake exchanges WebRTC data formats
+in the course of establishing a connections,
+and uses WebRTC protocols for NAT traversal
+and for data transfer between the client and a temporary proxy.
+Critically for Snowflake, WebRTC protocols
+are exposed by JavaScript APIs in web browsers,
+meaning it is possible to implement a WebRTC-based proxy
+in an ordinary web page or browser extension.
+WebRTC is also usable outside a browser,
+which is how we implement the Snowflake client program
+and alternative, command line--based proxies.
 
 As is typical in circumvention research,
 we assume a threat model where\ldots
