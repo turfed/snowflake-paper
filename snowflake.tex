@@ -166,9 +166,6 @@ of overblocking or underblocking,
 by making circumvention traffic difficult to distinguish
 from traffic that the censor finds valuable.
 
-more than just an idea and design
-actual deployment experience, at least half the richness
-
 flash proxy~\cite{Fifield2012a} (\url{https://bugs.torproject.org/5578})
 used WebSocket, still used in Snowflake on the proxy--bridge link
 % flashproxy.pdf §5.2: "New technologies like WebRTC [24] may fill this need in the future, if they become sufficiently popular that flash proxies' use of them does not stand out as unusual."
@@ -176,6 +173,8 @@ uProxy (\url{https://serene.cx/snowflake/})
 
 Comparison with MassBrowser~\cite{Nasr2020a}
 % https://github.com/net4people/bbs/issues/32
+standalone Buddy software, not in a browser
+option to proxy directly from a Buddy, no then through an additional proxy hop
 Protozoa~\cite{Barradas2020a} is superficially similar, but very different in its essentials.
 It uses WebRTC, but not really, and not in a way that would work with browser proxies.
 More like the ``centralized proxy'' model.
@@ -186,11 +185,13 @@ and discuss if so.}
 
 unfortunate tendency to emphasize the negative aspects of other systems
 paints an unnecessarily dire picture
-not what we are trying for here
+Such is not our object.
 circumvention works, existing systems are successful,
 it is a common part of many people's everyday access to the Internet
 with Snowflake, we are exploring a different point in the design space
 strengths and weaknesses, tradeoffs
+more than just an idea and design
+actual deployment experience, at least half the richness
 
 \section{How it works}
 \label{sec:mechanics}
