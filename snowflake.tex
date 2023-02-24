@@ -131,7 +131,40 @@ which is how we implement the Snowflake client program
 and alternative, command line--based proxies.
 
 As is typical in circumvention research,
-we assume a threat model where\ldots
+we assume a threat model where
+censored \emph{clients} reside in a censor-controlled network.
+The \emph{censor} has the power to inspect and interfere with
+traffic that crosses the border of its network;
+in practice, this power takes the form of things like
+inspection of IP addresses and destination server hostnames,
+dynamic protocol detection,
+IP address blocking, and injection of false DNS responses
+or TCP RST packets.
+The client wants to exchange some information with a
+destination outside the censor's network---often
+with the assistance of third-party \emph{proxies}---and
+the censor is motivated to block either the contents
+of the communication, or the destination itself.
+The censor is aware of the possibility of circumvention,
+and therefore seeks not only to block direct access,
+but also indirect access by way of a proxy or proxy protocol.
+We consider circumvention to be accomplished when a client
+can reliably reach any proxy,
+because the proxy then provides access to any desired destination.
+(In Snowflake, we separate the roles of temporary \emph{proxies}
+and a stable long-term \emph{bridge}, but the idea is the same.)
+Mitigating in the client's favor
+is the fact that the censor is presumed to derive some benefit
+from permitting some forms of network access:
+the censor cannot trivially ``win''
+in this abstract model simply by blocking all connections,
+but must be selective in what to block and allow
+in order to optimize some objective of its own.
+The art of censorship circumvention is
+forcing the censor into a difficult dilemma
+of overblocking or underblocking,
+by making circumvention traffic difficult to distinguish
+from traffic that the censor finds valuable.
 
 more than just an idea and design
 actual deployment experience, at least half the richness
