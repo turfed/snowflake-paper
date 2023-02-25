@@ -166,10 +166,41 @@ of overblocking or underblocking,
 by making circumvention traffic difficult to distinguish
 from traffic that the censor finds valuable.
 
-flash proxy~\cite{Fifield2012a} (\url{https://bugs.torproject.org/5578})
-used WebSocket, still used in Snowflake on the proxy--bridge link
+Snowflake has its origin in two earlier projects:
+flash proxy and uProxy.
+% https://lists.torproject.org/pipermail/tor-dev/2016-January/010310.html "Snowflake is a webrtc pluggable transport inspired by flashproxy."
+% https://keroserene.net/snowflake/technical/#1-introduction "It is inspired by and builds upon the previous work of Flashproxy. Snowflake is much like a hybrid of previous Pluggable Transports..."
+Flash proxy~\cite{Fifield2012a} similarly used a model
+of untrusted, temporary JavaScript proxies running in web browsers;
+however the link between client and proxy was WebSocket
+rather than WebRTC.
+(WebSocket still finds use in Snowflake,
+but only on the proxy--bridge link,
+not the client--proxy link.)
+Flash proxy was deployed to users in Tor Browser
+% 2013: https://blog.torproject.org/combined-flash-proxy-pyobfsproxy-browser-bundles
+% 2016: https://bugs.torproject.org/17428#note_2203210 "Remove Flashproxy from Tor Browser"
+from 2013 to~2016,
+but it never saw much use,
+probably because the reliance on WebSocket,
+which are TCP-based and do not have built-in NAT traversal like WebRTC does,
+and required uses to perform a
+% https://gitlab.torproject.org/legacy/trac/-/wikis/doc/PluggableTransports/FlashProxy/Howto
+cumbersome port forwarding procedure.
+WebRTC was at the time an emerging technology, and while
+% https://bugs.torproject.org/5578 "Investigate WebRTC for flash proxy NAT punching "
 % flashproxy.pdf §5.2: "New technologies like WebRTC [24] may fill this need in the future, if they become sufficiently popular that flash proxies' use of them does not stand out as unusual."
+it was considered as a future transport protocol for flash proxy,
+it was decided to begin Snowflake as an independent project,
+rather than build atop flash proxy.
+\ldots
+% https://serene.cx/snowflake/#note-flashproxy "...one could say that uProxy and flashproxy are the ancestors of snowflake."
 uProxy (\url{https://serene.cx/snowflake/})
+% https://docs.google.com/document/d/1t_30vX7RcrEGuWwcg0Jub-HiNI0Ko3kBOyqXgrQN3Kw/edit#heading=h.xapcidyka1bk
+% (from https://github.com/UWNetworksLab/uProxy-p2p/tree/4edae62ec1110ea2b0b795fb68b95d3f5d233244#status)
+privileged proxies, obfuscated WebRTC data channels
+``uProxy depends on leveraging existing trust relationships to to find and use a proxy''
+significant work required in Snowflake, relative to uProxy, for WebRTC outside the browser
 
 Comparison with MassBrowser~\cite{Nasr2020a}
 % https://github.com/net4people/bbs/issues/32
