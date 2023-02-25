@@ -44,6 +44,7 @@
 \author{}
 
 \maketitle
+\todo{Change the title: ``peer-to-peer'' is misleading as proxies are not themselves clients.}
 
 \begin{abstract}
 Snowflake is a system for circumventing Internet censorship.
@@ -75,7 +76,7 @@ and reflect on implications for circumvention generally.
 \end{abstract}
 
 % General references:
-%   https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/wikis/Technical%20Overview
+%   https://keroserene.net/snowflake/technical/#history
 %   https://www.bamsoftware.com/papers/thesis/#chap:snowflake
 
 \section{Introduction}
@@ -202,6 +203,21 @@ privileged proxies, obfuscated WebRTC data channels
 ``uProxy depends on leveraging existing trust relationships to to find and use a proxy''
 significant work required in Snowflake, relative to uProxy, for WebRTC outside the browser
 
+% Aside from flash proxy\index{flash proxy},
+% the most similar existing design was a former version of uProxy\index{uProxy}~\cite{uproxy}
+% (an upcoming revision will work differently).
+% uProxy required clients to know a confederate outside
+% the censor's network who could run a proxy.
+% The client would connect through the proxy
+% using WebRTC\index{WebRTC}; the proxy would then directly fetch
+% the client's requested URLs\index{URL}.
+% Snowflake centralizes the proxy discovery process\index{proxy distribution},
+% removing the requirement to arrange one's own proxy
+% outside the firewall.
+% Snowflake proxies are merely dumb pipes to a more capable proxy,
+% allowing them to carry traffic other than web traffic,
+% and preventing them from spying on the client's traffic.
+
 Comparison with MassBrowser~\cite{Nasr2020a}
 % https://github.com/net4people/bbs/issues/32
 standalone Buddy software, not in a browser
@@ -223,6 +239,9 @@ with Snowflake, we are exploring a different point in the design space
 strengths and weaknesses, tradeoffs
 more than just an idea and design
 actual deployment experience, at least half the richness
+
+\todo{Origin of the name Snowflake?}
+\todo{Deployed since\ldots}
 
 \section{How it works}
 \label{sec:mechanics}
@@ -518,19 +537,18 @@ DTLS
 key exchange
 DTLS fingerprint~\cite[\S 5]{rfc8842}
 
-% cecylia
-Clients and proxies in the Snowflake network each have one of a few possible
-network configurations that can be categorized by two factors:
-
-(1) the mapping behaviour of
-the peer's NAT(s), or network address translation tables, and
-
-(2) the filtering behaviour of the peer's firewalls.
 
 There is no guarantee that any two arbitrary peers will be able to form
 a connection using STUN for connection establishment as some mapping and
-filtering setups are incompatible with each other. Table~\ref{tab:nat-matching} shows
-which NAT variations are compatible with each other.
+filtering setups are incompatible with each other.
+Snowflake clients and proxies all have one of a few possible
+network configurations that can be categorized by two factors:
+(1)~the mapping behaviour of
+the peer's network address translation (NAT) tables; and
+(2)~the filtering behaviour of the peer's firewalls.
+Table~\ref{tab:nat-matching}
+\todo{The table is symmetric; show only half of it. Try to make columns equal width.}
+shows which NAT variations are compatible with each other.
 The implementation details of how NATs map internal IP and port combinations
 to external ports varies significantly, but for our purposes it was sufficient
 to condense these variations together with common firewall filtering behaviour
@@ -580,7 +598,7 @@ limitations of browsers and potential censorship vectors that impact client conn
 For clients, we use functionality built into the STUN protocol~\cite{rfc5780}. Not all deployed STUN
 servers support NAT discovery; we used a simple script to filter our list of public STUN servers
 to include only those that do. We worked with the maintainers of
-the pion stun library\footnote{https://github.com/pion/stun} to implement the client side logic
+the Pion stun library\footnote{https://github.com/pion/stun} to implement the client side logic
 for NAT behaviour discovery, and use this to sort clients into one of two groups.
 If the NAT discovery protocol fails, a client will self-report their NAT
 type as ``unknown'' to the broker, and the broker assumes these clients to have a symmetric NAT.
@@ -1153,6 +1171,7 @@ The project web site,
 \url{https://snowflake.torproject.org/},
 has links to source code
 and instructions for installing the proxy browser extensions.
+\todo{Add Git clone URL or similar for the paper itself.}
 
 \section*{Acknowledgements}
 
