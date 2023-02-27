@@ -4,7 +4,9 @@
 \usepackage{graphicx}
 \usepackage{newtxtext}
 \usepackage{newtxmath}
+\usepackage{pifont} % For checkmarks in tab:nat-matching.
 \usepackage[hyphens]{url}
+\usepackage[table]{xcolor}
 
 \usepackage[textsize=footnotesize]{todonotes}\setlength{\marginparwidth}{1.5cm}
 
@@ -26,11 +28,6 @@
 \pdftrailerid{}
 \pdfsuppressptexinfo=-1
 \fi
-
-% For nice looking check and x marks
-\usepackage{pifont}
-\newcommand{\cmark}{\ding{51}}%
-\newcommand{\xmark}{\ding{55}}%
 
 \hyphenation{Web-RTC}
 \hyphenation{Java-Script}
@@ -547,7 +544,8 @@ network configurations that can be categorized by two factors:
 the peer's network address translation (NAT) tables; and
 (2)~the filtering behaviour of the peer's firewalls.
 Table~\ref{tab:nat-matching}
-\todo{The table is symmetric; show only half of it. Try to make columns equal width.}
+\todo{The table is symmetric; show only half of it.
+Fix centering with \texttt{\textbackslash rlap} slanted labels.}
 shows which NAT variations are compatible with each other.
 The implementation details of how NATs map internal IP and port combinations
 to external ports varies significantly, but for our purposes it was sufficient
@@ -559,35 +557,45 @@ into the following well-known NAT variations:
         and port are mapped to the same external IP and port pair. Any remote
         host can send a packet to an internal host by sending a packet to the
         mapped external IP and port pair.
-    \item[Restricted cone] which acts the same as a full cone NAT
+    \item[Restricted cone] which acts the same as a full-cone NAT
         except incoming connections are filtered if there was not a previous outgoing connection
         to the remote IP address.
-    \item[Port restricted cone] which acts the same as a restricted
-        cone NAT except that incoming connections are filtered if there was not a previous
+    \item[Port-restricted cone] which acts the same as a restricted-cone
+        NAT except that incoming connections are filtered if there was not a previous
         outgoing connection to the remote IP and port pair.
     \item[Symmetric] where connections from an
-        internal IP and port pair are mapped to an external IP and port pair depending 
+        internal IP and port pair are mapped to an external IP--port pair depending
         on the remote address. Incoming connections are allowed only if there was an outgoing
         connection to the remote address.
 \end{description}
 
-
-\begin{table*}
-    \centering
-    \begin{tabular}{l|ccccc}
-         & No NAT & Full cone & Restricted cone & Port Restricted cone & Symmetric\\
-         \hline
-        No NAT & \cmark & \cmark & \cmark & \cmark & \cmark \\
-        Full cone & \cmark & \cmark &  \cmark & \cmark & \cmark \\
-        Restricted cone & \cmark & \cmark & \cmark & \cmark & \cmark\\
-        Port restricted cone & \cmark & \cmark & \cmark & \cmark & \xmark \\
-        Symmetric & \cmark & \cmark & \cmark & \xmark & \xmark \\
-    \end{tabular}
-    \caption{Compatibility of NAT peers for connection establishment with STUN. 
-    Pairwise compatible NATs are marked with a checkmark (\cmark) 
-    and incompatible NATs are marked with a cross (\xmark).}
-    \label{tab:nat-matching}
-\end{table*}
+\begin{table}
+\definecolor{Ycolor}{Gray}{14}
+\definecolor{ncolor}{Gray}{13}
+\newcommand{\Y}{\cellcolor{Ycolor}\ding{51}}
+\newcommand{\n}{\cellcolor{ncolor}--}
+\newcommand{\rot}[1]{\rotatebox{45}{\rlap{#1}}}
+\centering
+\begin{tabular}{rccccc}
+& % empty
+\rot{No NAT} &
+\rot{Full cone} &
+\rot{Restricted cone} &
+\rot{Port-restricted cone} &
+\rot{Symmetric} \\
+No NAT               & \Y & \Y & \Y & \Y & \Y \\
+Full cone            & \Y & \Y & \Y & \Y & \Y \\
+Restricted cone      & \Y & \Y & \Y & \Y & \Y \\
+Port-restricted cone & \Y & \Y & \Y & \Y & \n \\
+Symmetric            & \Y & \Y & \Y & \n & \n \\
+\end{tabular}
+\caption{
+Pairwise compatibility of NAT types for connection establishment with STUN.
+The incompatible cases are when one peer's NAT is symmetric
+and the other's is symmetric or port-restricted.
+}
+\label{tab:nat-matching}
+\end{table}
 
 As the difficulty lies in compatibility with symmetric NATs, we further simplify
 the matching by sorting proxies into one of two pools at the broker: those that work with
