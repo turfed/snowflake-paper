@@ -498,10 +498,11 @@ but only via an intermediary.
 The shaded background shows the censor's zone of control.
 }
 \label{fig:rendezvous}
+\todo[inline]{Replace provisional graphic.}
 \end{figure}
 
 We use a ``long polling'' model for the client's side of broker interaction.
-See \autoref{fig:rendezvous}\todo{Replace provisional graphic.}.
+See \autoref{fig:rendezvous}.
 There are proxies polling the broker constantly.
 Each poll is an HTTPS request to a designated URL path.
 (We assume there is no need for covertness
@@ -544,8 +545,6 @@ network configurations that can be categorized by two factors:
 the peer's network address translation (NAT) tables; and
 (2)~the filtering behaviour of the peer's firewalls.
 Table~\ref{tab:nat-matching}
-\todo{The table is symmetric; show only half of it.
-Fix centering with \texttt{\textbackslash rlap} slanted labels.}
 shows which NAT variations are compatible with each other.
 The implementation details of how NATs map internal IP and port combinations
 to external ports varies significantly, but for our purposes it was sufficient
@@ -595,6 +594,8 @@ The incompatible cases are when one peer's NAT is symmetric
 and the other's is symmetric or port-restricted.
 }
 \label{tab:nat-matching}
+\todo[inline]{The table is symmetric; show only half of it.
+Fix centering with \texttt{\textbackslash rlap} slanted labels.}
 \end{table}
 
 As the difficulty lies in compatibility with symmetric NATs, we further simplify
@@ -617,8 +618,9 @@ report having a symmetric NAT.
 \begin{figure}
 \centering
     \includegraphics[width=\columnwidth]{figures/clients-by-nat}
-    \caption{Snowflake client poll counts by NAT type. \todo[inline]{Replace provisional figure.}}
+    \caption{Snowflake client poll counts by NAT type.}
     \label{fig:clients-by-nat}
+    \todo[inline]{Replace provisional figure.}
 \end{figure}
 
 We use a different technique for determining the NAT type of Snowflake proxies because
@@ -899,9 +901,9 @@ is 133, on \mbox{2020-12-09}.
 %   date       transport users
 %   <date>     <chr>     <dbl>
 % 1 2020-12-09 snowflake  133.
-\todo[inline]{Bandwidth chart? Ideally with aligned horizontal axis.}
 }
 \label{fig:user-counts}
+\todo[inline]{Bandwidth chart? Ideally with aligned horizontal axis.}
 \end{figure*}
 
 This brings us to \autoref{fig:user-counts},
