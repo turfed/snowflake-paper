@@ -625,7 +625,7 @@ report having a symmetric NAT.
 
 We use a different technique for determining the NAT type of Snowflake proxies because
 NAT behaviour is not exposed as part of the WebRTC standard API for web browsers.
-Instead, we use a technique similar to that employed by Mass Browser~\cite{Nasr2020a}
+Instead, we use a technique similar to that employed by MassBrowser~\cite[\S V-A]{Nasr2020a}
 and have proxies attempt to establish a connection with a peer behind a symmetric NAT under our
 control before polling for clients. If the connection is successful, the proxy will be sorted into
 a pool where it will be matched to clients with symmetric NATs. If the connection times out,
