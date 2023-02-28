@@ -101,8 +101,8 @@ or in the inevitable overblocking that results
 when a censor tries to block circumvention traffic
 that is difficult to distinguish from other traffic
 the censor values highly.
-On the spectrum of mimickry to randomization,
-Snowflake falls more on the mimickry side;
+On the spectrum of mimicry to randomization,
+Snowflake falls more on the mimicry side;
 on the scale of concentrated to diffuse,
 it is diffuse.
 If~Snowflake has a single distinguishing characteristic,
@@ -168,7 +168,7 @@ Snowflake has its origin in two earlier projects:
 flash proxy and uProxy.
 % https://lists.torproject.org/pipermail/tor-dev/2016-January/010310.html "Snowflake is a webrtc pluggable transport inspired by flashproxy."
 % https://keroserene.net/snowflake/technical/#1-introduction "It is inspired by and builds upon the previous work of Flashproxy. Snowflake is much like a hybrid of previous Pluggable Transports..."
-Flash proxy~\cite{Fifield2012a} similarly used a model
+Flash proxy~\cite{Fifield2012a}, like Snowflake, used a model
 of untrusted, temporary JavaScript proxies running in web browsers;
 however the link between client and proxy was WebSocket
 rather than WebRTC.
@@ -189,7 +189,7 @@ WebRTC was at the time an emerging technology, and while
 % https://bugs.torproject.org/5578 "Investigate WebRTC for flash proxy NAT punching "
 % flashproxy.pdf §5.2: "New technologies like WebRTC [24] may fill this need in the future, if they become sufficiently popular that flash proxies' use of them does not stand out as unusual."
 it was considered as a future transport protocol for flash proxy,
-it was decided to begin Snowflake as an independent project,
+it was decided to begin Snowflake as a new, separate project,
 rather than build atop flash proxy.
 % https://serene.cx/snowflake/#note-flashproxy "...one could say that uProxy and flashproxy are the ancestors of snowflake."
 uProxy~\cite{uproxy}, in one of its early incarnations,
@@ -239,6 +239,11 @@ More like the ``centralized proxy'' model.
 \todo{Check if \href{https://censorbib.nymity.ch/\#Figueira2022a}{Stegozoa}
 and \href{https://censorbib.nymity.ch/\#Barradas2020b}{CRON} are relevant,
 and discuss if so.}
+\todo{Very early versions of Lantern (circa 2014) also used
+volunteer-operated proxies, not WebRTC though.
+% https://web.archive.org/web/20140326223853/http://techpresident.com/news/wegov/24455/why-remarkably-similar-circumvention-tools-uproxy-and-lantern-are-not-overkill
+% https://lists.torproject.org/pipermail/tor-dev/2014-March/006356.html "HOWTO use Lantern as a pluggable transport"
+}
 
 unfortunate tendency to emphasize the negative aspects of other systems
 paints an unnecessarily dire picture
@@ -554,14 +559,14 @@ a connection using STUN for connection establishment as some mapping and
 filtering setups are incompatible with each other.
 Snowflake clients and proxies all have one of a few possible
 network configurations that can be categorized by two factors:
-(1)~the mapping behaviour of
+(1)~the mapping behavior of
 the peer's network address translation (NAT) tables; and
-(2)~the filtering behaviour of the peer's firewalls.
+(2)~the filtering behavior of the peer's firewalls.
 Table~\ref{tab:nat-matching}
 shows which NAT variations are compatible with each other.
 The implementation details of how NATs map internal IP and port combinations
 to external ports varies significantly, but for our purposes it was sufficient
-to condense these variations together with common firewall filtering behaviour
+to condense these variations together with common firewall filtering behavior
 into the following well-known NAT variations:
 
 \begin{description}
@@ -621,7 +626,7 @@ For clients, we use functionality built into the STUN protocol~\cite{rfc5780}. N
 servers support NAT discovery; we used a simple script to filter our list of public STUN servers
 to include only those that do. We worked with the maintainers of
 the Pion stun library\footnote{https://github.com/pion/stun} to implement the client side logic
-for NAT behaviour discovery, and use this to sort clients into one of two groups.
+for NAT behavior discovery, and use this to sort clients into one of two groups.
 If the NAT discovery protocol fails, a client will self-report their NAT
 type as ``unknown'' to the broker, and the broker assumes these clients to have a symmetric NAT.
 Most clients work well with the majority of Snowflake proxies, as
@@ -637,7 +642,7 @@ report having a symmetric NAT.
 \end{figure}
 
 We use a different technique for determining the NAT type of Snowflake proxies because
-NAT behaviour is not exposed as part of the WebRTC standard API for web browsers.
+NAT behavior is not exposed as part of the WebRTC standard API for web browsers.
 Instead, we use a technique similar to that employed by MassBrowser~\cite[\S V-A]{Nasr2020a}
 and have proxies attempt to establish a connection with a peer behind a symmetric NAT under our
 control before polling for clients. If the connection is successful, the proxy will be sorted into
@@ -1182,9 +1187,9 @@ Distributed bridge architecture
 
 Snowflake have experienced a significant increase of active users since its initial release. However, the design of snowflake requires server to keep state for the clients across connections that prevents server side load balancing. To enable the use of more than one snowflake server, a new design amendment is necessary.
 
-Among many alternative designs, a snowflake client initiated server identity indication system was chosen. The snowflake client would send the server fingerprint it intended to connect to the broker.The broker then translate this server identity fingerprint to a server WebSocket relay address that corresponding to this server identify fingerprint and send this relay WebSocket address to the snowflake proxy matched. Upon receiving the address together with snowflake client's Session Description Protocol, the proxy will connect the client and the relay before tunnelling the connection between them.
+Among many alternative designs, a snowflake client initiated server identity indication system was chosen. The snowflake client would send the server fingerprint it intended to connect to the broker.The broker then translate this server identity fingerprint to a server WebSocket relay address that corresponding to this server identify fingerprint and send this relay WebSocket address to the snowflake proxy matched. Upon receiving the address together with snowflake client's Session Description Protocol, the proxy will connect the client and the relay before tunneling the connection between them.
 
-To protect the proxy against a compromised broker that lead to send unsolicited traffic to servers, the proxy can be configured to check the WebSocket address's hostname and reject those without predefined postfix. Combining with mandatory TLS the proxy with distributed snowflake support does not introduce network abuse risk. This hostname check system is also used to check the compatibility between the proxy and the broker, as the broker will reject any proxy with a host name rejection policy that is incompatible with the brokers', including the case when a legacy proxy connect to a broker with distributed snowflake support enabled.
+To protect the proxy against a compromised broker that lead to send unsolicited traffic to servers, the proxy can be configured to check the WebSocket address's hostname and reject those without predefined suffix. Combining with mandatory TLS the proxy with distributed snowflake support does not introduce network abuse risk. This hostname check system is also used to check the compatibility between the proxy and the broker, as the broker will reject any proxy with a host name rejection policy that is incompatible with the brokers', including the case when a legacy proxy connect to a broker with distributed snowflake support enabled.
 
 Multiplexing?
 
