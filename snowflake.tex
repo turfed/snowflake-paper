@@ -191,29 +191,39 @@ WebRTC was at the time an emerging technology, and while
 it was considered as a future transport protocol for flash proxy,
 it was decided to begin Snowflake as an independent project,
 rather than build atop flash proxy.
-\ldots
 % https://serene.cx/snowflake/#note-flashproxy "...one could say that uProxy and flashproxy are the ancestors of snowflake."
-uProxy (\url{https://serene.cx/snowflake/})
-% https://docs.google.com/document/d/1t_30vX7RcrEGuWwcg0Jub-HiNI0Ko3kBOyqXgrQN3Kw/edit#heading=h.xapcidyka1bk
-% (from https://github.com/UWNetworksLab/uProxy-p2p/tree/4edae62ec1110ea2b0b795fb68b95d3f5d233244#status)
-privileged proxies, obfuscated WebRTC data channels
-``uProxy depends on leveraging existing trust relationships to to find and use a proxy''
-significant work required in Snowflake, relative to uProxy, for WebRTC outside the browser
-
-% Aside from flash proxy\index{flash proxy},
-% the most similar existing design was a former version of uProxy\index{uProxy}~\cite{uproxy}
-% (an upcoming revision will work differently).
-% uProxy required clients to know a confederate outside
-% the censor's network who could run a proxy.
-% The client would connect through the proxy
-% using WebRTC\index{WebRTC}; the proxy would then directly fetch
-% the client's requested URLs\index{URL}.
-% Snowflake centralizes the proxy discovery process\index{proxy distribution},
-% removing the requirement to arrange one's own proxy
-% outside the firewall.
-% Snowflake proxies are merely dumb pipes to a more capable proxy,
-% allowing them to carry traffic other than web traffic,
-% and preventing them from spying on the client's traffic.
+uProxy~\cite{uproxy}, in one of its early incarnations,
+% "in one of its earlier incarnations": uProxy pivoted from friend proxies to cloud servers in 2016:
+%  https://web.archive.org/web/20161211194847/https://blog.uproxy.org/2016/02/get-access-24x7-through-your-own-uproxy.html
+pioneered the use of volunteer-operated WebRTC proxies.
+uProxy's proxies were browser-based,
+but the trust and deployment model was rather different
+from flash proxy's and Snowflake's.
+There was no centralized proxy discovery;
+instead each censored client would arrange, out of band,
+% uProxy v1.2.5 Design Doc: https://docs.google.com/document/d/1t_30vX7RcrEGuWwcg0Jub-HiNI0Ko3kBOyqXgrQN3Kw
+% "uProxy depends on leveraging existing trust relationships to to find and use a proxy."
+for a personal acquaintance, outside the censor's network,
+to run a proxy in their web browser.
+The social trust relationship was necessary to prevent misuse,
+because the browser proxies fetched destination content directly,
+without any further intermediary like the bridge in Snowflake.
+A~uProxy proxy was expected to be
+persistent and always online;
+clients did not changes proxies on the fly.
+% https://github.com/uProxy/uproxy-obfuscators
+uProxy supported protocol obfuscation:
+though the communication protocol was fundamentally WebRTC,
+the contents of packets could be transformed so as not to resemble WebRTC.
+This was possible because uProxy ran as a privileged browser extension
+with access to socket operations.
+Since Snowflake uses ordinary unprivileged browser APIs,
+its WebRTC is restricted to looking like WebRTC;
+on the other hand, because of that,
+it is even easier to deploy a Snowflake proxy.
+Like flash proxy, uProxy was active in the years
+% 2013: Serene's 30C3 lightning talk on uProxy https://events.ccc.de/congress/2013/wiki/Static:Lightning_Talks#Day_3
+2013--2016\todo{Check 2016 end date for uProxy}.
 
 Comparison with MassBrowser~\cite{Nasr2020a}
 % https://github.com/net4people/bbs/issues/32
