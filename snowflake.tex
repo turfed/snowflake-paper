@@ -259,21 +259,36 @@ which means that it, like uProxy, can use protocol obfuscation
 on the client--buddy link.
 Like Snowflake, MassBrowser has been deployed to real users
 and tested in practice against censors.
-\ldots
-Protozoa~\cite{Barradas2020a} is superficially similar
+Protozoa~\cite{Barradas2020a}
+% https://github.com/net4people/bbs/issues/55
+is superficially similar
 to Snowflake in its use of WebRTC,
 but the two systems are essentially different.
-It uses WebRTC, but not really, and not in a way that would work with browser proxies.
-More like the ``centralized proxy'' model.
-% https://github.com/net4people/bbs/issues/55
+More like uProxy, Protozoa has a one-to-one proxy model:
+client and proxy discover one another and arrange a connection out of band,
+and the proxy persists as long as the client is using it.
+If Snowflake's specialty is diversity of proxy addresses,
+Protozoa's is traffic analysis:
+using an authentic WebRTC audio or video stream as a carrier,
+it replaces the content encrypted, encoded media frames
+with covert ciphertexts of the same length,
+such that the replacement is undetectable to an observer.
+One technical subtlety is that where Snowflake uses
+WebRTC data channels,
+Protozoa uses WebRTC media channels,
+which may be an advantage;
+we will return to this point in \autoref{sec:fingerprinting}.
 \todo{Check if \href{https://censorbib.nymity.ch/\#Figueira2022a}{Stegozoa}
 and \href{https://censorbib.nymity.ch/\#Barradas2020b}{CRON} are relevant,
 and discuss if so.}
-\todo{Very early versions of Lantern (circa 2014) also used
-volunteer-operated proxies, not WebRTC though.
-% https://web.archive.org/web/20140326223853/http://techpresident.com/news/wegov/24455/why-remarkably-similar-circumvention-tools-uproxy-and-lantern-are-not-overkill
-% https://lists.torproject.org/pipermail/tor-dev/2014-March/006356.html "HOWTO use Lantern as a pluggable transport"
-}
+
+% Very early versions of Lantern (circa 2014) used social network–based trusted proxies:
+%   https://web.archive.org/web/20140326223853/http://techpresident.com/news/wegov/24455/why-remarkably-similar-circumvention-tools-uproxy-and-lantern-are-not-overkill
+%   https://lists.torproject.org/pipermail/tor-dev/2014-March/006356.html "HOWTO use Lantern as a pluggable transport"
+%   https://web.archive.org/web/20130831160152/https://www.youtube.com/watch?v=aiPkCugE-RY
+%   https://web.archive.org/web/2oe_/http://wayback-fakeurl.archive.org/yt/aiPkCugE-RY
+% But it wasn't WebRTC, so was less like Snowflake than uProxy was.
+% I'll draw the line here, since even Tor bridges are "volunteer-operated" in a sense.
 
 unfortunate tendency to emphasize the negative aspects of other systems
 paints an unnecessarily dire picture
