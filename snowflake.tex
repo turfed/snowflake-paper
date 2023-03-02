@@ -156,7 +156,7 @@ Mitigating in the client's favor
 is the fact that the censor is presumed to derive some benefit
 from permitting some forms of network access:
 the censor cannot trivially ``win''
-in this abstract model simply by blocking all connections,
+simply by blocking all connections,
 but must be selective in what to block and allow
 in order to optimize some objective of its own.
 The art of censorship circumvention is
@@ -196,7 +196,7 @@ rather than build atop flash proxy.
 uProxy~\cite{uproxy}, in one of its early incarnations,
 % "in one of its earlier incarnations": uProxy pivoted from friend proxies to cloud servers in 2016:
 %  https://web.archive.org/web/20161211194847/https://blog.uproxy.org/2016/02/get-access-24x7-through-your-own-uproxy.html
-pioneered the use of volunteer-operated WebRTC proxies.
+pioneered the use of WebRTC proxies.
 uProxy's proxies were browser-based,
 but the trust and deployment model was rather different
 from flash proxy's and Snowflake's.
@@ -704,7 +704,7 @@ NAT type to an ``unknown'' designation. A proxy that has been categorized as sui
 with symmetric NATs, but then fails to connect to too many clients in a row will update its NAT type
 and only assigned to clients without symmetric NATs until its next successful NAT check.
 
-The majority of browser based Snowflake proxies do not work with clients that have symmetric NATs.
+The majority of browser-based Snowflake proxies do not work with clients that have symmetric NATs.
 Due to the have either port restricted or symmetric NATs and are thus not suitable
 for restricted clients. Figure~\ref{fig:proxies-by-nats} shows the distribution of proxies by
 their NAT pool. Despite this fact, we have managed to maintain a sufficient number of proxies that do
@@ -1215,7 +1215,7 @@ Need a new experiment for this
 
 Snowflake relies on the proxies' network address change over time to avoid censor block snowflake based on proxies' network address. For this reason, it is beneficial to evaluate how the proxy's network address change over time while preserving the privacy of proxy operators. A distinct count system known as hyperloglog++ was used to count number of distinct proxy address while protecting the privacy of the proxy operators.
 
-For any proxies that communicate with the broker during a given period of time, its network address will be converted to a blinded representation with a hash based message authentication code and a secret. This blinded representation will then be added to the corresponding hyperloglog++ structure.
+For any proxies that communicate with the broker during a given period of time, its network address will be converted to a blinded representation with a hash-based message authentication code and a secret. This blinded representation will then be added to the corresponding hyperloglog++ structure.
 
 \subsection{Performance}
 \label{sec:performance}
