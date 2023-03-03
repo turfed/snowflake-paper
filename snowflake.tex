@@ -176,7 +176,7 @@ rather than WebRTC.
 (WebSocket still finds use in Snowflake,
 but only on the proxy--bridge link,
 not the client--proxy link.)
-Flash proxy was deployed to users in Tor Browser
+Flash proxy was deployed in Tor Browser
 % 2013: https://blog.torproject.org/combined-flash-proxy-pyobfsproxy-browser-bundles
 % 2016: https://bugs.torproject.org/17428#note_2203210 "Remove Flashproxy from Tor Browser"
 from 2013 to~2016,
@@ -700,7 +700,7 @@ report having a symmetric NAT.
 
 We use a different technique for determining the NAT type of Snowflake proxies because
 NAT behavior is not exposed as part of the WebRTC standard API for web browsers.
-Instead, we use a technique similar to that employed by MassBrowser~\cite[\S V-A]{Nasr2020a}
+Instead, we use a technique similar to that employed by MassBrowser~\cite[\S \mbox{V-A}]{Nasr2020a}
 and have proxies attempt to establish a connection with a peer behind a symmetric NAT under our
 control before polling for clients. If the connection is successful, the proxy will be sorted into
 a pool where it will be matched to clients with symmetric NATs. If the connection times out,
@@ -1257,9 +1257,9 @@ Need a new experiment for this
 \url{https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/34075}
 
 
-Snowflake relies on the proxies' network address change over time to avoid censor block snowflake based on proxies' network address. For this reason, it is beneficial to evaluate how the proxy's network address change over time while preserving the privacy of proxy operators. A distinct count system known as hyperloglog++ was used to count number of distinct proxy address while protecting the privacy of the proxy operators.
+Snowflake relies on the proxies' network address change over time to avoid censor block snowflake based on proxies' network address. For this reason, it is beneficial to evaluate how the proxy's network address change over time while preserving the privacy of proxy operators. A distinct count system known as HyperLogLog++ was used to count number of distinct proxy address while protecting the privacy of the proxy operators.
 
-For any proxies that communicate with the broker during a given period of time, its network address will be converted to a blinded representation with a hash-based message authentication code and a secret. This blinded representation will then be added to the corresponding hyperloglog++ structure.
+For any proxies that communicate with the broker during a given period of time, its network address will be converted to a blinded representation with a hash-based message authentication code and a secret. This blinded representation will then be added to the corresponding HyperLogLog++ structure.
 
 \subsection{Performance}
 \label{sec:performance}
