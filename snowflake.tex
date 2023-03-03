@@ -746,9 +746,26 @@ End-to-end security between client and bridge, proxies untrusted
 Centralized bridge
 - (notionally centralized, though may be realized as multiple instances for performance reasons, see \autoref{sec:experience})
 
-data channels
-DTLS
-\cite[\S 1]{rfc8831}
+Communication between WebRTC peers (client and proxy)
+takes place over
+WebRTC data channels~\cite{rfc8831}, which
+provide a TCP-like
+reliable stream interface inside the UDP-based WebRTC connection.
+The reliability comes from an embedded layer of
+Stream Control Transmission Protocol (SCTP), which
+handles reordering and retransmission of packets---like
+what an OS kernel does for a TCP connection, say,
+but in userspace.
+The SCTP layer is itself encapsulated in Datagram TLS (DTLS)
+for confidentiality and integrity between WebRTC peers.
+Data channels are a convenient abstraction for Snowflake to use,
+because the transmission of reliable stream data is closely matched
+to the use case of a circumvention proxy.
+But data channels are not the only option:
+WebRTC also provides media channels,
+for unreliable transmission of real-time audio and video.
+Data channels and media channels have distinguishable wire representations
+that give rise to fingerprinting concerns that we take up in \autoref{sec:fingerprinting}.
 
 % david
 Turbo Tunnel~\cite{Fifield2020a}
@@ -756,7 +773,22 @@ KCP/smux
 - session layer independent of the circumvention channel, permits switching proxies on the fly
 - proxy handoff is invisible to upper layers
 - the protocol layering generally
-browser does not have access to the SCTP layer
+\ldots
+Snowflake's Turbo Tunnel layer
+is partially redundant with the data channel SCTP layer
+on the WebRTC link between client and proxy,
+which similarly adds session and reliability facilities
+to an unreliable substrate.
+The duplication is, in any case, unavoidable
+given the abstractions we have to deal with:
+the SCTP layer is walled off and not open to inspection
+by the WebRTC APIs available in browsers.
+But more significantly, Snowflake requires an
+\emph{end-to-end} notion of a session,
+between the client and the bridge,
+whereas the WebRTC data channel provides only a
+\emph{hop-by-hop} session,
+one that lasts only as long as a single temporary proxy.
 
 Web badge vs. browser add-on vs. standalone daemon
 majority browser add-on, more effective at gaining popularity than web badge
