@@ -770,11 +770,30 @@ with the number of clients behind symmetric NAT,
 we could explore the use of TURN servers with some mitigation
 against blocking, such as rotating IP addresses.
 
+At the same time as the snowflake proxy makes a connection to its assigned client,
+% "At the same time": https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40228
+it also connects to the bridge.
+In contrast to the client--proxy link,
+the proxy--bridge link
+uses the WebSocket protocol~\cite{rfc6455}, not WebRTC.
+WebSocket offers a TCP-like, point-to-point, client--server connection
+layered atop HTTPS.
+As we assume the danger from a censor is past
+once a client reaches a snowflake proxy,
+the choice of protocol for the next hop to the bridge is somewhat arbitrary.
+It just needs to be a protocol that is supported in browsers
+and has reasonable performance.
+WebRTC would fit the bill for this link too,
+but WebSocket is somewhat less complex and easier to program.
 
-WebSocket on the proxy--bridge link
-Choice is somewhat arbitrary
-Needs to be something supported by browsers
-WebSocket easier to use than WebRTC
+At the end of this phase,
+a temporary snowflake proxy has made two connections,
+one to its client and one to the bridge.
+It~then proceeds to proxy a data stream between them
+in both directions,
+until the client terminates the session,
+or the proxy itself stop operating
+(the web browser it is running in closes, for example).
 
 \subsection{Data transfer}
 \label{sec:data-transfer}
