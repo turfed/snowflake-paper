@@ -526,7 +526,7 @@ from external observers.
 A~Snowflake rendezvous message is a serialized bundle of data.
 Its essential element
 is the information necessary to establish a WebRTC connection,
-namely a Session Description Protocol (SDP) \emph{offer}~\cite[\S 5]{rfc8839}.
+namely a Session Description Protocol (SDP) \emph{offer}~\cite{rfc8839}.
 The offer contains information needed for a network connection,
 such as the client's external IP addresses;
 as well as cryptographic information to secure a later key exchange between the peers.
@@ -599,7 +599,9 @@ Meanwhile, the client has been waiting for a response
 to its rendezvous message.
 The broker encapsulates the proxy's SDP answer
 and sends it to the client over the rendezvous channel,
-while simultaneously sending an acknowledgement to the proxy.
+and simultaneously sends an acknowledgement to the proxy.
+Now that the client and proxy have each other's
+SDP information, they are ready to actually connect to one another.
 
 \subsection{Peer-to-peer connection establishment}
 \label{sec:ice}
@@ -718,7 +720,7 @@ We use a different technique to determine the NAT type of Snowflake proxies,
 because NAT discovery is not exposed in the WebRTC API available to web browsers.
 We adapt a technique from MassBrowser~\cite[\S \mbox{V-A}]{Nasr2020a},
 and have proxies attempt to establish a connection with a peer under our control,
-behind a symmetric NAT.
+which is behind a simulated symmetric NAT.
 If the connection is successful,
 the proxy's NAT type is ``unrestricted''
 and it is eligible to be matched with any client;
