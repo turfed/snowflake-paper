@@ -544,8 +544,11 @@ which then forwards it to the client.
 Having exchanged an offer and answer,
 the client and proxy are now able to establish a direct WebRTC connection,
 without the broker in the middle.
-There is more on the mechanics of establishing the connection
-in \autoref{sec:ice}.
+The gathering of external IP addresses
+forms part of the ICE protocol
+and uses third-party STUN servers,
+\todo{Should say more about STUN and gathering of ICE candidates here.}
+which are described in more detail in \autoref{sec:ice}.
 
 In WebRTC terms, the offer/answer exchange is called
 ``signaling,'' and the broker here acts as a signaling server.
@@ -606,20 +609,67 @@ SDP information, they are ready to actually connect to one another.
 \subsection{Peer-to-peer connection establishment}
 \label{sec:ice}
 
-ICE (Interactive Connectivity Establishment)~\cite{rfc8445}
-STUN
-DTLS
-key exchange
-DTLS fingerprint~\cite[\S 5]{rfc8842}
+After rendezvous,
+a censored client in need of service
+and a temporary snowflake proxy
+will have exchanged
+(among other information)
+their IP addresses,
+using the broker as an intermediary.
+After this point, the broker is no longer involved
+(as~far as that specific client--proxy pairing goes).
+The next step is for the client and proxy
+to establish a direct connection---which
+is not a trivial operation,
+even in the absence of censorship,
+because of possible interference by
+network address translation (NAT)
+and ingress filters at either endpoint.
+(Recall that many proxies run in web browsers
+in ordinary residential ISPs,
+without the connectivity of a typical Internet server.)
+WebRTC is designed for exactly this use case
+and has built-in facilities for traversing NAT.
+Specifically, WebRTC uses
+ICE (Interactive Connectivity Establishment)~\cite{rfc8445},
+a procedure for testing candidate pairs of peer network addresses
+until finding one that works.
+ICE~makes use of
+STUN (Session Traversal Utilities for NAT)~\cite{rfc8489}
+and third-party STUN servers that provide services such as,
+for example, allowing a network host to
+discover its own external IP addresses.
+In~Snowflake, candidate IP addresses are gathered
+during rendezvous, with the assistance of STUN servers,
+and sent as part of rendezvous messages.
+ICE~may also use
+TURN (Traversal Using Relays around NAT)~\cite{rfc8656},
+effectively a UDP proxy.
 
+There is no guarantee that two arbitrary peers will be able to make
+a connection using the facilities of STUN alone.
+Some mapping and
+filtering setups are simply incompatible with one other.
+Most uses of ICE would fall back to TURN in this case,
+inserting a relay server between the peers to resolve any difficulties.
+TURN is problematic for Snowflake,
+because TURN relays' IP addresses are
+generally fixed and easily discoverable by a censor.
+But working in our favor is the fact that
+a client does not need to be matched to a \emph{specific} proxy;
+any compatible proxy will~do.
+In Snowflake, client and proxies self-assess their NAT configuration.
+Then the broker takes care to pair clients
+only with proxies that they will be able to connect to directly.
+Generally, we sort clients and proxies into
+``unrestricted'' and ``restricted'' categories.
+Unrestricted clients may be matched with any kind of proxy,
+unrestricted or restricted.
+Restricted clients may only be matched to unrestricted proxies.
 
-There is no guarantee that any two arbitrary peers will be able to form
-a connection using STUN for connection establishment as some mapping and
-filtering setups are incompatible with each other.
 Snowflake clients and proxies have one of a few possible
 network configurations that can be categorized by two factors:
-(1)~the mapping behavior of
-its network address translation (NAT) tables; and
+(1)~the mapping behavior of its NAT; and
 (2)~the filtering behavior of its firewall.
 The implementation details of how NATs map internal IP address and port combinations
 to external ports varies significantly, but for our purposes it suffices
@@ -757,21 +807,6 @@ version of the Snowflake proxy.
 \label{fig:proxies-by-nats}
 \end{figure}
 
-Our ability to perform NAT matching is a consequence of our large pool or proxies
-and the fact that, unlike more typical uses of WebRTC,
-we are not trying to form a connection between a client and a specific peer,
-but rather \emph{any} available compatible proxy.
-Other applications of WebRTC, such as video conferencing platforms,
-solve NAT compatibility problems using a TURN server (effectively a UDP proxy),
-or some other way of routing connections through a centralized point.
-These approaches are not immediately suitable for Snowflake because
-they rely on direct connections to a well-known central server
-that can easily be discovered and blocked.
-But if unrestricted proxy capacity fails to keep pace
-with the number of clients behind symmetric NAT,
-we could explore the use of TURN servers with some mitigation
-against blocking, such as rotating IP addresses.
-
 At the same time as the snowflake proxy makes a connection to its assigned client,
 % "At the same time": https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40228
 it also connects to the bridge.
@@ -799,6 +834,10 @@ or the proxy itself stop operating
 
 \subsection{Data transfer}
 \label{sec:data-transfer}
+
+DTLS
+key exchange
+DTLS fingerprint % https://www.rfc-editor.org/rfc/rfc8122.html#section-5
 
 % cecylia
 
