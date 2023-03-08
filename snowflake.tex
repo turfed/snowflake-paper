@@ -386,7 +386,6 @@ that persists beyond the lifetime of any single proxy.
 The client sends another rendezvous message to the broker,
 is assigned another proxy,
 and picks up where it left off.
-\todo{Cite Untrusted Messenger Discovery~\cite[\S 3]{Feamster2003a} here or in \autoref{sec:data-transfer}---decouples ``messenger'' and ``portal''.}
 More information about the data transfer phase is in \autoref{sec:data-transfer}.
 
 Never does the client communicate with the broker or bridge directly.
@@ -835,14 +834,43 @@ or the proxy itself stop operating
 \subsection{Data transfer}
 \label{sec:data-transfer}
 
+No complicated processing takes place at the proxy.
+The main value if a snowflake proxy is its IP address---it
+gives the client somewhere to connect to that the censor does not know about yet.
+Having provided that, the proxy assumes a role
+of pure data transfer until it, or one of the endpoints, goes away.
+Snowflake proxies are simple conduits that transfer
+a bidirectional data stream between endpoints,
+without interpreting~it.
+In particular, the proxy may not interfere with any
+end-to-end secure information exchanged between client and bridge,
+which in our deployment using Tor,
+includes not only the contents of the client's streams
+but also their eventual destination.
+It~may be considered an instance of the
+``untrusted messenger'' model described by
+Feamster et~al.~\cite[\S 3]{Feamster2003a}:
+what they call a ``messenger'' is our snowflake proxy;
+their ``portal'' is our bridge.
+
+The full stack of protocol layers is as shown below.
+We will describe each one and its purpose
+in the paragraphs that follow.
+
+\begin{verbatim}
+UDP  \ WebRTC       \
+DTLS | data channel | ephemeral, per proxy
+SCTP /              /
+KCP  \ Turbo        \
+smux / Tunnel       | persistent, per session
+Tor protocol        /
+client streams
+\end{verbatim}
+\todo[inline]{Redraw ASCII art as a proper figure.}
+
 DTLS
 key exchange
 DTLS fingerprint % https://www.rfc-editor.org/rfc/rfc8122.html#section-5
-
-% cecylia
-
-Proxies are simple conduits, transferring a reliable stream between endpoints
-End-to-end security between client and bridge, proxies untrusted
 
 % hooman
 Centralized bridge
