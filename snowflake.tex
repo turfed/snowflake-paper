@@ -504,7 +504,7 @@ upstream server's domain name in the TLS SNI,
 but it increases the number of usable intermediary nodes.
 \end{description}
 
-The rendezvous portion of Snowflake is, however, modular,
+The rendezvous component is, however, modular,
 and any system that can be persuaded to indirectly convey a request
 of about 1500 bytes, and a response of about the same size,
 can work as a plug-in rendezvous method.
@@ -829,7 +829,7 @@ It~then proceeds to proxy a data stream between them
 in both directions,
 until the client terminates the session,
 or the proxy itself stop operating
-(the web browser it is running in closes, for example).
+(when the web browser it is running in closes, for example).
 
 \subsection{Data transfer}
 \label{sec:data-transfer}
@@ -903,7 +903,8 @@ KCP/smux
 - session layer independent of the circumvention channel, permits switching proxies on the fly
 - proxy handoff is invisible to upper layers
 - the protocol layering generally
-\ldots
+- nothing essential to KCP/smux; has familiarity and demonstrated success in other systems; but might be swapped out with e.g.\ embedded QUIC or another (end-to-end) layer of SCTP
+
 Snowflake's Turbo Tunnel layer
 is partially redundant with the data channel SCTP layer
 on the WebRTC link between client and proxy,
