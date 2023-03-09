@@ -897,16 +897,55 @@ for unreliable transmission of real-time audio and video.
 Data channels and media channels have distinguishable wire representations
 that give rise to fingerprinting concerns that we take up in \autoref{sec:fingerprinting}.
 
-% david
-Turbo Tunnel~\cite{Fifield2020a}
-KCP/smux
-- session layer independent of the circumvention channel, permits switching proxies on the fly
-- proxy handoff is invisible to upper layers
-- the protocol layering generally
-- nothing essential to KCP/smux; has familiarity and demonstrated success in other systems; but might be swapped out with e.g.\ embedded QUIC or another (end-to-end) layer of SCTP
+If snowflake proxies were as reliable as traditional proxies,
+what we have described so far would already suffice:
+send client traffic through the WebRTC data channel,
+and have the proxy relay it to the bridge.
+But Snowflake's temporary proxies might
+disappear at any moment,
+and the design must account for that.
+If the client is in the middle of a long download,
+for example, the failure of a proxy should not interrupt it:
+the client and the bridge need a shared notion of session state
+that is independent of any single temporary proxy connection,
+so that the download can be resumed where it left off,
+once connectivity is restored on a new proxy.
+
+To make this possible, we employ the
+Turbo Tunnel design pattern~\cite{Fifield2020a};
+that is, we interpose an additional, userspace,
+session/reliability layer between the raw transport layer
+and client application streams.
+This additional layer gives the proxy and the bridge
+shared end-to-end state that persists throughout
+the sequence of temporary proxies that are the carriers of a Snowflake session.
+For the embedded session/reliability layer
+we use a combination of
+KCP~\cite{kcp} and
+smux~\cite{smux}:
+KCP provides reliability and reordering,
+and smux detects the end of idle sessions and terminates them.
+There is nothing essential about KCP/smux;
+any other transport protocol that provides the necessary features
+and can be implemented in userspace would~do,
+such as QUIC, TCP, or (our own layer of) SCTP.
+% In fact, we prototyped successfully with QUIC.
+The Turbo Tunnel layer does not depend on any browser features,
+because its packets are encapsulated into the data channel;
+from the proxy's point of view, it's just a sequence of bytes.
+A~switch from one temporary proxy to another
+is invisible to the upper application layers,
+except for a brief delay in packet delivery.
+The failure of a proxy
+is not any more fatal to a Snowflake session
+than a dropped packet is to a TCP connection.
+
+% we tried it without TT, was not fun
 
 Snowflake's Turbo Tunnel layer
 is partially redundant with the data channel SCTP layer
+% reliable stream with multiplexing, same as KCP/smux
+% (but we don't really use multiplexing)
 on the WebRTC link between client and proxy,
 which similarly adds session and reliability facilities
 to an unreliable substrate.
