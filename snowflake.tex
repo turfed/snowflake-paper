@@ -336,7 +336,7 @@ with WebRTC, using information exchanged during rendezvous.
 Finally, there is data transfer,
 where the proxy ferries data back and forth
 between the client and a remote service
-(i.e., a Tor bridge).
+(e.g., a Tor bridge).
 \autoref{fig:architecture}
 illustrates the process.
 
@@ -853,7 +853,7 @@ Feamster et~al.~\cite[\S 3]{Feamster2003a}:
 what they call a ``messenger'' is our snowflake proxy;
 their ``portal'' is our bridge.
 
-The full stack of protocol layers is as shown below.
+The full stack of protocol layers is shown below.
 We will describe each one and its purpose
 in the paragraphs that follow.
 
@@ -928,8 +928,8 @@ and smux detects the end of idle sessions and terminates them.
 There is nothing essential about KCP/smux;
 any other transport protocol that provides the necessary features
 and can be implemented in userspace would~do,
-such as QUIC, TCP, or (our own layer of) SCTP.
-% In fact, we prototyped successfully with QUIC.
+such as QUIC, TCP, or (an additional layer of) SCTP.
+(In~fact, we prototyped successfully with QUIC, before settling on KCP/smux.)
 The Turbo Tunnel layer does not depend on any browser features,
 because its packets are encapsulated into the data channel;
 from the proxy's point of view, it's just a sequence of bytes.
@@ -937,28 +937,25 @@ A~switch from one temporary proxy to another
 is invisible to the upper application layers,
 except for a brief delay in packet delivery.
 The failure of a proxy
-is not any more fatal to a Snowflake session
-than a dropped packet is to a TCP connection.
+is not fatal to a Snowflake session,
+just as a dropped packet does not mean the end of a TCP connection.
 
-% we tried it without TT, was not fun
+% we tried it without Turbo Tunnel (see timeline), was not fun
 
 Snowflake's Turbo Tunnel layer
 is partially redundant with the data channel SCTP layer
-% reliable stream with multiplexing, same as KCP/smux
-% (but we don't really use multiplexing)
 on the WebRTC link between client and proxy,
-which similarly adds session and reliability facilities
-to an unreliable substrate.
-The duplication is, in any case, unavoidable
-given the abstractions we have to deal with:
-the SCTP layer is walled off and not open to inspection
-by the WebRTC APIs available in browsers.
+which similarly builds a reliable stream interface
+on an unreliable substrate.
+The duplication is, in any case, unavoidable:
+the data channel's SCTP layer is walled off by abstractions
+in the WebRTC APIs available to browsers.
 But more significantly, Snowflake requires an
 \emph{end-to-end} notion of a session,
 between the client and the bridge,
-whereas the WebRTC data channel provides only a
-\emph{hop-by-hop} session,
-one that lasts only as long as a single temporary proxy.
+whereas the WebRTC data channel is only a
+\emph{hop-by-hop} session
+whose lifetime is tied to a single temporary proxy.
 
 The combination of data channels and an inner Turbo Tunnel layer
 provide a long-lasting ``virtual'' connection between the client and the bridge
@@ -1339,6 +1336,8 @@ Timeline of proxy + webext deployment
 Cupcake
 Relative ineffectiveness of web badge (i.e. the flash proxy model)
 people love the add-on and the daily count of connections
+We decided early on that the opt-out proxying model had been a mistake,
+and that Snowflake would be only opt-in.
 
 Orbot? as both client and proxy?
 
