@@ -960,14 +960,37 @@ whereas the WebRTC data channel provides only a
 \emph{hop-by-hop} session,
 one that lasts only as long as a single temporary proxy.
 
-Tor
-
-% hooman
-Centralized bridge
-- (notionally centralized, though may be realized as multiple instances for performance reasons, see \autoref{sec:experience})
-
-Web badge vs. browser add-on vs. standalone daemon
-majority browser add-on, more effective at gaining popularity than web badge
+The combination of data channels and an inner Turbo Tunnel layer
+provide a long-lasting ``virtual'' connection between the client and the bridge
+that is composed of a sequence of ``real'' connections through temporary proxies.
+Conceptually, here Snowflake's circumvention task is finished:
+the client only needs to somehow tell the bridge, through the tunnel,
+what resources to fetch, and the bridge fetches them and returns them through the tunnel.
+Practically, we need to specify some concrete proxy protocol to fill this role.
+This is another place where anything reasonable will serve,
+with the caveat that it should be an encrypted protocol
+(secure between client and bridge) to prevent proxies
+from inspecting or interfering with the client's requests.
+(The client--proxy link is encrypted with DTLS
+and the proxy--bridge link with HTTPS,
+but in the middle of these the proxy is in a position to see
+the client's traffic, unless separately end-to-end encrypted.)
+Our deployment is built on Tor,
+and the bridge in our deployment is a Tor entry relay.
+The Tor client provides a local SOCKS interface,
+which fills the role of an encrypted proxy protocol,
+and users of course get Tor's anonymity and privacy benefits
+in addition to the blocking resistance supplied by Snowflake.
+(In our deployment, not even the bridge is fully trusted---it
+does not get to see the contents of clients' connection,
+nor even their eventualy destinations.)
+But there is nothing about Tor that Snowflake depends on essentially;
+the tasks of providing a blocking-resistant to the bridge
+and then telling the bridge what to do are easily separable.
+We discuss alternatives to Tor
+and other extensions of Snowflake in \autoref{sec:future}.
+Integration with Tor brings its own challenges,
+which we will get into in \autoref{sec:challenges}\todo{Check this cross reference when \autoref{sec:experience} is fleshed out.}.
 
 \section{Protocol fingerprinting}
 \label{sec:fingerprinting}
@@ -1320,6 +1343,7 @@ people love the add-on and the daily count of connections
 Orbot? as both client and proxy?
 
 \subsection{Development challenges}
+\label{sec:challenges}
 
 % arlo, cecylia
 
@@ -1438,6 +1462,10 @@ For any proxies that communicate with the broker during a given period of time, 
 \label{sec:performance}
 
 % cecylia
+
+% hooman
+Centralized bridge
+- (notionally centralized, though may be realized as multiple instances for performance reasons, see \autoref{sec:experience})
 
 \section{Future work}
 \label{sec:future}
