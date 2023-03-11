@@ -992,33 +992,81 @@ which we will get into in \autoref{sec:challenges}\todo{Check this cross referen
 \section{Protocol fingerprinting}
 \label{sec:fingerprinting}
 
+Snowflake leans heavily into the ``address blocking'' side of blocking resistance,
+but the ``content blocking'' part matters too.
+As always, the goal is to make circumvention traffic
+difficult to distinguish from traffic the censor cares not to block.
+Snowflake is, by nature, tied to WebRTC,
+and therefore can only be effective against a censor
+that is not motivated to block WebRTC protocols wholesale.
+But even within that scope,
+there are many possible variations in \emph{how}
+WebRTC is implemented and used,
+which, if not considered carefully, might permit a censor
+to selectively block only Snowflake,
+while leaving other uses of WebRTC undisturbed.
+In~this discussion, it is worth remembering
+what Tschantz et~al.\ have observed:
+that censors prefer to exploit
+simple, precise, deterministic distinguishers
+that appear in the early phase of a circumvention session whenever possible,
+and use long-term, probabilistic, or computationally expensive tests
+only as a last resort~\cite[\mbox{VI-A}]{Tschantz2016a}.
+It is hardly worth worrying about protocol fingerprints
+in a circumvention system while easier distinguishers exist;
+conversely, small, patchable, fingerprinting flaws are forgivable
+as long as the foundation is solid.
+
+As~WebRTC is designed for the web,
+most implementation of WebRTC are embedded in web browsers,
+and are not trivially usable outside that context.
+Snowflake originally used a WebRTC library extracted from Chromium,
+but that eventually proved unworkable from a practical standpoint---more
+details are in \autoref{sec:deployment}.
+Since 2019, Snowflake has used Pion~\cite{pion-webrtc},
+an independent implementation of WebRTC
+implemented as a generic library,
+not tied to any browser.
+This is both good and bad.
+The good is greater agility and less development friction,
+and a working relationship with upstream developers
+that enables us to get fingerprinting-related changes made.
+The bad is that the WebRTC fingerprint of Pion
+does not automatically match that of the primarily browser-originated
+WebRTC that Snowflake aims to blend in with.
+
 % kyle, david
 
 \url{https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/wikis/Fingerprinting}
 
-Fifield and Gil Epner~\cite{arxiv.1605.08805}
+Fifield and Gil Epner~\cite{arxiv.1605.08805} and
+MacMillan et~al.~\cite{arxiv.2008.03254};
+the former predates Snowflake's switch to Pion.
 
-MacMillan et~al.~\cite{arxiv.2008.03254}
+Unfortunately for the circumvention developer,
+WebRTC's rich set of interacting protocols
+creates a large attack surface for fingerprinting.
 
-Snowflake leans heavily into the ``address blocking'' side of blocking
-resistance, but the ``content blocking'' part is still important.
+\begin{itemize}
+\item Detection of rendezvous (e.g.\ TLS fingerprinting of domain fronting or AMP cache rendezvous)
+\item WebRTC signaling
+\item Contents of STUN messages
+\item Choice of STUN servers
+\item DTLS handshake fingerprinting
+\item Choice of WebRTC data channel versus media channel
+\end{itemize}
 
-Fingerprintable features
-- signaling
-- STUN (choice of servers and contents of messages)
-- DTLS
-- WebRTC media channel vs. data channel
-- Broker rendezvous (e.g.\ TLS fingerprint \url{https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40207\#note_2849437} \url{https://github.com/net4people/bbs/issues/131}
-
-Historically overvalued in research (cf. \cite{Tschantz2016a})
-Practicality is paramount; censors are hard to predict
-But we can anticipate possible reactions
 
 Upstreaming fingerprinting changes to Pion
 \url{https://ntc.party/t/second-snowflake-bridge-available-for-testing/3445/7}
   \href{https://github.com/pion/dtls/pull/407}{Do not include IP addresses as SNI values}
   \href{https://github.com/pion/dtls/pull/410}{Only include supported\_groups extension in ClientHello}
 \href{https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40249}{Hello Verify}
+
+Snowflake client may be either the DTLS client or DTLS server
+Even a Snowflake client with a blocked fingerprint may work,
+if it happens to be paired with a browser proxy (which may be presumed to have an unblocked fingerprint)
+and it plays the DTLS server role
 
 Chen et~al.~\cite{Chen2023a}
 have the good idea of prefiltering by DNS queries:
@@ -1060,6 +1108,7 @@ or by smarter selection of STUN servers by the client.
 \label{sec:experience}
 
 \subsection{Deployment history}
+\label{sec:deployment}
 
 % Excerpts from https://gitlab.torproject.org/tpo/network-health/metrics/timeline:
 % |2017-01-24|||snowflake|Tor Browser 7.0a1 released, including Snowflake for GNU/Linux only.|[blog post](https://blog.torproject.org/blog/tor-browser-70a1-released)||
