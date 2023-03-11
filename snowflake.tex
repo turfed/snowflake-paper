@@ -727,7 +727,8 @@ The incompatible cases are when one peer's NAT is symmetric
 and the other's is symmetric or port-restricted.
 }
 \label{tab:nat-matching}
-\todo[inline]{Fix centering (off center because of \texttt{\textbackslash rlap} slanted labels).}
+\todo[inline]{Fix centering (off center because of \texttt{\textbackslash rlap} slanted labels).
+Also fix overflow into the top page margin.}
 \end{table}
 
 Table~\ref{tab:nat-matching}
@@ -809,7 +810,7 @@ version of the Snowflake proxy.
 At the same time as the snowflake proxy makes a connection to its assigned client,
 % "At the same time": https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40228
 it also connects to the bridge.
-In contrast to the client--proxy link,
+In~contrast to the client--proxy link,
 the proxy--bridge link
 uses the WebSocket protocol~\cite{rfc6455}, not WebRTC.
 WebSocket offers a TCP-like, point-to-point, client--server connection
@@ -980,7 +981,7 @@ and users of course get Tor's anonymity and privacy benefits
 in addition to the blocking resistance supplied by Snowflake.
 (In our deployment, not even the bridge is fully trusted---it
 does not get to see the contents of clients' connection,
-nor even their eventualy destinations.)
+nor even their eventual destinations.)
 But there is nothing about Tor that Snowflake depends on essentially;
 the tasks of providing a blocking-resistant to the bridge
 and then telling the bridge what to do are easily separable.
