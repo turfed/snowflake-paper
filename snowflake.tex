@@ -993,6 +993,8 @@ which we will get into in \autoref{sec:challenges}\todo{Check this cross referen
 \section{Protocol fingerprinting}
 \label{sec:fingerprinting}
 
+% https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/wikis/Fingerprinting
+
 Snowflake leans heavily into the ``address blocking'' side of blocking resistance,
 but the ``content blocking'' part matters too.
 As always, the goal is to make circumvention traffic
@@ -1036,41 +1038,75 @@ The bad is that the WebRTC fingerprint of Pion
 does not automatically match that of the primarily browser-originated
 WebRTC that Snowflake aims to blend in with.
 
-% kyle, david
-
-\url{https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/wikis/Fingerprinting}
-
-Fifield and Gil Epner~\cite{arxiv.1605.08805} and
-MacMillan et~al.~\cite{arxiv.2008.03254};
-the former predates Snowflake's switch to Pion.
-
 Unfortunately for the circumvention developer,
-WebRTC's rich set of interacting protocols
-creates a large attack surface for fingerprinting.
+the rich set of interacting protocols that comprise WebRTC
+afford a large attack surface for fingerprinting.
+Not only that, WebRTC leaves the details of
+the signaling path---where peers exchange information
+needed to set up a connection,
+corresponding to Snowflake rendezvous---unspecified~\cite[\S 3]{rfc8825},
+leaving applications to invent their own signaling mechanisms.
+% "The choice of protocols for client-server and inter-server signaling, and the definition of the translation between them, are outside the scope of the WebRTC protocol suite described in this document."
 
-\begin{itemize}
-\item Detection of rendezvous (e.g.\ TLS fingerprinting of domain fronting or AMP cache rendezvous)
-\item WebRTC signaling
-\item Contents of STUN messages
-\item Choice of STUN servers
-\item DTLS handshake fingerprinting
-\item Choice of WebRTC data channel versus media channel
-\end{itemize}
+The following is a list of potential fingerprinting concerns
+that bear on Snowflake, together with brief descriptions
+of the degree to which we have tried to address them.
+The list may not be exhaustive.
 
+\begin{description}
+\item[Rendezvous]
+(e.g.\ TLS fingerprinting of domain fronting or AMP cache rendezvous)
+designed to be blocking-resistant on its own, but may combine with other features
+\autoref{sec:block-ir}
+\ldots
 
-Upstreaming fingerprinting changes to Pion
-\url{https://ntc.party/t/second-snowflake-bridge-available-for-testing/3445/7}
-  \href{https://github.com/pion/dtls/pull/407}{Do not include IP addresses as SNI values}
-  \href{https://github.com/pion/dtls/pull/410}{Only include supported\_groups extension in ClientHello}
-\href{https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40249}{Hello Verify}
+\item[Selection of STUN servers]
+\ldots
 
-Snowflake client may be either the DTLS client or DTLS server
-Even a Snowflake client with a blocked fingerprint may work,
-if it happens to be paired with a browser proxy (which may be presumed to have an unblocked fingerprint)
-and it plays the DTLS server role
+\item[Form and content of STUN messages]
+\todo{Check if ``message'' is the right terminology}
+\ldots
+
+\item[DTLS]
+handshake fingerprinting
+just like TLS
+selection and order of ciphersuites,
+selection and order of extensions
+\autoref{sec:block-ru}
+\ldots
+
+\item[Data channel or media channel]
+\ldots
+
+\todo{Mention traffic shaping?}
+% The Snowflake protocol supports traffic shaping (inside the WebRTC layer),
+% but it is currently disabled.
+% As \autoref{sec:experience} shows,
+% censors are still going after easier targets.
+% Circumvention research awaits a good treatment of
+% exactly what is a good strategy for traffic shaping to
+% best mitigate attacks of this nature,
+% and an analysis of how well such attacks work outside the laboratory.
+
+\end{description}
+
+Snowflake's susceptibility to protocol fingerprinting
+has been analyzed in the past by
+Fifield and Gil Epner~\cite{arxiv.1605.08805} and by
+MacMillan et~al.~\cite{arxiv.2008.03254}.
+The former predates Snowflake's switch to Pion.
+The latter identified specific distinguishing features
+of the Pion DTLS handshake
+that later ended up being used in practice
+to block Snowflake in Russia
+and which we had to work around;
+see \autoref{sec:block-ru}.
 
 Chen et~al.~\cite{Chen2023a}
-have the good idea of prefiltering by DNS queries:
+have the good idea of combining features
+of rendezvous and the DTLS handshake
+to reduce false positives.
+They first prefilter using DNS queries:
 the Snowflake client's default selection of STUN servers
 on its own may be unexceptional,
 and its default server used for domain fronting rendezvous
@@ -1095,15 +1131,11 @@ The DNS query prefilter may perhaps be mitigated
 by alternative rendezvous methods (\autoref{sec:rendezvous}),
 or by smarter selection of STUN servers by the client.
 
-\todo{Mention traffic shaping?}
-% The Snowflake protocol supports traffic shaping (inside the WebRTC layer),
-% but it is currently disabled.
-% As \autoref{sec:experience} shows,
-% censors are still going after easier targets.
-% Circumvention research awaits a good treatment of
-% exactly what is a good strategy for traffic shaping to
-% best mitigate attacks of this nature,
-% and an analysis of how well such attacks work outside the laboratory.
+Upstreaming fingerprinting changes to Pion
+\url{https://ntc.party/t/second-snowflake-bridge-available-for-testing/3445/7}
+  \href{https://github.com/pion/dtls/pull/407}{Do not include IP addresses as SNI values}
+  \href{https://github.com/pion/dtls/pull/410}{Only include supported\_groups extension in ClientHello}
+\href{https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40249}{Hello Verify}
 
 \section{Experience}
 \label{sec:experience}
@@ -1454,6 +1486,11 @@ Hard to get testers/volunteers
 % https://gitlab.torproject.org/tpo/community/support/-/issues/40050#note_2796770
 
 % mention the creeping block of VPNs? https://github.com/net4people/bbs/issues/76
+
+Snowflake client may be either the DTLS client or DTLS server
+Even a Snowflake client with a blocked fingerprint may work,
+if it happens to be paired with a browser proxy (which may be presumed to have an unblocked fingerprint)
+and it plays the DTLS server role
 
 % david
 
