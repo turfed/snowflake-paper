@@ -1054,18 +1054,50 @@ of the degree to which we have tried to address them.
 The list may not be exhaustive.
 
 \begin{description}
-\item[Rendezvous]
-(e.g.\ TLS fingerprinting of domain fronting or AMP cache rendezvous)
-designed to be blocking-resistant on its own, but may combine with other features
-\autoref{sec:block-ir}
-\ldots
-
 \item[Selection of STUN servers]
-\ldots
+It~is not unusual for a WebRTC application to use STUN;
+but which servers it uses is externally observable
+and is the choice of the application (often hardcoded).
+Running a dedicated STUN server just for Snowflake is a nonstarter---if~there
+are no users of the server other than circumvention users,
+a~censor will experience no harm in simply blocking its IP address.
+In~Snowflake, we use a pool of public STUN servers,
+used for many purposes other than circumvention,
+and filtered for those that support the NAT behavior discovery feature
+described in \autoref{sec:ice}.
+The client chooses a random subset of the servers in the pool
+each time it makes a connection.
+This is because not every STUN server is accessible
+under every censor.
+% I went to check stun.l.google.com for blocking in China,
+% but OONI apparently does not measure that server:
+% https://explorer.ooni.org/chart/mat?test_name=stunreachability&axis_x=measurement_start_day&since=2023-02-12&until=2023-03-15&time_grain=day&probe_cc=CN&axis_y=domain
 
 \item[Form and content of STUN messages]
 \todo{Check if ``message'' is the right terminology}
 \ldots
+
+\item[Rendezvous]
+The rendezvous methods of
+\autoref{sec:rendezvous},
+being modular,
+generally all need their own security argument
+as to why they should be difficult to block.
+Besides that, each must be implemented in a way
+that does not expose accidental distinguishers.
+For example, the domain fronting and AMP cache rendezvous methods
+use HTTPS, which is TLS, which means they are susceptible to TLS fingerprinting~\cite[\S 5.1]{Fifield2015a}.
+In Snowflake, we use the uTLS package~\cite[\S VII]{Frolov2019a}
+(commonly used by circumvention programs)
+to get a TLS fingerprint that is randomized or that imitates common browsers.
+See \autoref{sec:block-ir} for an account of when
+domain fronting rendezvous was briefly blocking in Iran,
+because we were slow in activating uTLS.
+
+Though each rendezvous method must be difficult to block in itself,
+a~censor may combine a low-confidence suspicion of having observed a rendezvous exchange
+with features from other phases of the Snowflake data exchange
+to strengthen its guess and possibly effect a blocking decision.
 
 \item[DTLS]
 handshake fingerprinting
@@ -1123,7 +1155,7 @@ But principle and practice are different,
 and in practice,
 the world of circumvention development
 lacks a tool that does for DTLS fingerprints
-what uTLS does for TCP-based~TLS~\cite[\S VII]{Frolov2019a}.
+what uTLS does for TCP-based~TLS.
 The present way of altering the Snowflake client's DTLS fingerprint
 is submitting pull requests to the Pion project.
 \todo{Media channel also would not use DTLS.}
