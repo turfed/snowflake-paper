@@ -742,7 +742,7 @@ We determine the NAT type of snowflake peers differently for clients and proxies
 limitations in browsers and potential censorship vectors that
 only matter for client connections.
 For clients, we the NAT discovery feature in STUN~\cite{rfc5780}.
-Not all STUN servers support NAT discovery,
+Not all STUN servers support behavior NAT discovery,
 but we ensure that those whose addresses we ship with the Snowflake client~do.
 With the help of a STUN server,
 clients classify their own NAT type as
@@ -767,7 +767,8 @@ self-report having a restricted NAT type.
 \end{figure}
 
 We use a different technique to determine the NAT type of Snowflake proxies,
-because NAT discovery is not exposed in the WebRTC API available to web browsers.
+because the NAT behavior discovery feature
+is not exposed in the WebRTC API available to web browsers.
 We adapt a technique from MassBrowser~\cite[\S \mbox{V-A}]{Nasr2020a},
 and have proxies attempt to establish a connection with a peer under our control,
 which is behind a simulated symmetric NAT.
@@ -981,7 +982,7 @@ and users of course get Tor's anonymity and privacy benefits
 in addition to the blocking resistance supplied by Snowflake.
 (In our deployment, not even the bridge is fully trusted---it
 does not get to see the contents of clients' connection,
-nor even their eventual destinations.)
+nor their eventual destinations.)
 But there is nothing about Tor that Snowflake depends on essentially;
 the tasks of providing a blocking-resistant to the bridge
 and then telling the bridge what to do are easily separable.
@@ -1142,7 +1143,7 @@ They first prefilter using DNS queries:
 the Snowflake client's default selection of STUN servers
 on its own may be unexceptional,
 and its default server used for domain fronting rendezvous
-on its own may be exceptional,
+on its own may be unexceptional,
 but DNS queries for all of these within a short time span
 is likely characteristic of Snowflake and little else.
 After DNS prefiltering, they identify Snowflake connections
