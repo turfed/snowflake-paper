@@ -742,6 +742,8 @@ We determine the NAT type of snowflake peers differently for clients and proxies
 limitations in browsers and potential censorship vectors that
 only matter for client connections.
 For clients, we the NAT discovery feature in STUN~\cite{rfc5780}.
+% "Use STUN to determine NAT behaviour of peers" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/34129
+% "Add utility to help user discover their NAT type" https://github.com/pion/stun/issues/8
 Not all STUN servers support behavior NAT discovery,
 but we ensure that those whose addresses we ship with the Snowflake client~do.
 With the help of a STUN server,
@@ -1028,6 +1030,7 @@ Snowflake originally used a WebRTC library extracted from Chromium,
 but that eventually proved unworkable from a practical standpoint---more
 details are in \autoref{sec:deployment}.
 Since 2019, Snowflake has used Pion~\cite{pion-webrtc},
+% "Evaluate pion WebRTC" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/28942
 an independent implementation of WebRTC
 implemented as a generic library,
 not tied to any browser.
@@ -1180,6 +1183,7 @@ Upstreaming fingerprinting changes to Pion
   \href{https://github.com/pion/dtls/pull/407}{Do not include IP addresses as SNI values}
   \href{https://github.com/pion/dtls/pull/410}{Only include supported\_groups extension in ClientHello}
 \href{https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40249}{Hello Verify}
+\href{https://github.com/pion/stun/pull/33}{Rfc5780 NAT behavior detection}
 
 \section{Experience}
 \label{sec:experience}
