@@ -1074,9 +1074,20 @@ under every censor.
 % but OONI apparently does not measure that server:
 % https://explorer.ooni.org/chart/mat?test_name=stunreachability&axis_x=measurement_start_day&since=2023-02-12&until=2023-03-15&time_grain=day&probe_cc=CN&axis_y=domain
 
-\item[Form and content of STUN messages]
-\todo{Check if ``message'' is the right terminology}
-\ldots
+\item[Format and content of STUN messages]
+STUN messages consist of a fixed header
+followed by a variable-length list of ordered
+attributes~\cite[\S 5]{rfc8489}.
+STUN is most often deployed using plaintext UDP as a transport,
+which leaves its messages open to inspection
+and potentially fingerprintable.
+The order and selection of these attributes
+is left up to the implementation.
+Among the attributes are some used
+for the NAT behavior discovery feature~\cite[\S 7]{rfc5780}
+of \autoref{sec:ice}.
+
+\todo{Have we done anything for STUN message fingerprinting?}
 
 \item[Rendezvous]
 The rendezvous methods of
