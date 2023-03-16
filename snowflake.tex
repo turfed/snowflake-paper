@@ -1115,12 +1115,32 @@ with features from other phases of the Snowflake data exchange
 to strengthen its guess and possibly effect a blocking decision.
 
 \item[DTLS]
-handshake fingerprinting
-just like TLS
-selection and order of ciphersuites,
-selection and order of extensions
-\autoref{sec:block-ru}
-\ldots
+DTLS over UDP is the outermost protocol
+of a WebRTC data connection and is exposed to the censor.
+DTLS is an adaptation of TLS to the datagram setting,
+and therefore inherits the fingerprinting concerns of TLS~\cite{Frolov2019a}.
+TLS/DTLS fingerprinting may involve, for example,
+inspecting the ClientHello message to see what
+ciphersuites and extensions are used,
+and their ordering---it may be that a particular fingerprint
+is specific to a particular implementation of a circumvention system
+and may therefore be blocked at low cost to the censor.
+
+Due to practical implementation considerations,
+the defenses to DTLS fingerprinting in Snowflake are not very robust,
+and are reactive rather than proactive.
+In~the world of TLS one may use the uTLS package~\cite[\S VII]{Frolov2019a},
+or~(at a not inconsiderable cost of complexity)
+tunnel through a locally installed web browser
+to borrow its TLS fingerprint~\cite[\S 5.1]{Fifield2015a}.
+But there is as yet no equivalent of uTLS for DTLS,
+and using a browser's DTLS implementation proved unworkable
+even for implementation, let alone convenient deployment to users.
+The present way of altering DTLS fingerprints in Snowflake
+is by submitting pull requests to the Pion project
+whenever a fingerprint feature actually used for blocking is identified.
+\autoref{sec:block-ru} documents how this has happened twice,
+in response to blocking in Russia.
 
 \item[Data channel or media channel]
 \ldots
@@ -1166,14 +1186,6 @@ used in the Snowflake client.
 The authors acknowledge that DTLS fingerprinting
 is fragile, as the DTLS fingerprint is, in principle,
 a~controllable feature.
-But principle and practice are different,
-and in practice,
-the world of circumvention development
-lacks a tool that does for DTLS fingerprints
-what uTLS does for TCP-based~TLS.
-The present way of altering the Snowflake client's DTLS fingerprint
-is submitting pull requests to the Pion project.
-\todo{Media channel also would not use DTLS.}
 The DNS query prefilter may perhaps be mitigated
 by alternative rendezvous methods (\autoref{sec:rendezvous}),
 or by smarter selection of STUN servers by the client.
