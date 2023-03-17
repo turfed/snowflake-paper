@@ -275,7 +275,7 @@ with covert ciphertexts of the same length,
 such that the replacement is undetectable to an observer.
 One technical subtlety is that where Snowflake uses
 WebRTC data channels,
-Protozoa uses WebRTC media channels,
+Protozoa uses WebRTC media streams,
 which may be an advantage;
 we will return to this point in \autoref{sec:fingerprinting}.
 \todo{Check if \href{https://censorbib.nymity.ch/\#Figueira2022a}{Stegozoa}
@@ -896,9 +896,9 @@ because transmission of reliable,
 connection-oriented streams data is closely matched
 to the use case of a circumvention proxy.
 But data channels are not the only available option:
-WebRTC also provides media channels,
+WebRTC also provides media stream,
 for unreliable transmission of real-time audio and video.
-Data channels and media channels have distinguishable wire representations
+Data channels and media streams have distinguishable wire representations
 that give rise to fingerprinting concerns that we take up in \autoref{sec:fingerprinting}.
 
 If snowflake proxies were as reliable as traditional proxies,
@@ -1146,7 +1146,7 @@ whenever a fingerprint feature actually used for blocking is identified.
 \autoref{sec:block-ru} documents how this has happened twice,
 in response to blocking in Russia.
 
-\item[Data channel or media channel]
+\item[Data channel or media stream]
 \ldots
 
 \todo{Mention traffic shaping?}
