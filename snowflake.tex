@@ -1151,7 +1151,35 @@ whenever a fingerprint feature actually used for blocking is identified.
 in response to blocking in Russia.
 
 \item[Data channel or media stream]
-\ldots
+Besides data channels, WebRTC offers \firstterm{media streams},
+in line with its intended purpose of enabling real-time
+audio and video communication.
+Data channels and media streams are externally distinguishable
+because they use different encrypted transports:
+while data channels use DTLS,
+media streams use DTLS-SRTP;
+that is, the Secure Real-Time Transport Protocol
+preceded by a DTLS key exchange~\cite[\S 4.3]{rfc8827}.
+
+Data channels are a better match for Snowflake's communication model:
+media streams are meant to contain encoded audio and video,
+not arbitrary binary data,
+and do not guarantee reliable or in-order delivery.
+But the use of DTLS rather than DTLS-SRTP could become
+a significant feature if most other WebRTC applications use media streams.
+(We do not know which is more common in practice,
+or whether there are enough other uses of data channels
+to support an argument that blocking all data channels would be expensive.)
+Although it would be less convenient,
+it would be possible to adapt the WebRTC link between
+the client and the proxy
+to use a media stream rather than a data channel,
+either by modulating binary data into a well-formed encoded
+audio or video signal in the manner of, say,
+CovertCast~\cite[\S 4.3]{McPherson2016a},
+or by directly replacing the ciphertext of SRTP packets,
+like Protozoa~\cite[\S 4.4]{Barradas2020a}.
+% See idea about WebRTC Encoded Transform: https://lists.torproject.org/pipermail/anti-censorship-team/2023-February/000284.html
 
 \todo{Mention traffic shaping?}
 % The Snowflake protocol supports traffic shaping (inside the WebRTC layer),
