@@ -274,7 +274,7 @@ and the proxy persists as long as the client is using it.
 If Snowflake's specialty is diversity of proxy addresses,
 Protozoa's is traffic analysis:
 using an authentic WebRTC audio or video stream as a carrier,
-it replaces the content encrypted, encoded media frames
+it replaces the content of encrypted, encoded media frames
 with covert ciphertexts of the same length,
 such that the replacement is undetectable to an observer.
 One technical subtlety is that where Snowflake uses
@@ -903,7 +903,7 @@ But data channels are not the only available option:
 WebRTC also provides media stream,
 for unreliable transmission of real-time audio and video.
 Data channels and media streams have distinguishable wire representations
-that give rise to fingerprinting concerns that we take up in \autoref{sec:fingerprinting}.
+that give rise to fingerprinting concerns we take up in \autoref{sec:fingerprinting}.
 
 If snowflake proxies were as reliable as traditional proxies,
 what we have described so far would already suffice:
@@ -1018,12 +1018,12 @@ which, if not considered carefully, might permit a censor
 to selectively block only Snowflake,
 while leaving other uses of WebRTC undisturbed.
 In~this discussion, it is worth remembering
-what Tschantz et~al.\ have observed:
+what Tschantz et~al.\ have observed\cite[\mbox{VI-A}]{Tschantz2016a}:
 that censors prefer to exploit
 simple, precise, deterministic distinguishers
 that appear in the early phase of a circumvention session whenever possible,
 and use long-term, probabilistic, or computationally expensive tests
-only as a last resort~\cite[\mbox{VI-A}]{Tschantz2016a}.
+only as a last resort.
 It is hardly worth worrying about protocol fingerprints
 in a circumvention system while easier distinguishers exist;
 conversely, small, patchable, fingerprinting flaws are forgivable
@@ -1057,6 +1057,7 @@ needed to set up a connection,
 corresponding to Snowflake rendezvous---unspecified~\cite[\S 3]{rfc8825},
 leaving applications to invent their own signaling mechanisms.
 % "The choice of protocols for client-server and inter-server signaling, and the definition of the translation between them, are outside the scope of the WebRTC protocol suite described in this document."
+% https://www.rfc-editor.org/rfc/rfc8829.html#section-3.1: "JSEP does not specify a particular signaling model or state machine, other than the generic need to exchange session descriptions in the fashion described by [RFC3264] (offer/answer)..."
 
 The following is a list of potential fingerprinting concerns
 that bear on Snowflake, together with brief descriptions
@@ -1193,7 +1194,7 @@ like Protozoa~\cite[\S 4.4]{Barradas2020a}.
 
 \end{description}
 
-Snowflake's susceptibility to protocol fingerprinting
+The degree of Snowflake's susceptibility to protocol fingerprinting
 has been analyzed in the past by
 Fifield and Gil Epner~\cite{arxiv.1605.08805} and by
 MacMillan et~al.~\cite{arxiv.2008.03254}.
