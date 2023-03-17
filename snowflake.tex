@@ -33,6 +33,10 @@
 \hyphenation{Java-Script}
 \hyphenation{uProxy}
 
+% Highlight the first usage or definition of a technical term.
+% Like the firstterm element in DocBook: https://tdg.docbook.org/tdg/5.2/firstterm.html.
+\newcommand{\firstterm}[1]{\textit{#1}}
+
 \begin{document}
 
 \date{}
@@ -131,8 +135,8 @@ and alternative, command line--based proxies.
 
 As is typical in circumvention research,
 we assume a threat model where
-censored \emph{clients} reside in a censor-controlled network.
-The \emph{censor} has the power to inspect and interfere with
+censored \firstterm{clients} reside in a censor-controlled network.
+The \firstterm{censor} has the power to inspect and interfere with
 traffic that crosses the border of its network;
 in practice, this power takes the form of things like
 inspection of IP addresses and destination server hostnames,
@@ -141,7 +145,7 @@ IP address blocking, and injection of false DNS responses
 or TCP RST packets.
 The client wants to exchange some information with a
 destination outside the censor's network---often
-with the assistance of third-party \emph{proxies}---and
+with the assistance of third-party \firstterm{proxies}---and
 the censor is motivated to block either the contents
 of the communication, or the destination itself.
 The censor is aware of the possibility of circumvention,
@@ -150,8 +154,8 @@ but also indirect access by way of a proxy or proxy protocol.
 We consider circumvention to be accomplished when a client
 can reliably reach any proxy,
 because the proxy then provides access to any desired destination.
-(In Snowflake, we separate the roles of temporary \emph{proxies}
-and a stable long-term \emph{bridge}, but the idea is the same.)
+(In Snowflake, we separate the roles of temporary \firstterm{proxies}
+and a stable long-term \firstterm{bridge}, but the idea is the same.)
 Mitigating in the client's favor
 is the fact that the censor is presumed to derive some benefit
 from permitting some forms of network access:
@@ -525,7 +529,7 @@ from external observers.
 A~Snowflake rendezvous message is a serialized bundle of data.
 Its essential element
 is the information necessary to establish a WebRTC connection,
-namely a Session Description Protocol (SDP) \emph{offer}~\cite{rfc8839}.
+namely a Session Description Protocol (SDP) \firstterm{offer}~\cite{rfc8839}.
 The offer contains information needed for a network connection,
 such as the client's external IP addresses;
 as well as cryptographic information to secure a later key exchange between the peers.
@@ -536,7 +540,7 @@ with a compatible proxy.
 The client serializes all these pieces of data and sends them to the broker.
 The broker chooses an available proxy
 and forwards the client's offer to it.
-The proxy composes an SDP \emph{answer},
+The proxy composes an SDP \firstterm{answer},
 containing its own external addresses and cryptographic information,
 and sends it back to the broker,
 which then forwards it to the client.
