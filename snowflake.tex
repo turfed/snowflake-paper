@@ -1182,16 +1182,6 @@ or by directly replacing the ciphertext of SRTP packets,
 like Protozoa~\cite[\S 4.4]{Barradas2020a}.
 % See idea about WebRTC Encoded Transform: https://lists.torproject.org/pipermail/anti-censorship-team/2023-February/000284.html
 
-\todo{Mention traffic shaping?}
-% The Snowflake protocol supports traffic shaping (inside the WebRTC layer),
-% but it is currently disabled.
-% As \autoref{sec:experience} shows,
-% censors are still going after easier targets.
-% Circumvention research awaits a good treatment of
-% exactly what is a good strategy for traffic shaping to
-% best mitigate attacks of this nature,
-% and an analysis of how well such attacks work outside the laboratory.
-
 \end{description}
 
 The degree of Snowflake's susceptibility to protocol fingerprinting
@@ -1227,6 +1217,28 @@ a~controllable feature.
 The DNS query prefilter may perhaps be mitigated
 by alternative rendezvous methods (\autoref{sec:rendezvous}),
 or by smarter selection of STUN servers by the client.
+
+Somewhat related to protocol fingerprinting is traffic analysis;
+that is, inferring the use of a censorship system
+by looking at features like the distribution of packet sizes,
+arrival times, and the sequence of packet directionality (in/out)---the
+kind of analysis that, in other contexts, is known as ``website fingerprinting''
+% Could cite IETF survey on website fingerprinting.
+% (But don't want to give this topic more attention than it is due.)
+may potentially also be applied to detecting circumvention systems.
+In~our opinion, this possibility has remained more potential than actual.
+As our own (see \autoref{sec:experience}) and wider experience shows,
+censors still prefer to attack easier targets.
+The Snowflake protocol supports traffic shaping (inside the WebRTC layer),
+but it is currently disabled:
+packets are sent with their ``natural'' sizes and without delay,
+reflecting the traffic dynamics of the tunneled Tor traffic
+(which in turn more or less represents the dynamics
+of the user's application-layer streams deeper in the tunnel).
+Circumvention research awaits a treatment of
+what is a good strategy for traffic shaping to
+best mitigate attacks of this nature,
+and an analysis of how much of a threat they pose in practice.
 
 Upstreaming fingerprinting changes to Pion
 \url{https://ntc.party/t/second-snowflake-bridge-available-for-testing/3445/7}
