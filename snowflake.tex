@@ -1151,6 +1151,27 @@ whenever a fingerprint feature actually used for blocking is identified.
 \autoref{sec:block-ru} documents how this has happened twice,
 in response to blocking in Russia.
 
+% For reference, fingerprinting changes upstreamed to Pion:
+% * IP addresses as SNI values
+%   https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40014#note_2764715
+%   https://github.com/pion/dtls/issues/406
+%   https://github.com/pion/dtls/pull/407
+% * supported_groups in Server Hello
+%   https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40014#note_2765074
+%   https://github.com/pion/dtls/issues/409
+%   https://github.com/pion/dtls/pull/410
+% * Server sending Hello Verify Request
+%   https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40014#note_2764715
+%   https://gitlab.torproject.org/tpo/applications/tor-browser-build/-/merge_requests/637
+%   https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40249
+%   https://github.com/pion/dtls/pull/513
+%   https://github.com/pion/webrtc/pull/2407
+%
+% Not fingerprinting but also upstreamed:
+% * NAT behavior detection
+%   https://github.com/pion/stun/issues/8
+%   https://github.com/pion/stun/pull/33
+
 \item[Data channel or media stream]
 Besides data channels, WebRTC offers \firstterm{media streams},
 in line with its intended purpose of enabling real-time
@@ -1239,13 +1260,6 @@ Circumvention research awaits a treatment of
 what is a good strategy for traffic shaping to
 best mitigate attacks of this nature,
 and an analysis of how much of a threat they pose in practice.
-
-Upstreaming fingerprinting changes to Pion
-\url{https://ntc.party/t/second-snowflake-bridge-available-for-testing/3445/7}
-  \href{https://github.com/pion/dtls/pull/407}{Do not include IP addresses as SNI values}
-  \href{https://github.com/pion/dtls/pull/410}{Only include supported\_groups extension in ClientHello}
-\href{https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40249}{Hello Verify}
-\href{https://github.com/pion/stun/pull/33}{Rfc5780 NAT behavior detection}
 
 \section{Experience}
 \label{sec:experience}
