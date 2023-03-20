@@ -54,14 +54,19 @@ EVENTS <- tribble(
 	"2022-10-04 17:15:00",112000, "TLS fingerprint blocking in Iran",              # https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40207#note_2849437
 	"2022-10-27 00:00:00",114000, "",                                              # https://blog.torproject.org/new-release-tor-browser-1156/
 	"2022-11-01 00:00:00",128000, "Tor Browser 11.5.6 and Orbot 16.6.3\nfix TLS fingerprint", # https://github.com/guardianproject/orbot/releases/tag/16.6.3-RC-1-tor.0.4.7.10
-	"2022-12-07 00:00:00",138000, "Tor Browser 12.0 adds a second Snowflake bridge", # https://blog.torproject.org/new-release-tor-browser-120/
+	"2022-12-07 00:00:00",138000, "Tor Browser 12.0 adds a second bridge",         # https://blog.torproject.org/new-release-tor-browser-120/
 	"2023-01-16 00:00:00", 33000, "",                                              # https://bugs.torproject.org/tpo/anti-censorship/team/115
 	"2023-01-24 00:00:00",  8000, "Domain fronting\nrendezvous\ntemporarily\nblocked in Iran", # https://bugs.torproject.org/tpo/anti-censorship/team/115
 	# "2023-01-31 00:00:00", 33000, "",                                            # https://bugs.torproject.org/tpo/anti-censorship/team/115#note_2876012
 	# "2023-02-02 00:00:00",  8000, "Domain fronting rendezvous again blocked in Iran", # https://bugs.torproject.org/tpo/anti-censorship/team/115#note_2876012
-	# "2023-02-10 00:00:00", 33000, "",                                            # https://explorer.ooni.org/chart/mat?probe_cc=IR&since=2023-01-20&until=2023-02-20&time_grain=day&axis_x=measurement_start_day&test_name=web_connectivity&domain=cdn.sstatic.net
-	# "2023-02-14 00:00:00",  8000, "Domain fronting rendezvous again blocked in Iran", # https://explorer.ooni.org/chart/mat?probe_cc=IR&since=2023-01-20&until=2023-02-20&time_grain=day&axis_x=measurement_start_day&test_name=web_connectivity&domain=cdn.sstatic.net
-	# "2023-02-19 00:00:00",  8000, "Domain fronting rendezvous again blocked in Iran", # https://explorer.ooni.org/chart/mat?probe_cc=IR&since=2023-01-20&until=2023-02-20&time_grain=day&axis_x=measurement_start_day&test_name=web_connectivity&domain=cdn.sstatic.net
+	# "2023-02-10 00:00:00", 33000, "",                                            # https://gitlab.torproject.org/tpo/anti-censorship/team/-/issues/115#note_2883298
+	# "2023-02-14 00:00:00",  8000, "Domain fronting rendezvous again blocked in Iran", # https://gitlab.torproject.org/tpo/anti-censorship/team/-/issues/115#note_2883298
+	"2023-02-15 00:00:00",118000, "Tor Browser 12.0.3\nalters DTLS fingerprint"     # https://blog.torproject.org/new-release-tor-browser-1203/
+	# "2023-02-19 00:00:00",  8000, "",                                            # https://gitlab.torproject.org/tpo/anti-censorship/team/-/issues/115#note_2883298
+	# "2023-02-20 00:00:00",  8000, "Domain fronting rendezvous again blocked in Iran", # https://gitlab.torproject.org/tpo/anti-censorship/team/-/issues/115#note_2883298
+	# "2023-02-22 00:00:00",  8000, "",                                            # https://gitlab.torproject.org/tpo/anti-censorship/team/-/issues/115#note_2883298
+	# "2023-02-23 00:00:00",  8000, "Domain fronting rendezvous again blocked in Iran", # https://gitlab.torproject.org/tpo/anti-censorship/team/-/issues/115#note_2883298
+	# "2023-03-15 00:00:00", 10000, "Orbot 17.0.0 BETA 2 adds a second bridge",       # [release](https://github.com/guardianproject/orbot/releases/tag/17.0.0-BETA-2-tor.0.4.7.11
 ) %>% mutate(date = lubridate::ymd_hms(date) %>% lubridate::as_date())
 
 # Return an abbreviation for the month, followed by a year for January only.
