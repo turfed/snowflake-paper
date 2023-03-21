@@ -485,7 +485,7 @@ We currently support two rendezvous methods in Snowflake:
 \begin{description}
 \item[Domain fronting]
 In this method, the client does one HTTPS exchange
-with the broker; however routing through an intermediary such as a CDN
+with the broker; however routing through an intermediary such as a CDN,
 and disguising the externally visible domain name
 (the TLS Server Name Indication, or SNI) so that the exchange
 appears to be destined to a different site.
@@ -1010,7 +1010,7 @@ As always, the goal is to make circumvention traffic
 difficult to distinguish from traffic the censor cares not to block.
 Snowflake is, by nature, tied to WebRTC,
 and therefore can only be effective against a censor
-that is not motivated to block WebRTC protocols wholesale.
+that cannot afford to block WebRTC protocols wholesale.
 But even within that scope,
 there are many possible variations in \emph{how}
 WebRTC is implemented and used,
@@ -1026,7 +1026,7 @@ and use long-term, probabilistic, or computationally expensive tests
 only as a last resort.
 It is hardly worth worrying about protocol fingerprints
 in a circumvention system while easier distinguishers exist;
-conversely, small, patchable, fingerprinting flaws are forgivable
+conversely, small, corrigible fingerprinting flaws may be excused
 as long as the foundation is solid.
 
 As~WebRTC is designed for the web,
@@ -1124,10 +1124,11 @@ with features from other phases of the Snowflake data exchange
 to strengthen its guess and possibly effect a blocking decision.
 
 \item[DTLS]
-DTLS over UDP is the outermost protocol
-of a WebRTC data connection and is exposed to the censor.
-DTLS is an adaptation of TLS to the datagram setting,
-and therefore inherits the fingerprinting concerns of TLS~\cite{Frolov2019a}.
+The outermost protocol
+of a WebRTC data connection, exposed to the censor,
+is Datagram TLS (DTLS) over UDP.
+DTLS is an adaptation of TLS,
+and inherits the fingerprinting concerns of the latter~\cite{Frolov2019a}.
 TLS/DTLS fingerprinting may involve, for example,
 inspecting the ClientHello message to see what
 ciphersuites and extensions are used,
@@ -1200,7 +1201,7 @@ either by modulating binary data into a well-formed encoded
 audio or video signal in the manner of, say,
 CovertCast~\cite[\S 4.3]{McPherson2016a},
 or by directly replacing the ciphertext of SRTP packets,
-like Protozoa~\cite[\S 4.4]{Barradas2020a}.
+as in Protozoa~\cite[\S 4.4]{Barradas2020a}.
 % See idea about WebRTC Encoded Transform: https://lists.torproject.org/pipermail/anti-censorship-team/2023-February/000284.html
 
 \end{description}
@@ -1345,7 +1346,7 @@ no way to start using a different proxy on the fly.
 (A~lack of session persistence across temporary proxies
 had also been a problem in flash proxy~\cite[\S 5.2]{Fifield2012a}.)
 Probably because of this, by early 2020,
-the number of simultaneous users of Snowflake
+the average number of concurrent users
 had not risen above~40.
 % > library("tidyverse")
 % > WANTED_FINGERPRINTS <- c(
@@ -1421,7 +1422,7 @@ is 133, on \mbox{2020-12-09}.
 }
 \label{fig:user-counts}
 \todo[inline]{Cut off the \(y\)-axis at the maximum of the data,
-so that the vertical annotations at the top fall outside the plot itself.}
+so that the vertical annotations at the top fall outside the plot area.}
 \todo[inline]{Bandwidth chart? Ideally with aligned horizontal axis.}
 \end{figure*}
 
@@ -1513,9 +1514,6 @@ As of May 2022, about 65\% of Snowflake users come from Russia.
 
 \todo{2022-07-14 Tor Browser 11.5 \href{https://blog.torproject.org/new-release-tor-browser-115/}{automatic circumvention configuration}.}
 
-The Tor Metrics Timeline~\cite{tor-metrics-timeline}
-has a detailed list of events over the course of Snowflake deployment.
-
 % david
 $X$ TB of user data transferred\todo{Compute this, make it reproducible.}
 
@@ -1539,7 +1537,7 @@ We began to collect metrics on the number of deployed proxies on \mbox{2019-06-2
 \autoref{fig:total-proxy-counts} shows the total count of unique proxy IP addresses
 from the beginning of our collection to the writing of this paper.
 The majority of the growth in Snowflake proxies over the last three years comes from
-the success of the Snowflake browser add-on.
+the success of the Snowflake browser add-on.\todo{Audit ``add-on'' vs.\ ``extension''.}
 The add-on was released for Firefox on \mbox{2019-06-26} and Chrome on \mbox{2019-07-03},
 but the first major spike in proxy counts was thanks to the integration
 of Snowflake with the existing flash proxy add-on, Cupcake.
@@ -1726,7 +1724,7 @@ Distributed bridge architecture
 
 Snowflake have experienced a significant increase of active users since its initial release. However, the design of snowflake requires server to keep state for the clients across connections that prevents server side load balancing. To enable the use of more than one snowflake server, a new design amendment is necessary.
 
-Among many alternative designs, a snowflake client initiated server identity indication system was chosen. The snowflake client would send the server fingerprint it intended to connect to the broker.The broker then translate this server identity fingerprint to a server WebSocket relay address that corresponding to this server identify fingerprint and send this relay WebSocket address to the snowflake proxy matched. Upon receiving the address together with snowflake client's Session Description Protocol, the proxy will connect the client and the relay before tunneling the connection between them.
+Among many alternative designs, a snowflake client initiated server identity indication system was chosen. The snowflake client would send the server fingerprint it intended to connect to the broker. The broker then translate this server identity fingerprint to a server WebSocket relay address that corresponding to this server identify fingerprint and send this relay WebSocket address to the snowflake proxy matched. Upon receiving the address together with snowflake client's Session Description Protocol, the proxy will connect the client and the relay before tunneling the connection between them.
 
 To protect the proxy against a compromised broker that lead to send unsolicited traffic to servers, the proxy can be configured to check the WebSocket address's hostname and reject those without predefined suffix. Combining with mandatory TLS the proxy with distributed snowflake support does not introduce network abuse risk. This hostname check system is also used to check the compatibility between the proxy and the broker, as the broker will reject any proxy with a host name rejection policy that is incompatible with the brokers', including the case when a legacy proxy connect to a broker with distributed snowflake support enabled.
 
