@@ -1304,44 +1304,35 @@ and an analysis of how much of a threat they pose in practice.
 % |2023-03-15|||snowflake|Release of Orbot for Android v17 BETA 2. First release of Orbot to include the snowflake-02 bridge along with the existing snowflake-01.|[release](https://github.com/guardianproject/orbot/releases/tag/17.0.0-BETA-2-tor.0.4.7.11)||
 
 The deployment of Snowflake to end users was gradual,
-reflecting its development.
-It was tested in the alpha release series of Tor Browser
-over a course of four years
-before finally becoming part of the stable release.
+reflecting a long development process.
+Deployment began in~2017;
+however the system only really became usable in~2020,
+and began to attract large numbers of users
+(large enough to merit a censor's attention)
+in~2022, following particular generalized
+network blocking events in Russia and Iran.
+Here we examine the timeline of deployment
+and world events,
+and their influence on the number of Snowflake users over time.
+
+Snowflake was shipped in the alpha release series of Tor Browser
+over the course of four years
+before becoming part of the stable release.
 % https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/issues/19001 "First working bundles with Snowflake, for linux only"
-The necessary go-webrtc bindings became available first for GNU/Linux,
-and so Snowflake was released for the first time, for GNU/Linux only,
-with Tor Browser 7.0a1 on \mbox{2017-01-24}.
+It~first became available for GNU/Linux
+with Tor Browser 7.0a1 on \mbox{2017-01-24};
 % https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/issues/19001 "mac reproducible build"
 % [tbb-dev] Please check reproducibility of mac build with Snowflake (e084e83418) https://lists.torproject.org/pipermail/tbb-dev/2017-July/000579.html
-The next platform for which we got go-webrtc bindings working
-and building reproducibly was macOS,
-and Snowflake for macOS was released as part of
-Tor Browser 7.5a4 on \mbox{2017-08-08}.
-
-% https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/issues/19001 "windows reproducible build"
-% https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/issues/25483 "Windows reproducible build of snowflake"
-Preparing reproducible the go-webrtc bindings for Windows
-presented enormous difficulties.
-The Chromium browser\todo{Maybe \mbox{``libwebrtc''} is better than ``Chromium''.}
-from which go-webrtc was derived
-is a massively complex software project,
-with a multi-stage and frequently changing build system.
-The reproducible build environment,
-with its requirements to
-cross-compile from source,
-without any pre-built binary or proprietary dependencies,
-was never a supported build configuration.
-The issue stalled us for a long time.
-We finally broke through the impasse
-by switching from the Chromium-derived go-webrtc
-to Pion WebRTC~\cite{pion-webrtc} in the middle of 2019.
-% https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/issues/28942 "Evaluate pion WebRTC"
-Pion is an independent implementation of WebRTC protocols, written in Go,
-that had not existing at the beginning of the Snowflake project.
-Pion presented no major difficulties to building reproducibly,
-and with it we were able to release Snowflake for Windows
-in Tor Browser 9.0a7 on \mbox{2019-10-01}.
+then for macOS
+with Tor Browser 7.5a4 on \mbox{2017-08-08}.
+Here we hit a roadblock:
+the Chromium-derived WebRTC library we had used to that point
+proved difficult to make work in Tor Browser's
+cross-compiling and reproducible build environment.
+Pion WebRTC~\cite{pion-webrtc} was more suited to our development needs,
+and after switching to it we were able to release
+Snowflake for Windows
+with Tor Browser 9.0a7 on \mbox{2019-10-01}.
 
 While at this point Snowflake was functional on all major desktop platforms,
 it was not yet really usable.
@@ -1405,9 +1396,10 @@ on \mbox{2020-05-22}.
 It was at this point that Snowflake became
 comfortable enough to use for daily browsing,
 and the number of users began to grow steadily into 2021.\todo{Add NAT matching to this timeline: that was required for comfort as well.}
-Snowflake for Android became available with
-Tor Browser 10.0a1 on \mbox{2020-06-02}.
+Meanwhile, Snowflake for Android had become available with
 % https://gitlab.torproject.org/tpo/applications/tor-browser/-/issues/28672 "Android reproducible build of Snowflake"
+Tor Browser 10.0a1 on \mbox{2020-06-02}.
+\todo{Find out when the first release of Snowflake in Orbot was.}
 
 \begin{figure*}
 \includegraphics{figures/users-global/users-global}
@@ -1578,10 +1570,31 @@ Orbot? as both client and proxy?
 
 % arlo, cecylia
 
-Difficulty of using WebRTC outside a browser
-
-Reproducible builds
-- difficulty of cross-compiling go-webrtc extracted from Chromium
+Reproducible builds\ldots
+Difficulty of cross-compiling go-webrtc extracted from Chromium\ldots
+Difficulty of using WebRTC outside a browser\ldots
+% https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/issues/19001 "windows reproducible build"
+% https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/issues/25483 "Windows reproducible build of snowflake"
+Preparing reproducible builds the go-webrtc bindings for Windows
+presented enormous difficulties.
+The Chromium browser\todo{Maybe \mbox{``libwebrtc''} is better than ``Chromium''.}
+from which go-webrtc was derived
+is a massively complex software project,
+with a multi-stage and frequently changing build system.
+The reproducible build environment,
+with its requirements to
+cross-compile from source,
+without any pre-built binary or proprietary dependencies,
+was never a supported build configuration.
+The issue stalled us for a long time.
+We finally broke through the impasse
+by switching from the Chromium-derived go-webrtc
+% https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/issues/28942 "Evaluate pion WebRTC"
+to Pion WebRTC~\cite{pion-webrtc} in the middle of 2019.
+Pion is an independent implementation of WebRTC protocols, written in Go,
+that had not existing at the beginning of the Snowflake project.
+Pion presented no major difficulties to building reproducibly,
+and with it we were able to release Snowflake for Windows
 
 History of changing domain fronts
 
