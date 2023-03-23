@@ -1313,6 +1313,30 @@ and an analysis of how much of a threat they pose in practice.
 % |2023-03-13 20:17:54|||snowflake|Restarted snowflake-01 bridge for a bugfix.|[comment](https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40262#note_2886041) [issue](https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40260)||
 % |2023-03-15|||snowflake|Release of Orbot for Android v17 BETA 2. First release of Orbot to include the snowflake-02 bridge along with the existing snowflake-01.|[release](https://github.com/guardianproject/orbot/releases/tag/17.0.0-BETA-2-tor.0.4.7.11)||
 
+\begin{figure*}[t]
+\includegraphics{figures/users-global/users-global}
+\caption{
+Estimated average number of simultaneous Snowflake users per day.
+The value at the extreme left edge of the graph,
+the beginning of 2021, is about~60.
+At this point, Snowflake was available in the Tor Browser alpha release series
+for desktop platforms and Android,
+and it had the Turbo Tunnel session persistence feature.
+% Loesing~\cite{tor-tr-2012-10-001} describes how user counts are estimated.
+The maximum value in the part of the graph not shown
+is~133, on \mbox{2020-12-09}.
+% > filtered[which.max(filter(filtered, date < "2021-01-01")$users), ]
+% # A tibble: 1 x 3
+%   date       transport users
+%   <date>     <chr>     <dbl>
+% 1 2020-12-09 snowflake  133.
+}
+\label{fig:user-counts}
+\todo[inline]{Cut off the \(y\)-axis at the maximum of the data,
+so that the vertical annotations at the top fall outside the plot area.}
+\todo[inline]{Bandwidth chart? Ideally with aligned horizontal axis.}
+\end{figure*}
+
 The deployment of Snowflake to end users was gradual,
 reflecting a long development process.
 Deployment began in~2017;
@@ -1412,35 +1436,6 @@ and the necessary proxy support was released on \mbox{2020-11-17}.
 % https://archive.org/details/snowflake-webextension-0.5.2
 After this, Snowflake became usable for daily browsing
 and the number of users began to grow steadily into 2021.
-
-Meanwhile, Snowflake for Android had become available with
-% "Android reproducible build of Snowflake" https://bugs.torproject.org/tpo/applications/tor-browser/28672
-Tor Browser~10.0a1 on \mbox{2020-06-02}.
-\todo{Find out when the first release of Snowflake in Orbot was.}
-
-\begin{figure*}
-\includegraphics{figures/users-global/users-global}
-\caption{
-Estimated average number of simultaneous Snowflake users per day.
-The value at the extreme left edge of the graph,
-the beginning of 2021, is about~60.
-At this point, Snowflake was available in the Tor Browser alpha release series
-for desktop platforms and Android,
-and it had the Turbo Tunnel session persistence feature.
-% Loesing~\cite{tor-tr-2012-10-001} describes how user counts are estimated.
-The maximum value in the part of the graph not shown
-is~133, on \mbox{2020-12-09}.
-% > filtered[which.max(filter(filtered, date < "2021-01-01")$users), ]
-% # A tibble: 1 x 3
-%   date       transport users
-%   <date>     <chr>     <dbl>
-% 1 2020-12-09 snowflake  133.
-}
-\label{fig:user-counts}
-\todo[inline]{Cut off the \(y\)-axis at the maximum of the data,
-so that the vertical annotations at the top fall outside the plot area.}
-\todo[inline]{Bandwidth chart? Ideally with aligned horizontal axis.}
-\end{figure*}
 
 This brings us to \autoref{fig:user-counts},
 which shows the estimated number of Snowflake users since 2021.
