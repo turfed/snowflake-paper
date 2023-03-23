@@ -713,7 +713,10 @@ connection to the remote address.
 \definecolor{ncolor}{Gray}{13}
 \newcommand{\Y}{\cellcolor{Ycolor}\ding{51}}
 \newcommand{\n}{\cellcolor{ncolor}--}
-\newcommand{\rot}[1]{\rotatebox{45}{\rlap{#1}}}
+\newcommand{\rotlabel}[1]{\rotatebox{45}{#1}}
+% \vphantom is to make the labels take up vertical space;
+% \rlap is so they don't expand the horizontal size of table columns.
+\newcommand{\rot}[1]{\vphantom{\rotlabel{#1}}\rotlabel{\rlap{#1}}}
 \centering
 \begin{tabular}{rccccc}
 & % empty
@@ -734,8 +737,7 @@ The incompatible cases are when one peer's NAT is symmetric
 and the other's is symmetric or port-restricted.
 }
 \label{tab:nat-matching}
-\todo[inline]{Fix centering (off center because of \texttt{\textbackslash rlap} slanted labels).
-Also fix overflow into the top page margin.}
+\todo[inline]{Fix centering (off center because of \texttt{\textbackslash rlap} slanted labels).}
 \end{table}
 
 Table~\ref{tab:nat-matching}
