@@ -321,7 +321,7 @@ is in the complications that emerge when idea meets practice.
 \section{How it works}
 \label{sec:mechanics}
 
-\begin{figure*}
+\begin{figure*}[t]
 \framebox[\textwidth]{\vbox to 2in{\vfil\centering TODO\vfil}}
 \caption{
 Architecture of Snowflake.
@@ -675,8 +675,8 @@ Restricted clients may only be matched to unrestricted proxies.
 
 Snowflake clients and proxies have one of a few possible
 network configurations that can be categorized by two factors:
-(1)~the mapping behavior of its NAT; and
-(2)~the filtering behavior of its firewall.
+the mapping behavior of its NAT,
+and the filtering behavior of its firewall.
 The implementation details of how NATs map internal IP address and port combinations
 to external ports varies significantly, but for our purposes it suffices
 to condense these variations, together with common firewall filtering behaviors,
@@ -1287,6 +1287,8 @@ and an analysis of how much of a threat they pose in practice.
 % |2020-08-19|||snowflake|Release of Tor Browser 10.0a5, which added added the ability to do NAT behavior discovery to the Snowflake client.|[blog post](https://blog.torproject.org/new-release-tor-browser-100a5/) [issue](https://bugs.torproject.org/tpo/applications/tor-browser-build/40016)||
 % |2020-10-29|||snowflake|Release of Snowflake WebExtension 0.5.0, with a NAT type self-test.|[archive](https://archive.org/details/snowflake-webextension-0.5.0) [issue](https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40013)||
 % |2020-11-17|||snowflake|Release of Snowflake WebExtension 0.5.2, with a fix to the NAT type self-test.|[archive](https://archive.org/details/snowflake-webextension-0.5.2) [merge request](https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake-webext/-/merge_requests/9) [comment](https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40013#note_2716071)||
+% |2021-01-12|||snowflake|Release of Orbot 16.4.0-RC-1-tor-0.4.4.6, first release with Snowflake client support.|[release](https://github.com/guardianproject/orbot/releases/tag/16.4.0-RC-1-tor-0.4.4.6)||
+% |2021-02-23|||snowflake|Release of Orbot 16.4.1-BETA-2-tor.0.4.4.6, with experimental Snowflake proxy support.|[release](https://github.com/guardianproject/orbot/releases/tag/16.4.1-BETA-2-tor.0.4.4.6)||
 % |2021-07-06 16:56:37|||snowflake|Release of Tor Browser 10.5, first stable release that includes Snowflake.|[blog post](https://blog.torproject.org/new-release-tor-browser-105)||
 % |2021-12-20|||snowflake|Release of Tor Browser 11.0.3, with an altered DTLS fingerprint in Snowflake to counteract blocking in Russia.|[blog post](https://blog.torproject.org/new-release-tor-browser-1103/) [issue](https://bugs.torproject.org/tpo/applications/tor-browser-build/40393) [NTC post](https://ntc.party/t/ooni-reports-of-tor-blocking-in-certain-isps-since-2021-12-01/1477/59)||
 % |2021-12-14|||snowflake|Release of Tor Browser 11.5a1, with an altered DTLS fingerprint in Snowflake to counteract blocking in Russia.|[blog post](https://blog.torproject.org/new-release-tor-browser-115a1/) [issue](https://bugs.torproject.org/tpo/applications/tor-browser-build/40393) [NTC post](https://ntc.party/t/ooni-reports-of-tor-blocking-in-certain-isps-since-2021-12-01/1477/59)||
@@ -1349,8 +1351,7 @@ Here we examine the timeline of deployment
 and world events,
 and their influence on the number of Snowflake users over time.
 
-Snowflake shipped in the alpha release series of Tor Browser
-over the course of four years
+Snowflake first shipped in the alpha release series of Tor Browser
 before graduating to the stable series.
 % "First working bundles with Snowflake, for linux only" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/19001
 It~first became available for GNU/Linux
@@ -1367,9 +1368,14 @@ Pion WebRTC~\cite{pion-webrtc} was more suited to our development needs,
 and after switching to it we were able to release
 Snowflake for Windows
 with Tor Browser~9.0a7 on \mbox{2019-10-01}.
-\todo{Consider only counting stable, not alpha, releases.}
+% "Android reproducible build of Snowflake" https://bugs.torproject.org/tpo/applications/tor-browser/28672
+Snowflake for Android became available with
+Tor Browser~10.0a1 on \mbox{2020-06-02}.
+\todo{Find out when the first release of Snowflake in Orbot was.}
+% |2021-01-12|||snowflake|Release of Orbot 16.4.0-RC-1-tor-0.4.4.6, first release with Snowflake client support.|[release](https://github.com/guardianproject/orbot/releases/tag/16.4.0-RC-1-tor-0.4.4.6)||
 
-While at this point Snowflake was available on major desktop platforms,
+While at this point Snowflake was available
+on every platform supported by Tor Browser,
 it was not yet comfortably usable.
 There were two important parts missing:
 no NAT type matching (\autoref{sec:ice})
@@ -1435,7 +1441,7 @@ and the necessary proxy support was released on \mbox{2020-11-17}.
 % "after merging snowflake-webext!9 (merged), this is finally working" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40013#note_2716071
 % https://archive.org/details/snowflake-webextension-0.5.2
 After this, Snowflake became usable for daily browsing
-and the number of users began to grow steadily into 2021.
+and the number of users began to grow steadily into~2021.
 
 This brings us to \autoref{fig:user-counts},
 which shows the estimated number of Snowflake users since 2021.
@@ -1572,7 +1578,9 @@ people love the add-on and the daily count of connections
 We decided early on that the opt-out proxying model had been a mistake,
 and that Snowflake would be only opt-in.
 
-Orbot---as proxy?
+Orbot---as proxy (``kindness'' mode)?
+% 2021-02-23 https://github.com/guardianproject/orbot/releases/tag/16.4.1-BETA-2-tor.0.4.4.6
+% "experimental mode to enable running as a Snowflake proxy"
 
 \subsection{Development challenges}
 \label{sec:challenges}
