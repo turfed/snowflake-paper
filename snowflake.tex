@@ -181,7 +181,7 @@ but only on the proxy--bridge link,
 not the client--proxy link.)
 Flash proxy was deployed in Tor Browser
 % 2013: https://blog.torproject.org/combined-flash-proxy-pyobfsproxy-browser-bundles
-% 2016: https://bugs.torproject.org/17428#note_2203210 "Remove Flashproxy from Tor Browser"
+% 2016: "Remove Flashproxy from Tor Browser" https://bugs.torproject.org/17428#note_2203210
 from 2013 to~2016,
 but it never saw much use,
 probably because the reliance on WebSocket,
@@ -190,7 +190,7 @@ and required uses to perform a
 % https://gitlab.torproject.org/legacy/trac/-/wikis/doc/PluggableTransports/FlashProxy/Howto
 cumbersome port forwarding procedure.
 WebRTC was at the time an emerging technology, and while
-% https://bugs.torproject.org/5578 "Investigate WebRTC for flash proxy NAT punching "
+% "Investigate WebRTC for flash proxy NAT punching" https://bugs.torproject.org/5578
 % flashproxy.pdf §5.2: "New technologies like WebRTC [24] may fill this need in the future, if they become sufficiently popular that flash proxies' use of them does not stand out as unusual."
 it was considered as a future transport protocol for flash proxy,
 it was decided to begin Snowflake as a new, separate project,
@@ -1319,10 +1319,10 @@ and their influence on the number of Snowflake users over time.
 Snowflake was shipped in the alpha release series of Tor Browser
 over the course of four years
 before becoming part of the stable release.
-% https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/issues/19001 "First working bundles with Snowflake, for linux only"
+% "First working bundles with Snowflake, for linux only" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/19001
 It~first became available for GNU/Linux
 with Tor Browser 7.0a1 on \mbox{2017-01-24};
-% https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/issues/19001 "mac reproducible build"
+% "mac reproducible build" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/19001
 % [tbb-dev] Please check reproducibility of mac build with Snowflake (e084e83418) https://lists.torproject.org/pipermail/tbb-dev/2017-July/000579.html
 then for macOS
 with Tor Browser 7.5a4 on \mbox{2017-08-08}.
@@ -1392,13 +1392,13 @@ The Turbo Tunnel session persistence feature
 described in \autoref{sec:data-transfer}
 became available to users in Tor Browser 9.5a13
 on \mbox{2020-05-22}.
-% https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/issues/33745 "Merge a turbotunnel branch"
-% https://gitlab.torproject.org/tpo/applications/tor-browser/-/issues/34043 "Update snowflake to persist sessions across proxies"
+% "Merge a turbotunnel branch" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/33745
+% "Update snowflake to persist sessions across proxies" https://bugs.torproject.org/tpo/applications/tor-browser/34043
 It was at this point that Snowflake became
 comfortable enough to use for daily browsing,
 and the number of users began to grow steadily into 2021.\todo{Add NAT matching to this timeline: that was required for comfort as well.}
 Meanwhile, Snowflake for Android had become available with
-% https://gitlab.torproject.org/tpo/applications/tor-browser/-/issues/28672 "Android reproducible build of Snowflake"
+% "Android reproducible build of Snowflake" https://bugs.torproject.org/tpo/applications/tor-browser/28672
 Tor Browser 10.0a1 on \mbox{2020-06-02}.
 \todo{Find out when the first release of Snowflake in Orbot was.}
 
@@ -1449,7 +1449,7 @@ algorithm involves some approximations and guessed parameters---but
 the chart is at least relatively comparable to others
 produced by Tor Metrics.\todo{%
 Speaking of, should we show Snowflake numbers in context with other PTs and relay users?
-% https://gitlab.torproject.org/tpo/community/support/-/issues/40050#note_2796770 "This graph shows shows all the Tor users in Russia, whether using relays, bridges, or bridges with pluggable transports."
+% "This graph shows shows all the Tor users in Russia, whether using relays, bridges, or bridges with pluggable transports." https://bugs.torproject.org/tpo/community/support/40050#note_2796770
 }
 
 The growth of Snowflake users began in earnest on
@@ -1571,8 +1571,8 @@ Orbot? as both client and proxy?
 Reproducible builds\ldots
 Difficulty of cross-compiling go-webrtc extracted from Chromium\ldots
 Difficulty of using WebRTC outside a browser\ldots
-% https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/issues/19001 "windows reproducible build"
-% https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/issues/25483 "Windows reproducible build of snowflake"
+% "windows reproducible build" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/19001#note_2591246
+% "Windows reproducible build of snowflake" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/25483
 Preparing reproducible builds the go-webrtc bindings for Windows
 presented enormous difficulties.
 The Chromium browser\todo{Maybe \mbox{``libwebrtc''} is better than ``Chromium''.}
@@ -1587,7 +1587,7 @@ was never a supported build configuration.
 The issue stalled us for a long time.
 We finally broke through the impasse
 by switching from the Chromium-derived go-webrtc
-% https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/issues/28942 "Evaluate pion WebRTC"
+% "Evaluate pion WebRTC" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/28942
 to Pion WebRTC~\cite{pion-webrtc} in the middle of 2019.
 Pion is an independent implementation of WebRTC protocols, written in Go,
 that had not existing at the beginning of the Snowflake project.
