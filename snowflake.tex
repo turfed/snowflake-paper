@@ -2,6 +2,7 @@
 
 \usepackage[top=1in,bottom=1in,left=0.75in,right=0.75in]{geometry}
 \usepackage{graphicx}
+\usepackage{multirow}
 \usepackage{newtxtext}
 \usepackage{newtxmath}
 \usepackage{pifont} % For checkmarks in tab:nat-matching.
@@ -718,18 +719,20 @@ connection to the remote address.
 % \rlap is so they don't expand the horizontal size of table columns.
 \newcommand{\rot}[1]{\vphantom{\rotlabel{#1}}\rotlabel{\rlap{#1}}}
 \centering
-\begin{tabular}{rccccc}
+\begin{tabular}{@{}rccccc@{\hspace{1.5ex}}l@{~}l@{}}
 & % empty
 \rot{No NAT} &
 \rot{Full cone} &
 \rot{Restricted cone} &
 \rot{Port-restricted cone} &
-\rot{Symmetric} \\
-No NAT               & \Y & \Y & \Y & \Y & \Y \\
-Full cone            & \Y & \Y & \Y & \Y & \Y \\
-Restricted cone      & \Y & \Y & \Y & \Y & \Y \\
-Port-restricted cone & \Y & \Y & \Y & \Y & \n \\
-Symmetric            & \Y & \Y & \Y & \n & \n \\
+\rot{Symmetric} &
+&
+\\
+No NAT               & \Y & \Y & \Y & \Y & \Y & \multirow{3}{*}{$\left.\rule[-12pt]{0pt}{24pt}\right\}$} & \multirow{3}{*}{\small ``unrestricted''} \\
+Full cone            & \Y & \Y & \Y & \Y & \Y & \\
+Restricted cone      & \Y & \Y & \Y & \Y & \Y & \\
+Port-restricted cone & \Y & \Y & \Y & \Y & \n & \multirow{2}{*}{$\left.\rule[-7pt]{0pt}{14pt}\right\}$}  & \multirow{2}{*}{\small ``restricted''} \\
+Symmetric            & \Y & \Y & \Y & \n & \n & \\
 \end{tabular}
 \caption{
 Pairwise compatibility of NAT types for connection establishment with STUN.
@@ -737,7 +740,6 @@ The incompatible cases are when one peer's NAT is symmetric
 and the other's is symmetric or port-restricted.
 }
 \label{tab:nat-matching}
-\todo[inline]{Fix centering (off center because of \texttt{\textbackslash rlap} slanted labels).}
 \end{table}
 
 Table~\ref{tab:nat-matching}
