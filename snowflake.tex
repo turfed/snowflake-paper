@@ -657,6 +657,7 @@ inserting a relay server between the peers to resolve any difficulties.
 TURN is problematic for Snowflake,
 because TURN relays' IP addresses are
 generally fixed and easily discoverable by a censor.
+% "Configure TURN servers for the proxy and/or client" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/25596
 But working in our favor is the fact that
 a client does not need to be matched to a \emph{specific} proxy;
 any compatible proxy will~do.
@@ -668,6 +669,9 @@ Generally, we sort clients and proxies into
 Unrestricted clients may be matched with any kind of proxy,
 unrestricted or restricted.
 Restricted clients may only be matched to unrestricted proxies.
+
+% "Investigate Snowflake proxy failures" https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/issues/33666#note_2595319
+% "Okay here's a summary of what I've found: ..."
 
 Snowflake clients and proxies have one of a few possible
 network configurations that can be categorized by two factors:
@@ -747,7 +751,7 @@ only matter for client connections.
 For clients, we the NAT discovery feature in STUN~\cite{rfc5780}.
 % "Use STUN to determine NAT behaviour of peers" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/34129
 % "Add utility to help user discover their NAT type" https://github.com/pion/stun/issues/8
-Not all STUN servers support behavior NAT discovery,
+Not all STUN servers support NAT behavior discovery,
 but we ensure that those whose addresses we ship with the Snowflake client~do.
 With the help of a STUN server,
 clients classify their own NAT type as
@@ -951,8 +955,6 @@ The failure of a proxy
 is not fatal to a Snowflake session,
 just as a dropped packet does not mean the end of a TCP connection.
 
-% we tried it without Turbo Tunnel (see timeline), was not fun
-
 Snowflake's Turbo Tunnel layer
 is partially redundant with the data channel SCTP layer
 on the WebRTC link between client and proxy,
@@ -1084,8 +1086,8 @@ each time it makes a connection.
 This is because not every STUN server is accessible
 under every censor.
 % I went to check stun.l.google.com for blocking in China,
-% but OONI apparently does not measure that server:
-% https://explorer.ooni.org/chart/mat?test_name=stunreachability&axis_x=measurement_start_day&since=2023-02-12&until=2023-03-15&time_grain=day&probe_cc=CN&axis_y=domain
+% but OONI Probe does not measure that server as of v3.17.1:
+% https://github.com/ooni/probe/issues/2417#issuecomment-1468478811
 
 \item[Format and content of STUN messages]
 STUN messages consist of a fixed header
@@ -1103,6 +1105,7 @@ for the NAT behavior discovery feature~\cite[\S 7]{rfc5780}
 of \autoref{sec:ice}.
 
 \todo{Have we done anything for STUN message fingerprinting?}
+% "Investigate if STUN over TCP/TLS is beneficial to us" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40240
 
 \item[Rendezvous]
 The rendezvous methods of
@@ -1270,7 +1273,7 @@ and an analysis of how much of a threat they pose in practice.
 
 \todo{Add some intro here.}
 
-\subsection{Deployment history and user dynamics}
+\subsection{Deployment history and user counts}
 \label{sec:deployment}
 
 % Excerpts from https://gitlab.torproject.org/tpo/network-health/metrics/timeline:
@@ -1322,24 +1325,25 @@ Here we examine the timeline of deployment
 and world events,
 and their influence on the number of Snowflake users over time.
 
-Snowflake was shipped in the alpha release series of Tor Browser
+Snowflake shipped in the alpha release series of Tor Browser
 over the course of four years
-before becoming part of the stable release.
+before graduating to the stable series.
 % "First working bundles with Snowflake, for linux only" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/19001
 It~first became available for GNU/Linux
-with Tor Browser 7.0a1 on \mbox{2017-01-24};
+with Tor Browser~7.0a1 on \mbox{2017-01-24};
 % "mac reproducible build" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/19001
 % [tbb-dev] Please check reproducibility of mac build with Snowflake (e084e83418) https://lists.torproject.org/pipermail/tbb-dev/2017-July/000579.html
 then for macOS
-with Tor Browser 7.5a4 on \mbox{2017-08-08}.
+with Tor Browser~7.5a4 on \mbox{2017-08-08}.
 Here we hit a roadblock:
 the Chromium-derived WebRTC library we had used to that point
 proved difficult to make work in Tor Browser's
-cross-compiling and reproducible build environment.
+cross-compiled and reproducible build environment.
 Pion WebRTC~\cite{pion-webrtc} was more suited to our development needs,
 and after switching to it we were able to release
 Snowflake for Windows
-with Tor Browser 9.0a7 on \mbox{2019-10-01}.
+with Tor Browser~9.0a7 on \mbox{2019-10-01}.
+\todo{Consider only counting stable, not alpha, releases.}
 
 While at this point Snowflake was available on major desktop platforms,
 it was not yet comfortably usable.
@@ -1393,8 +1397,7 @@ had not risen above~40.
 %   <date>     <chr>     <dbl>
 % 1 2020-04-01 snowflake  34.0
 The Turbo Tunnel session persistence feature
-described in \autoref{sec:data-transfer}
-became available to users in Tor Browser 9.5a13
+became available to users in Tor Browser~9.5a13
 on \mbox{2020-05-22}.
 % "Merge a turbotunnel branch" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/33745
 % "Update snowflake to persist sessions across proxies" https://bugs.torproject.org/tpo/applications/tor-browser/34043
@@ -1412,7 +1415,7 @@ and the number of users began to grow steadily into 2021.
 
 Meanwhile, Snowflake for Android had become available with
 % "Android reproducible build of Snowflake" https://bugs.torproject.org/tpo/applications/tor-browser/28672
-Tor Browser 10.0a1 on \mbox{2020-06-02}.
+Tor Browser~10.0a1 on \mbox{2020-06-02}.
 \todo{Find out when the first release of Snowflake in Orbot was.}
 
 \begin{figure*}
@@ -1426,7 +1429,7 @@ for desktop platforms and Android,
 and it had the Turbo Tunnel session persistence feature.
 % Loesing~\cite{tor-tr-2012-10-001} describes how user counts are estimated.
 The maximum value in the part of the graph not shown
-is 133, on \mbox{2020-12-09}.
+is~133, on \mbox{2020-12-09}.
 % > filtered[which.max(filter(filtered, date < "2021-01-01")$users), ]
 % # A tibble: 1 x 3
 %   date       transport users
@@ -1574,7 +1577,7 @@ people love the add-on and the daily count of connections
 We decided early on that the opt-out proxying model had been a mistake,
 and that Snowflake would be only opt-in.
 
-Orbot? as both client and proxy?
+Orbot---as proxy?
 
 \subsection{Development challenges}
 \label{sec:challenges}
