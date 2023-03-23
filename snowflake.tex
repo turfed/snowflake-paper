@@ -775,6 +775,7 @@ self-report having a restricted NAT type.
 We use a different technique to determine the NAT type of Snowflake proxies,
 because the NAT behavior discovery feature
 is not exposed in the WebRTC API available to web browsers.
+% "Have a remote probe service to test snowflake proxy NAT compatability" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40013
 We adapt a technique from MassBrowser~\cite[\S \mbox{V-A}]{Nasr2020a},
 and have proxies attempt to establish a connection with a peer under our control,
 which is behind a simulated symmetric NAT.
@@ -918,6 +919,8 @@ the client and the bridge need a shared notion of session state
 that is independent of any single temporary proxy connection,
 so that the download can be resumed where it left off,
 once connectivity is restored on a new proxy.
+A~lack of session persistence across temporary proxies
+was an unsolved problem in flash proxy~\cite[\S 5.2]{Fifield2012a}.
 
 To make this possible, we employ the
 Turbo Tunnel design pattern~\cite{Fifield2020a};
@@ -1278,6 +1281,9 @@ and an analysis of how much of a threat they pose in practice.
 % |2020-05-22 19:51:29|||snowflake|Release of Tor Browser 9.5a13, the first release with Turbo Tunnel session persistence features for Snowflake. There is a spike in estimated users on 2020-05-21 and 2020-05-22, which appears to be an artifact.|[blog post](https://blog.torproject.org/new-release-tor-browser-95a13) [ticket](https://bugs.torproject.org/tpo/applications/tor-browser/34043) [users graph](https://metrics.torproject.org/userstats-bridge-transport.html?start=2020-03-01&end=2020-08-01&transport=snowflake)||
 % |2020-06-02 18:09:48|||snowflake|Release of Tor Browser 10.0a1, the first release with Snowflake for Android.|[blog post](https://blog.torproject.org/new-release-tor-browser-100a1) [ticket](https://bugs.torproject.org/tpo/applications/tor-browser/30318)||
 % |2020-06-25|2020-06-25||snowflake|One- or two-day spike in estimated Snowflake users. It resembles the spike that occurred around the time of the Turbo Tunnel release of Tor Browser 9.5a13 on 2020-05-22.|[users graph](https://metrics.torproject.org/userstats-bridge-transport.html?start=2020-03-01&end=2020-08-01&transport=snowflake)|X|
+% |2020-08-19|||snowflake|Release of Tor Browser 10.0a5, which added added the ability to do NAT behavior discovery to the Snowflake client.|[blog post](https://blog.torproject.org/new-release-tor-browser-100a5/) [issue](https://bugs.torproject.org/tpo/applications/tor-browser-build/40016)||
+% |2020-10-29|||snowflake|Release of Snowflake WebExtension 0.5.0, with a NAT type self-test.|[archive](https://archive.org/details/snowflake-webextension-0.5.0) [issue](https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40013)||
+% |2020-11-17|||snowflake|Release of Snowflake WebExtension 0.5.2, with a fix to the NAT type self-test.|[archive](https://archive.org/details/snowflake-webextension-0.5.2) [merge request](https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake-webext/-/merge_requests/9) [comment](https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40013#note_2716071)||
 % |2021-07-06 16:56:37|||snowflake|Release of Tor Browser 10.5, first stable release that includes Snowflake.|[blog post](https://blog.torproject.org/new-release-tor-browser-105)||
 % |2021-12-20|||snowflake|Release of Tor Browser 11.0.3, with an altered DTLS fingerprint in Snowflake to counteract blocking in Russia.|[blog post](https://blog.torproject.org/new-release-tor-browser-1103/) [issue](https://bugs.torproject.org/tpo/applications/tor-browser-build/40393) [NTC post](https://ntc.party/t/ooni-reports-of-tor-blocking-in-certain-isps-since-2021-12-01/1477/59)||
 % |2021-12-14|||snowflake|Release of Tor Browser 11.5a1, with an altered DTLS fingerprint in Snowflake to counteract blocking in Russia.|[blog post](https://blog.torproject.org/new-release-tor-browser-115a1/) [issue](https://bugs.torproject.org/tpo/applications/tor-browser-build/40393) [NTC post](https://ntc.party/t/ooni-reports-of-tor-blocking-in-certain-isps-since-2021-12-01/1477/59)||
@@ -1335,17 +1341,15 @@ and after switching to it we were able to release
 Snowflake for Windows
 with Tor Browser 9.0a7 on \mbox{2019-10-01}.
 
-While at this point Snowflake was functional on all major desktop platforms,
-it was not yet really usable.
-The reason is that there was no session persistence:
-a~user's Tor browsing session was tied to the first Snowflake proxy they were assigned by the broker.
-If the user was lucky, the proxy might persist for an hour;
-if unlucky, only a few minutes;
-and then the user would have to restart their browser---there was
-no way to start using a different proxy on the fly.
-(A~lack of session persistence across temporary proxies
-had also been a problem in flash proxy~\cite[\S 5.2]{Fifield2012a}.)
-Probably because of this, by early 2020,
+While at this point Snowflake was available on major desktop platforms,
+it was not yet comfortably usable.
+There were two important parts missing:
+no NAT type matching (\autoref{sec:ice})
+meant that an assigned proxy was not always compatible with your NAT;
+and the lack of persistent session state (\autoref{sec:data-transfer})
+meant that even if you were assigned a compatible proxy,
+your session would break once that proxy disappeared.
+For these reasons, by early 2020,
 the average number of concurrent users
 had not risen above~40.
 % > library("tidyverse")
@@ -1394,9 +1398,18 @@ became available to users in Tor Browser 9.5a13
 on \mbox{2020-05-22}.
 % "Merge a turbotunnel branch" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/33745
 % "Update snowflake to persist sessions across proxies" https://bugs.torproject.org/tpo/applications/tor-browser/34043
-It was at this point that Snowflake became
-comfortable enough to use for daily browsing,
-and the number of users began to grow steadily into 2021.\todo{Add NAT matching to this timeline: that was required for comfort as well.}
+The client part of NAT behavior detection
+was released with Tor Browser~10.0a5 on \mbox{2020-08-19},
+% "Use STUN to determine NAT behaviour of peers" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/34129
+% "Update snowflake version and prefs to do nat discovery at the client" https://bugs.torproject.org/tpo/applications/tor-browser-build/40016
+and the necessary proxy support was released on \mbox{2020-11-17}.
+% "Have a remote probe service to test snowflake proxy NAT compatability" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40013
+% "Wait for ice gathering to complete before probtest" https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake-webext/-/merge_requests/9
+% "after merging snowflake-webext!9 (merged), this is finally working" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40013#note_2716071
+% https://archive.org/details/snowflake-webextension-0.5.2
+After this, Snowflake became usable for daily browsing
+and the number of users began to grow steadily into 2021.
+
 Meanwhile, Snowflake for Android had become available with
 % "Android reproducible build of Snowflake" https://bugs.torproject.org/tpo/applications/tor-browser/28672
 Tor Browser 10.0a1 on \mbox{2020-06-02}.
