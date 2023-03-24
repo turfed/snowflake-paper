@@ -665,11 +665,12 @@ any compatible proxy will~do.
 In Snowflake, client and proxies self-assess their NAT configuration.
 Then the broker takes care to pair clients
 only with proxies that they will be able to connect to directly.
-Generally, we sort clients and proxies into
-``unrestricted'' and ``restricted'' categories.
-Unrestricted clients may be matched with any kind of proxy,
-unrestricted or restricted.
-Restricted clients may only be matched to unrestricted proxies.
+Generally, proxies are sorted into either the
+``unrestricted'' or ``restricted'' bucket. 
+The unrestricted bucket is for clients whose NATs only work with very 
+very few other types of NATs, and the 
+restricted bucket is for clients whose networking setup is compatible 
+with most types of NAT.
 
 % "Investigate Snowflake proxy failures" https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/issues/33666#note_2595319
 % "Okay here's a summary of what I've found: ..."
@@ -691,22 +692,21 @@ host may send a packet to an internal host by sending a packet to the
 mapped external IP--port pair.
 \item[Restricted cone]
 Like full-cone NAT,
-except that incoming connections
-\todo{Do we really mean ``incoming connections,'' or ``incoming packets''? Respectively with ``outgoing.''}
+except that incoming packets
 are allowed only if
-there has been a recent outgoing connection
+there has been a recent outgoing packet
 to the same remote IP address.
 \item[Port-restricted cone]
 Like restricted-cone NAT,
-except that incoming connections are allowed only if
-there has been a recent outgoing connection
+except that incoming packets are allowed only if
+there has been a recent outgoing packet
 to the same remote IP--port pair.
 \item[Symmetric]
 The external IP--port pair depends on both
 the internal IP--port pair and the external IP--port pair.
-Incoming connections are allowed only if
+Incoming packets are allowed only if
 there has been a recent outgoing
-connection to the remote address.
+packet to the remote address.
 \end{description}
 
 \begin{table}
@@ -743,33 +743,33 @@ and the other's is symmetric or port-restricted.
 \end{table}
 
 Table~\ref{tab:nat-matching}
-shows what NAT variations are compatible with what others.
+shows the pairwise compatibility of NAT variations.
 As the incompatible cases always involve a symmetric NAT,
-we further simplify matching by categorizing peers into two groups:
-``unrestricted'' for those that work with symmetric-NAT peers,
-and ``restricted'' for those that do not.
+we further simplify matching by sorting proxies into two buckets:
+an ``unrestricted'' bucket for proxies that work with symmetric-NAT peers,
+and a ``restricted'' bucket for those that do not.
 
 We determine the NAT type of snowflake peers differently for clients and proxies, due to
 limitations in browsers and potential censorship vectors that
 only matter for client connections.
-For clients, we the NAT discovery feature in STUN~\cite{rfc5780}.
+For clients, we use the NAT discovery feature in STUN~\cite{rfc5780}.
 % "Use STUN to determine NAT behaviour of peers" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/34129
 % "Add utility to help user discover their NAT type" https://github.com/pion/stun/issues/8
 Not all STUN servers support NAT behavior discovery,
 but we ensure that those whose addresses we ship with the Snowflake client~do.
 With the help of a STUN server,
-clients classify their own NAT type as
-``unrestricted'' (compatible with symmetric NAT),
-``restricted'' (not compatible with symmetric NAT),
-or ``unknown'' if the discovery process fails.
-The client reports its NAT type to the broker
+clients will decide which bucket to request from as follows:
+they will request ``unrestricted'' proxies if they have a symmetric NAT, and
+``restricted'' proxies if their NAT type is not symmetric,
+and will report ``unknown'' if the discovery process has failed.
+The client reports which bucket to use to the broker
 in its rendezvous message.
 The broker conservatively assumes that clients
-with a the ``unknown'' type have a symmetric NAT.
+with an ``unknown'' NAT type have a symmetric NAT.
 Most clients work well with the majority of Snowflake proxies, as
 shown in \autoref{fig:clients-by-nat}.
 However, approximately one quarter of client polls
-self-report having a restricted NAT type.
+are matched with the ``unrestricted'' bucket.\todo{Double check this number and update if needed.}
 
 \begin{figure}
 \centering
@@ -777,6 +777,7 @@ self-report having a restricted NAT type.
 \caption{Snowflake client poll counts by NAT type.}
 \label{fig:clients-by-nat}
 \todo[inline]{Replace provisional figure.}
+\todo[inline]{Make sure the axis labels make sense with new "bucket" framing.}
 \todo[inline]{Commit source data (e.g.\ CSV) to repository.}
 \end{figure}
 
@@ -788,11 +789,10 @@ We adapt a technique from MassBrowser~\cite[\S \mbox{V-A}]{Nasr2020a},
 and have proxies attempt to establish a connection with a peer under our control,
 which is behind a simulated symmetric NAT.
 If the connection is successful,
-the proxy's NAT type is ``unrestricted''
+the proxy is sorted into the ``unrestricted'' bucket
 and it is eligible to be matched with any client;
-if not, it is ``restricted''
-and may only be matched with unrestricted clients
-(those without symmetric NATs).
+if not, it is sorted as ``restricted''
+and may only be matched to clients without symmetric NATs.
 Clients and proxies
 retest their NAT type periodically, to account for changes in their local networking
 environment.
@@ -800,18 +800,18 @@ environment.
 We have a number of
 mechanisms in place to avoid too much reliance on single points of failure.
 When a proxy cannot determine its NAT type,
-it goes in the ``unknown'' pool and may only be matched to unrestricted clients.
+it is placed in the ``restricted'' bucket may only be matched to clients without symmetric NATs.
 If a proxy was previously able to determine its NAT type,
-a~failure of a periodic retest will not cause it to transition to the ``unknown'' type.
+a~failure of a periodic retest will not cause it to transition to the ``restricted'' bucket.
 A~proxy that self-tests as unrestricted,
 but which nevertheless fails multiple client connections in a row,
 will reclassify itself as restricted
 until its next successful NAT check.
 
 The majority of browser-based Snowflake proxies
-fall into the ``restricted'' NAT type.
+fall into the ``restricted'' bucket.
 Due to their having either port-restricted or symmetric NATs,
-they are not suitable for restricted clients.
+they are not suitable to be matched with symmetrically-NAT clients.
 \autoref{fig:proxies-by-nats} shows the distribution of proxies by NAT type.
 Despite this, we have managed to maintain a sufficient number of unrestricted proxies,
 thanks in large part to the standalone, command-line
