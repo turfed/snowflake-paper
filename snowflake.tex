@@ -1323,12 +1323,21 @@ and an analysis of how much of a threat they pose in practice.
 \includegraphics{figures/users-global/users-global}
 \caption{
 Estimated average number of simultaneous Snowflake users per day.
-The value at the extreme left edge of the graph,
-the beginning of 2021, is about~60.
-At this point, Snowflake was available in the Tor Browser alpha release series
-for desktop platforms and Android,
-and it had the Turbo Tunnel session persistence feature.
-% Loesing~\cite{tor-tr-2012-10-001} describes how user counts are estimated.
+The value at the far left,
+in early January 2021, is about~60.
+% > filter(filtered, abs(date - as.Date("2021-01-01")) < 3)
+% # A tibble: 5 x 3
+%   date       transport users
+%   <date>     <chr>     <dbl>
+% 1 2020-12-30 snowflake  66.2
+% 2 2020-12-31 snowflake  54.0
+% 3 2021-01-01 snowflake  53.4
+% 4 2021-01-02 snowflake  65.5
+% 5 2021-01-03 snowflake  65.4
+At this point, Snowflake was available
+for desktop platforms and Android
+in Tor Browser's alpha release series,
+but not yet in the stable release series.
 The maximum value in the part of the graph not shown
 is~133, on \mbox{2020-12-09}.
 % > filtered[which.max(filter(filtered, date < "2021-01-01")$users), ]
@@ -1447,28 +1456,32 @@ and the necessary proxy support was released on \mbox{2020-11-17}.
 After this, Snowflake became usable for daily browsing
 and the number of users began to grow steadily into~2021.
 
-This brings us to \autoref{fig:user-counts},
-which shows the estimated number of Snowflake users since 2021.
-Because of Snowflake's affiliation with Tor and Tor Browser,
-we estimate users using the normal statistics reported by the bridge
-and collected by Tor Metrics.
-Be aware: the chart does not show the number of unique daily users,
-as one might expect,
-but the \emph{average number of simultaneous users} per day.
-For example, if the line goes through 1,700 on 2021-12-01,
-it means that if the number of Snowflake users were instantaneously sampled
-at a random moment in that day, the expected number of users would be 1,700.
-The number of unique users per day is necessarily higher,
-but how much higher depends on how many hours an average user stays connected.
-Counting simultaneous users, rather than unique users,
-has been the practice of Tor Metrics since 2012~\cite{tor-tr-2012-10-001};
-the reason for it is that the statistics reported by Tor bridges
-lend themselves better to the former estimation than the latter.
-\todo{Can we do better with respect to unique users? See \href{https://bugs.torproject.org/tpo/network-health/metrics/analysis/40012\#note_2803514}{\#40012}.}
-The values should not be taken as exact---the
-algorithm involves some approximations and guessed parameters---but
-the chart is at least relatively comparable to others
-produced by Tor Metrics.\todo{%
+\autoref{fig:user-counts}
+shows the estimated number of Snowflake users since 2021.
+As~the bridge in our deployment is a Tor bridge,
+we estimate client counts using the ordinary aggregate statistics
+collected by the bridge
+and the formulas of Tor Metrics~\cite{tor-tr-2012-10-001}.
+Be aware: the chart does not show a count of unique clients,
+but rather the \emph{average number of simultaneous clients} per day.
+% "The result is an average number of concurrent users, estimated from data collected over a day. We can't say how many distinct users there are."
+% https://metrics.torproject.org/reproducible-metrics.html#users
+\todo{Can we do better with respect to unique clients? See \href{https://bugs.torproject.org/tpo/network-health/metrics/analysis/40012\#note_2803514}{\#40012}.}
+% $ grep '^2022-05-01.*,snowflake,' figures/users-global/userstats-bridge-transport-multi.csv
+% 2022-05-01,5481936581E23D2D178105D44DB6915AB06BFB7F,snowflake,12235.62,100.00
+For example, the value of 12,000 on \mbox{2022-05-01}
+means that, on average, 12,000 clients were using the service
+at any time during the day.
+The chart counts clients, not proxies:
+a~client's contribution is the same no matter how many
+temporary proxies they use over the course of a session.
+(See \autoref{fig:proxy-type-counts} for a count of proxies
+and \autoref{sec:proxy-churn} for an estimate of how frequently they change.)
+The counts should not be taken as exact,
+as the formulas involve an estimated parameter~\cite[\S 4]{tor-tr-2012-10-001},
+but they are relatively comparable to others
+produced by Tor Metrics.
+\todo{
 Speaking of, should we show Snowflake numbers in context with other PTs and relay users?
 % "This graph shows shows all the Tor users in Russia, whether using relays, bridges, or bridges with pluggable transports." https://bugs.torproject.org/tpo/community/support/40050#note_2796770
 }
@@ -1717,6 +1730,7 @@ Second round of DTLS fingerprinting, this time targeting DTLS Client Hello?
 Actually tailored to the broker protocol, not a generic attack tool.
 
 \subsection{Rate of proxy IP address churn}
+\label{sec:proxy-churn}
 
 % shelikhoo
 
