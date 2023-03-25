@@ -1674,13 +1674,56 @@ around blocking events.
 
 % |2021-10-24||tm|snowflake|Snowflake users in Turkmenistan drop to zero, possibly as a result of blocking of the broker's domain-fronting channel.|[issue](https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40024) [comment](https://bugs.torproject.org/tpo/community/support/40030#note_2759213) [discussion](http://meetbot.debian.net/tor-meeting/2021/tor-meeting.2021-11-04-15.59.log.html#l-55)|X|
 
-\url{https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40024}
+% \url{https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40024}
 
-\autoref{fig:user-counts-tm-ru}
+In late October, 2021 we noticed a sharp decline in our usage metrics of Snowflake users from 
+Turkmenistan, as shown in \autoref{fig:user-counts-tm-ru}.
 
-Block of domain front
-Unclear if AMP cache rendezvous was a sufficient workaround
-Hard to get testers/volunteers
+While usage metrics can detect whether blocking has occurred and \emph{when} the block occurs, 
+it unfortunately supplies too few details to determine \emph{how} the blocking occurs. 
+Snowflake in particular makes many different connections, any of which may be the subject of endpoint blocks, 
+protocol-based blocking, or fingerprinting as discussed in \autoref{sec:fingerprinting}.
+
+Because Turkmenistan performs blocking bidirectionally
+%https://github.com/net4people/bbs/issues/80
+we were able to confirm from outside of Turkmenistan 
+that the front domain `cdn.sstatic.net` was being blocked by a DNS injection attack.
+\todo{David, do you want to go into more detail here?}
+A similar test determined that `www.google.com` was not being blocked, along with several other front domains.
+As a result, users were able to bypass the DNS injection attack 
+by using a different domain front. It was unclear whether the AMP cache rendezvous also worked.
+Despite unblocking the connection to the broker, we continued to receive reports from users that they were still unable to 
+connect to the Snowflake bridge.
+
+Contact with
+with testers and volunteers in the affected region is an immensely valuable 
+way to pinpoint the cause of the block and develop a work around. However, this type of back-and-forth 
+development is not always easy to achieve, especially in the presence of tight Internet controls.
+To help debug the source of the blocking, we introduced log messages at key points during Snowflake's
+connection establishment with the bridge and passed these messages through to the tor process using
+the new LOG feature of Tor's pluggable transport specification.
+This allowed users to copy and paste the Tor log from their Tor Browser settings and send these logs
+to the community support team.
+% https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/issues/40062
+% https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/issues/40076
+
+From the Tor logs, were able to determine that users were successfully contacting the broker but failing to 
+establish a connection with any Snowflake peers.
+% https://gitlab.torproject.org/tpo/anti-censorship/censorship-analysis/-/issues/40024#note_2829121
+While the enumeration and blocking of Snowflake proxies is 
+possible in theory, we determined it was unlikely given the large number of proxies at the time.
+\todo{Look up how many we had}
+The more plausible cause for a failed peer connection would be the inability of the client to correctly determine 
+its ICE candidates before they are sent to the peer. Through a few rounds of sending new bridge lines and receiving 
+the resulting log messages, we were able to track the cause to port-based blocking of STUN servers.
+% https://gitlab.torproject.org/tpo/anti-censorship/censorship-analysis/-/issues/40024#note_2829127
+% https://gitlab.torproject.org/tpo/anti-censorship/censorship-analysis/-/issues/40024#note_2829157
+Our use of NAT behaviour capable STUN servers came in handy here because the alternate STUN port 3479 remained
+unblocked in AGTS, one of the two major affected ISPs, and users were able to establish a connection
+with Snowflake again. TurkmenTelecom, the other major ISP, blocked both ports.
+% https://gitlab.torproject.org/tpo/anti-censorship/censorship-analysis/-/issues/40024#note_2829394
+
+\todo{check if we can determine through our metrics for how long the port 3479 bridge line worked in AGTS}
 
 \subsection{Blocking in Russia}
 \label{sec:block-ru}
