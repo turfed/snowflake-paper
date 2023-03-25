@@ -1384,8 +1384,6 @@ with Tor Browser~9.0a7 on \mbox{2019-10-01}.
 % "Android reproducible build of Snowflake" https://bugs.torproject.org/tpo/applications/tor-browser/28672
 Snowflake for Android became available with
 Tor Browser~10.0a1 on \mbox{2020-06-02}.
-\todo{Find out when the first release of Snowflake in Orbot was.}
-% |2021-01-12|||snowflake|Release of Orbot 16.4.0-RC-1-tor-0.4.4.6, first release with Snowflake client support.|[release](https://github.com/guardianproject/orbot/releases/tag/16.4.0-RC-1-tor-0.4.4.6)||
 
 While at this point Snowflake was available
 on every platform supported by Tor Browser,
@@ -1486,16 +1484,28 @@ Speaking of, should we show Snowflake numbers in context with other PTs and rela
 % "This graph shows shows all the Tor users in Russia, whether using relays, bridges, or bridges with pluggable transports." https://bugs.torproject.org/tpo/community/support/40050#note_2796770
 }
 
-The growth of Snowflake users began in earnest on
-\mbox{2021-07-06}, when it became part of the stable release series
-in Tor Browser~10.5.
+Snowflake's growth began in earnest
+when it became part of default installations.
+Orbot, a mobile app that provides a VPN-like Tor proxy,
+added a Snowflake client in version 16.4.0
+on \mbox{2021-01-12}.\todo{Fact-check this date with Guardian Project.}
+% 2021-01-12 for v16.4.0-RC-1-tor-0.4.4.6,  according to https://github.com/guardianproject/orbot/releases/tag/16.4.0-RC-1-tor-0.4.4.6
+% 2021-01-19 for v16.4.0-RC-1-tor-0.4.4.6,  according to https://www.apkmirror.com/apk/the-tor-project/orbot-proxy-with-tor/orbot-proxy-with-tor-16-4-0-release/
+% 2021-01-19 for v16.4.0-RC-2a-tor-0.4.4.6, according to https://www.apkmirror.com/apk/the-tor-project/orbot-proxy-with-tor/orbot-proxy-with-tor-16-4-0-release/
+% 2021-02-03 for v16.4.0,                   according to https://mobile.softpedia.com/apk/orbot-proxy-with-tor/
+% 2021-02-03 for v16.4.0-RC-2a-tor-0.4.4.6, according to https://apkpure.com/orbot-tor-for-android/org.torproject.android/variant/16.4.0-RC-2a-tor-0.4.4.6-APK
+Snowflake became part of the Tor browser stable release series
+on \mbox{2021-07-06} in Tor Browser~10.5,
 % https://blog.torproject.org/new-release-tor-browser-105
-Being part of the stable series means that it was
-available as a built-in option for circumvention for all Tor Browser users,
+becoming a third built-in circumvention option,
+alongside meek and obfs4.
+% https://gitlab.torproject.org/tpo/applications/tor-browser-build/-/blob/tbb-10.5-build1/projects/tor-browser/Bundle-Data/PTConfigs/bridge_prefs.js
+Being part of the stable series meant that it was
+easily to all Tor users,
 not only those who had taken the trouble to install a special alpha release.
-The rate of adoption increased,
-and the number of simultaneous users steadily increased to almost 2,000
-over the next five months.
+Over the next five months,
+the number of concurrent users steadily increased
+to almost~2,000.
 
 On \mbox{2021-12-01}, some (not all) ISPs in Russia began to block
 most forms of access to Tor~\cite{ooni-2021-russia-blocks-tor}\todo{Possibly replace with ``Network Responses to Russia's Invasion of Ukraine'' (\S6.2), to appear USENIX 2023.}.
