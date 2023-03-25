@@ -21,52 +21,53 @@ WANTED_FINGERPRINTS <- c(
 LINE_SIZE <- 0.2
 
 GAPS <- tribble(
-	~begin, ~end, ~y,
+	~begin, ~end, ~y, ~left_side,
 	# https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40033#note_2735468
 	# https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/merge_requests/43#note_2740276
-	"2021-05-12 14:13:56", "2021-06-21 14:22:24", 8800
+	"2021-05-12 14:13:56", "2021-06-21 14:22:24", 8800, T
 ) %>% mutate(
 	begin = lubridate::ymd_hms(begin) %>% lubridate::as_date(),
 	end = lubridate::ymd_hms(end) %>% lubridate::as_date()
 )
 
 EVENTS <- tribble(
-	~date, ~y, ~label,
-	# "2017-01-24 00:00:00",  1000, "Tor Browser 7.0a1\nSnowflake for Linux",      # https://blog.torproject.org/blog/tor-browser-70a1-released
-	# "2017-08-08 00:00:00",  1000, "Tor Browser 7.5a4\nSnowflake for macOS",      # https://blog.torproject.org/blog/tor-browser-75a4-released
-	# "2018-04-13 16:00:00",  1000, "App Engine domain fronting disabled",         # https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/25804
-	# "2018-05-09 20:46:16",  1000, "Rendezvous moved to Azure",                   # https://bugs.torproject.org/tpo/applications/tor-browser/26010
-	# "2019-10-01 00:00:00",  1000, "Tor Browser 9.0a7\nSnowflake for Windows",    # https://blog.torproject.org/new-release-tor-browser-90a7
-	# "2020-05-22 19:51:29",  1000, "Tor Browser 9.5a13\nadds Turbo Tunnel",       # https://blog.torproject.org/new-release-tor-browser-95a13
-	# "2020-06-02 18:09:48",  1000, "Tor Browser 10.0a1\nSnowflake for Android",   # https://blog.torproject.org/new-release-tor-browser-100a1
-	"2021-07-06 16:56:37", 25000, "Tor Browser 10.5\nincludes Snowflake",          # https://blog.torproject.org/new-release-tor-browser-105
-	"2021-12-01 00:00:00", 25000, "Onset of Tor blocking in Russia",               # https://bugs.torproject.org/tpo/community/support/40050
-	"2021-12-14 00:00:00", 28000, "",                                              # https://blog.torproject.org/new-release-tor-browser-115a1/
-	"2021-12-20 00:00:00", 42000, "Tor Browser 11.5a1 and 11.0.3\nalter DTLS fingerprint", # https://blog.torproject.org/new-release-tor-browser-1103/
-	"2022-01-25 17:41:00", 54000, "Load balancing of bridge",                      # https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40095#note_2772325
-	# "2022-01-31 18:20:00", 12000, "Back to production bridge, now load-balanced",# https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40095#note_2773704
-	"2022-02-24 00:00:00", 64000, "Russian invasion of Ukraine",
-	"2022-03-16 16:51:35", 74000, "Bridge hardware upgrade",                       # https://bugs.torproject.org/tpo/tpa/team/40664#note_2787624
-	# "2022-03-18 03:21:45", 22000, "Fixed problem with onion keys",               # https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40110#note_2788622
-	# "2022-04-11 15:49:30", 22000, "Bridge server migration",                     # https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40111#note_2794860
-	"2022-07-14 00:00:00", 40000, "Tor Browser 11.5\nautomatic configuration",     # https://blog.torproject.org/new-release-tor-browser-115/
-	"2022-09-20 00:00:00",100000, "Protests in Iran",                              # https://lists.torproject.org/pipermail/anti-censorship-team/2022-September/000247.html
-	"2022-10-04 17:15:00",112000, "TLS fingerprint blocking in Iran",              # https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40207#note_2849437
-	"2022-10-27 00:00:00",114000, "",                                              # https://blog.torproject.org/new-release-tor-browser-1156/
-	"2022-11-01 00:00:00",128000, "Tor Browser 11.5.6 and Orbot 16.6.3\nfix TLS fingerprint", # https://github.com/guardianproject/orbot/releases/tag/16.6.3-RC-1-tor.0.4.7.10
-	"2022-12-07 00:00:00",138000, "Tor Browser 12.0 adds a second bridge",         # https://blog.torproject.org/new-release-tor-browser-120/
-	"2023-01-16 00:00:00", 33000, "",                                              # https://bugs.torproject.org/tpo/anti-censorship/team/115
-	"2023-01-24 00:00:00",  8000, "Domain fronting\nrendezvous\ntemporarily\nblocked in Iran", # https://bugs.torproject.org/tpo/anti-censorship/team/115
-	# "2023-01-31 00:00:00", 33000, "",                                            # https://bugs.torproject.org/tpo/anti-censorship/team/115#note_2876012
-	# "2023-02-02 00:00:00",  8000, "Domain fronting rendezvous again blocked in Iran", # https://bugs.torproject.org/tpo/anti-censorship/team/115#note_2876012
-	# "2023-02-10 00:00:00", 33000, "",                                            # https://gitlab.torproject.org/tpo/anti-censorship/team/-/issues/115#note_2883298
-	# "2023-02-14 00:00:00",  8000, "Domain fronting rendezvous again blocked in Iran", # https://gitlab.torproject.org/tpo/anti-censorship/team/-/issues/115#note_2883298
-	"2023-02-15 00:00:00",118000, "Tor Browser 12.0.3\nalters DTLS fingerprint"     # https://blog.torproject.org/new-release-tor-browser-1203/
-	# "2023-02-19 00:00:00",  8000, "",                                            # https://gitlab.torproject.org/tpo/anti-censorship/team/-/issues/115#note_2883298
-	# "2023-02-20 00:00:00",  8000, "Domain fronting rendezvous again blocked in Iran", # https://gitlab.torproject.org/tpo/anti-censorship/team/-/issues/115#note_2883298
-	# "2023-02-22 00:00:00",  8000, "",                                            # https://gitlab.torproject.org/tpo/anti-censorship/team/-/issues/115#note_2883298
-	# "2023-02-23 00:00:00",  8000, "Domain fronting rendezvous again blocked in Iran", # https://gitlab.torproject.org/tpo/anti-censorship/team/-/issues/115#note_2883298
-	# "2023-03-15 00:00:00", 10000, "Orbot 17.0.0 BETA 2 adds a second bridge",       # [release](https://github.com/guardianproject/orbot/releases/tag/17.0.0-BETA-2-tor.0.4.7.11
+	~date, ~y, ~left_side, ~label,
+	# "2017-01-24 00:00:00",  1000, T, "Tor Browser 7.0a1\nSnowflake for Linux",      # https://blog.torproject.org/blog/tor-browser-70a1-released
+	# "2017-08-08 00:00:00",  1000, T, "Tor Browser 7.5a4\nSnowflake for macOS",      # https://blog.torproject.org/blog/tor-browser-75a4-released
+	# "2018-04-13 16:00:00",  1000, T, "App Engine domain fronting disabled",         # https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/25804
+	# "2018-05-09 20:46:16",  1000, T, "Rendezvous moved to Azure",                   # https://bugs.torproject.org/tpo/applications/tor-browser/26010
+	# "2019-10-01 00:00:00",  1000, T, "Tor Browser 9.0a7\nSnowflake for Windows",    # https://blog.torproject.org/new-release-tor-browser-90a7
+	# "2020-05-22 19:51:29",  1000, T, "Tor Browser 9.5a13\nadds Turbo Tunnel",       # https://blog.torproject.org/new-release-tor-browser-95a13
+	# "2020-06-02 18:09:48",  1000, T, "Tor Browser 10.0a1\nSnowflake for Android",   # https://blog.torproject.org/new-release-tor-browser-100a1
+	"2021-01-12 00:00:00", 20000, F, "Orbot 16.4.0\nincludes Snowflake",              # https://github.com/guardianproject/orbot/releases/tag/16.4.0-RC-1-tor-0.4.4.6
+	"2021-07-06 16:56:37", 25000, T, "Tor Browser 10.5\nincludes Snowflake",          # https://blog.torproject.org/new-release-tor-browser-105
+	"2021-12-01 00:00:00", 25000, T, "Onset of Tor blocking in Russia",               # https://bugs.torproject.org/tpo/community/support/40050
+	"2021-12-14 00:00:00", 28000, T, "",                                              # https://blog.torproject.org/new-release-tor-browser-115a1/
+	"2021-12-20 00:00:00", 42000, T, "Tor Browser 11.5a1 and 11.0.3\nalter DTLS fingerprint", # https://blog.torproject.org/new-release-tor-browser-1103/
+	"2022-01-25 17:41:00", 54000, T, "Load balancing of bridge",                      # https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40095#note_2772325
+	# "2022-01-31 18:20:00", 12000, T, "Back to production bridge, now load-balanced",# https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40095#note_2773704
+	"2022-02-24 00:00:00", 64000, T, "Russian invasion of Ukraine",
+	"2022-03-16 16:51:35", 74000, T, "Bridge hardware upgrade",                       # https://bugs.torproject.org/tpo/tpa/team/40664#note_2787624
+	# "2022-03-18 03:21:45", 22000, T, "Fixed problem with onion keys",               # https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40110#note_2788622
+	# "2022-04-11 15:49:30", 22000, T, "Bridge server migration",                     # https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40111#note_2794860
+	"2022-07-14 00:00:00", 40000, T, "Tor Browser 11.5\nautomatic configuration",     # https://blog.torproject.org/new-release-tor-browser-115/
+	"2022-09-20 00:00:00",100000, T, "Protests in Iran",                              # https://lists.torproject.org/pipermail/anti-censorship-team/2022-September/000247.html
+	"2022-10-04 17:15:00",112000, T, "TLS fingerprint blocking in Iran",              # https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40207#note_2849437
+	"2022-10-27 00:00:00",114000, T, "",                                              # https://blog.torproject.org/new-release-tor-browser-1156/
+	"2022-11-01 00:00:00",128000, T, "Tor Browser 11.5.6 and Orbot 16.6.3\nfix TLS fingerprint", # https://github.com/guardianproject/orbot/releases/tag/16.6.3-RC-1-tor.0.4.7.10
+	"2022-12-07 00:00:00",138000, T, "Tor Browser 12.0 adds a second bridge",         # https://blog.torproject.org/new-release-tor-browser-120/
+	"2023-01-16 00:00:00", 33000, T, "",                                              # https://bugs.torproject.org/tpo/anti-censorship/team/115
+	"2023-01-24 00:00:00",  8000, T, "Domain fronting\nrendezvous\ntemporarily\nblocked in Iran", # https://bugs.torproject.org/tpo/anti-censorship/team/115
+	# "2023-01-31 00:00:00", 33000, T, "",                                            # https://bugs.torproject.org/tpo/anti-censorship/team/115#note_2876012
+	# "2023-02-02 00:00:00",  8000, T, "Domain fronting rendezvous again blocked in Iran", # https://bugs.torproject.org/tpo/anti-censorship/team/115#note_2876012
+	# "2023-02-10 00:00:00", 33000, T, "",                                            # https://gitlab.torproject.org/tpo/anti-censorship/team/-/issues/115#note_2883298
+	# "2023-02-14 00:00:00",  8000, T, "Domain fronting rendezvous again blocked in Iran", # https://gitlab.torproject.org/tpo/anti-censorship/team/-/issues/115#note_2883298
+	"2023-02-15 00:00:00",118000, T, "Tor Browser 12.0.3\nalters DTLS fingerprint"     # https://blog.torproject.org/new-release-tor-browser-1203/
+	# "2023-02-19 00:00:00",  8000, T, "",                                            # https://gitlab.torproject.org/tpo/anti-censorship/team/-/issues/115#note_2883298
+	# "2023-02-20 00:00:00",  8000, T, "Domain fronting rendezvous again blocked in Iran", # https://gitlab.torproject.org/tpo/anti-censorship/team/-/issues/115#note_2883298
+	# "2023-02-22 00:00:00",  8000, T, "",                                            # https://gitlab.torproject.org/tpo/anti-censorship/team/-/issues/115#note_2883298
+	# "2023-02-23 00:00:00",  8000, T, "Domain fronting rendezvous again blocked in Iran", # https://gitlab.torproject.org/tpo/anti-censorship/team/-/issues/115#note_2883298
+	# "2023-03-15 00:00:00", 10000, T, "Orbot 17.0.0 BETA 2 adds a second bridge",       # [release](https://github.com/guardianproject/orbot/releases/tag/17.0.0-BETA-2-tor.0.4.7.11
 ) %>% mutate(date = lubridate::ymd_hms(date) %>% lubridate::as_date())
 
 # Return an abbreviation for the month, followed by a year for January only.
@@ -102,15 +103,19 @@ text_annotation <- function(data) {
 			color = "#808080",
 			size = 0.25
 		),
-		geom_label(data = data, aes(x = x, y = ymax, label = label),
+		geom_label(data = data,
+			aes(
+				x = x + ifelse(left_side, -2, +2),
+				y = ymax,
+				label = label,
+				hjust = ifelse(left_side, 1, 0)
+			),
 			fill = "#ffffffc0",
 			label.size = 0,
 			label.r = unit(0, "lines"),
 			label.padding = unit(0.05, "lines"),
 			family = FONT_FAMILY,
 			size = 2.0,
-			hjust = 1,
-			nudge_x = -2,
 			vjust = ifelse(data$ymin <= data$ymax, 1, 0),
 			lineheight = 0.8
 		)
