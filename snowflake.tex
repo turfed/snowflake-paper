@@ -1504,39 +1504,41 @@ alongside meek and obfs4.
 Being part of the stable series meant that it was
 easily to all Tor users,
 not only those who had taken the trouble to install a special alpha release.
-Over the next five months,
-the number of concurrent users steadily increased
-to almost~2,000.
+The number of concurrent users steadily increased
+over the next five months,
+reaching almost~2,000 by December~2021.
 
-On \mbox{2021-12-01}, some (not all) ISPs in Russia began to block
-most forms of access to Tor~\cite{ooni-2021-russia-blocks-tor}\todo{Possibly replace with ``Network Responses to Russia's Invasion of Ukraine'' (\S6.2), to appear USENIX 2023.}.
-We will have more to say about this in \autoref{sec:block-ru}.
-Snowflake was also affected,
-but we released updates to evade the blocking on
-\mbox{2021-12-14} (alpha) and
-\mbox{2021-12-20} (stable).
-The blocking of plain Tor increased demand for circumvention transports,
-and Snowflake was strongly affected.
-The number of users quadrupled in the next two months.
-There were so many new users from Russia, in fact,
-that we had to rearchitect the bridge deployment
-at the end of January
-in order to handle the increased load.
+Network blocking events result in sometimes fewer and
+sometimes more users of a circumvention system.
+Fewer if the system has not enough resistance to avoid
+itself being caught up in the blocking;
+more if remains unblocked and becomes one
+among a diminished array of network access options.
+Two such censorship events
+resulted in increases in the number of Snowflake users
+by multiples.
+(Because they also threatened Snowflake itself in part,
+we will have more to say about them in \autoref{sec:challenges}.)
+
+On \mbox{2021-12-01}, a subset of ISPs in Russia suddenly began to block
+most forms of access to Tor~\cite{ooni-2021-russia-blocks-tor},
+including Snowflake (the censor used a feature of the DTLS handshake).
+We released workarounds within a few weeks in
+Tor Browser~11.5a1 and~11.0.3,
+and in the next two months the total number of users quadrupled,
+mostly due to new users in Russia.
+The added demand temporarily overwhelmed the bridge hardware;
+for a few weeks Snowflake was almost unusably slow.
+We~had to invent a new way of deploying a Tor bridge,
+using load balancing over multiple processes to permit better scaling;\todo{Cite ``Running a high-performance pluggable transports Tor bridge'' if and when it comes out.}
 % https://forum.torproject.net/t/tor-relays-how-to-reduce-tor-cpu-load-on-a-single-bridge/1483
 % https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40095#note_2772325
-Even with these architectural changes,
-the bridge's CPU capacity again became saturated.
-Around the beginning of March, Snowflake was almost unusably slow for a few weeks.
+as well as migrate the bridge to more substantial server hardware
+and a faster network link.
 % https://old.reddit.com/r/TOR/comments/t49i14/hello_i_have_a_problem_with_snowflake_can_you/
 % https://forum.torproject.net/t/tor-project-more-resources-required-for-snowflake-bridge/2353
-The invasion of Ukraine by Russia starting on \mbox{2022-03-24}
-was accompanied by additional restrictions on Internet access in Russia,
-which only increased demand for circumvention.
-In response, on \mbox{2022-03-16} we upgraded the bridge to substantial server hardware,
-which has been sufficient for the time being.
-(See \autoref{sec:future} for an idea to run multiple independent bridge sites,
-to permit scaling further.)
-As of May 2022, about 65\% of Snowflake users come from Russia.
+In~May 2022, according to Tor's IP geolocation.
+about 70\% of Snowflake users were in Russia.
 % https://metrics.torproject.org/collector.html#type-bridge-extra-info
 %
 % @type bridge-extra-info 1.3
