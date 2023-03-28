@@ -1678,41 +1678,6 @@ and must sometimes take priority over speed of development.
 % Safe Browsing / zip bomb problem (2019)
 % https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/issues/31250
 
-
-\subsection{Blocking in Turkmenistan}
-\label{sec:block-tm}
-
-\begin{figure}
-\framebox[\linewidth]{\vbox to 2in{\vfil\centering TODO\vfil}}
-\caption{
-Users in Turkmenistan and Russia,
-around blocking events.
-}
-\label{fig:user-counts-tm-ru}
-\end{figure}
-
-% |2021-10-24||tm|snowflake|Snowflake users in Turkmenistan drop to zero, possibly as a result of blocking of the broker's domain-fronting channel.|[issue](https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40024) [comment](https://bugs.torproject.org/tpo/community/support/40030#note_2759213) [discussion](http://meetbot.debian.net/tor-meeting/2021/tor-meeting.2021-11-04-15.59.log.html#l-55)|X|
-
-\url{https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40024}
-
-\autoref{fig:user-counts-tm-ru}
-
-Block of domain front
-Unclear if AMP cache rendezvous was a sufficient workaround
-Hard to get testers/volunteers
-
-censor relativity
-Highlight this to make the point that blocking resistance cannot be defined absolutely,
-but only relative to a particular censor
-Censors differ not only in their technical capabilities
-(time, money, equipment, personnel),
-but also in their tolerance
-Different censors value the many aspects of network access differently,
-and circumvention must respond to and act within those constraints.
-Keep in mind that censors are not bound to act rationally,
-even taking into account likely motivations for their behavior.
-Like fighting a man who has nothing to lose
-
 \subsection{Blocking in Russia}
 \label{sec:block-ru}
 
@@ -1796,6 +1761,40 @@ but the effectiveness of manual workarounds is far inferior to automatically pro
 Blocking of default domain front for domain fronting rendezvous
 Again, not clear it was targeted at Snowflake specifically,
 as many circumvention systems use the same front domain.
+
+\subsection{Blocking in Turkmenistan}
+\label{sec:block-tm}
+
+\begin{figure}
+\framebox[\linewidth]{\vbox to 2in{\vfil\centering TODO\vfil}}
+\caption{
+Users in Turkmenistan and Russia,
+around blocking events.
+}
+\label{fig:user-counts-tm-ru}
+\end{figure}
+
+% |2021-10-24||tm|snowflake|Snowflake users in Turkmenistan drop to zero, possibly as a result of blocking of the broker's domain-fronting channel.|[issue](https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40024) [comment](https://bugs.torproject.org/tpo/community/support/40030#note_2759213) [discussion](http://meetbot.debian.net/tor-meeting/2021/tor-meeting.2021-11-04-15.59.log.html#l-55)|X|
+
+\url{https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40024}
+
+\autoref{fig:user-counts-tm-ru}
+
+Block of domain front
+Unclear if AMP cache rendezvous was a sufficient workaround
+Hard to get testers/volunteers
+
+censor relativity
+Highlight this to make the point that blocking resistance cannot be defined absolutely,
+but only relative to a particular censor
+Censors differ not only in their technical capabilities
+(time, money, equipment, personnel),
+but also in their tolerance
+Different censors value the many aspects of network access differently,
+and circumvention must respond to and act within those constraints.
+Keep in mind that censors are not bound to act rationally,
+even taking into account likely motivations for their behavior.
+Like fighting a man who has nothing to lose
 
 \subsection{SQL injection attempts at broker}
 
