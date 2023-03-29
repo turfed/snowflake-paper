@@ -1298,6 +1298,7 @@ and an analysis of how much of a threat they pose in practice.
 % |2021-12-14|||snowflake|Release of Tor Browser 11.5a1, with an altered DTLS fingerprint in Snowflake to counteract blocking in Russia.|[blog post](https://blog.torproject.org/new-release-tor-browser-115a1/) [issue](https://bugs.torproject.org/tpo/applications/tor-browser-build/40393) [NTC post](https://ntc.party/t/ooni-reports-of-tor-blocking-in-certain-isps-since-2021-12-01/1477/59)||
 % |2022-01-25 17:41:00|||snowflake|Switched the snowflake bridge to a temporary load-balanced staging server. Debugged connection problems until 2022-01-25 18:47:00.|[issue](https://bugs.torproject.org/tpo/tpa/team/40598#note_2772287) [comment](https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40095#note_2772325) [post](https://forum.torproject.net/t/tor-relays-how-to-reduce-tor-cpu-load-on-a-single-bridge/1483/16) [comment](https://github.com/net4people/bbs/issues/103#issuecomment-1033067920)||
 % |2022-03-16 16:51:35|||snowflake|Moved Snowflake traffic to the interim bridge running instances flakey1–flakey8.|[comment](https://bugs.torproject.org/tpo/tpa/team/40664#note_2787624)||
+% |2022-06-27|||snowflake|Deployed version 0.6.0 of the Snowflake WebExtension. The main feature added in this release was support for more than one bridge. It had a bug that caused it to stop reporting client IP addresses, which are used for metrics purposes by the bridge.|[archive](https://archive.org/details/snowflake-webextension-0.6.0) [merge request](https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake-webext/-/merge_requests/29) [issue](https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake-webext/82)||
 % |2022-07-14|||bridge|Release of Tor Browser 11.5, with a new feature of automatic censorship circumvention configuration.|[blog post](https://blog.torproject.org/new-release-tor-browser-115/)||
 % |2022-09-21|ongoing|ir||Protests and daily Internet shutdowns in Iran.|[OONI report](https://ooni.org/post/2022-iran-blocks-social-media-mahsa-amini-protests/) [BBS thread](https://github.com/net4people/bbs/issues/125)||
 % |2022-10-03 12:50:34|||snowflake|Deployment of Snowflake broker to reject proxies that do not support multiple bridges.|[issue](https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40193) [issue](https://bugs.torproject.org/tpo/anti-censorship/team/95)||
@@ -1559,8 +1560,13 @@ about 70\% of Snowflake users were in Russia.
 % 0.6727047146401985
 % >>> 16720 / 26264 # bridge-ips=ru / bridge-ip-transports=snowflake
 % 0.7137978142076503
-
-\todo{2022-07-14 Tor Browser 11.5 \href{https://blog.torproject.org/new-release-tor-browser-115/}{automatic circumvention configuration}.}
+The count of users in Russia get an additional small boost,
+visible in the graph,
+starting on \mbox{2022-07-14},
+when Tor Browser~11.5 added the Connection Assist feature,
+which attempts to automatically enable circumvention options when needed.
+% https://blog.torproject.org/new-release-tor-browser-115/
+% Graph showing boost going mostly to Russia: https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake-webext/82#note_2891387
 
 % "Shutdowns, intensified blocking in Iran since 2022-09-21" https://github.com/net4people/bbs/issues/125
 % "Need to increase number of tor instances on snowflake-01 bridge, increased usage since yesterday [2022-09-21]" https://lists.torproject.org/pipermail/anti-censorship-team/2022-September/000247.html
