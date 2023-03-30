@@ -965,7 +965,10 @@ on the WebRTC link between client and proxy,
 which similarly builds a reliable stream interface
 on an unreliable substrate.
 \todo{Clarify/\allowbreak refine this in light of the fact that
-\href{https://lists.torproject.org/pipermail/anti-censorship-team/2023-March/000286.html}{data channels can be unreliable and unordered}.}
+\href{https://lists.torproject.org/pipermail/anti-censorship-team/2023-March/000286.html}{data channels can be unreliable and unordered}.
+% "turn off reliable mode for WebRTC DataChannel" https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/merge_requests/109
+% "Snowflake is currently using network resource in a so suboptimal way..." https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40251#note_2891751
+}
 The duplication is, in any case, unavoidable:
 the data channel's SCTP layer is walled off by abstractions
 in the WebRTC APIs available to browsers.
