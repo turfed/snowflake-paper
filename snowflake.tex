@@ -1322,7 +1322,7 @@ and an analysis of how much of a threat they pose in practice.
 % |2023-03-15|||snowflake|Release of Orbot for Android v17 BETA 2. First release of Orbot to include the snowflake-02 bridge along with the existing snowflake-01.|[release](https://github.com/guardianproject/orbot/releases/tag/17.0.0-BETA-2-tor.0.4.7.11)||
 
 \begin{figure*}[t]
-\includegraphics{figures/users-global/users-global}
+\includegraphics{figures/users/users-global}
 \caption{
 Estimated average number of simultaneous Snowflake users per day.
 The value at the far left,
@@ -1404,7 +1404,7 @@ had not risen above~40.
 %     "5481936581E23D2D178105D44DB6915AB06BFB7F" = "snowflake-01",
 %     "91DA221A149007D0FD9E5515F5786C3DD07E4BB0" = "snowflake-02"
 %   )
-% > userstats <- read_csv("figures/users-global/userstats-bridge-transport-multi.csv") %>%
+% > userstats <- read_csv("figures/users/userstats-bridge-transport-multi.csv") %>%
 %     filter(transport == "snowflake" & fingerprint %in% names(WANTED_FINGERPRINTS)) %>%
 %     mutate(users = users * frac / 100, frac = NULL) %>%
 %     group_by(date, transport) %>% summarize(users = sum(users, na.rm = TRUE), .groups = "drop")
@@ -1468,7 +1468,7 @@ but rather the \emph{average number of simultaneous clients} per day.
 % "The result is an average number of concurrent users, estimated from data collected over a day. We can't say how many distinct users there are."
 % https://metrics.torproject.org/reproducible-metrics.html#users
 \todo{Can we do better with respect to unique clients? See \href{https://bugs.torproject.org/tpo/network-health/metrics/analysis/40012\#note_2803514}{\#40012}.}
-% $ grep '^2022-05-01.*,snowflake,' figures/users-global/userstats-bridge-transport-multi.csv
+% $ grep '^2022-05-01.*,snowflake,' figures/users/userstats-bridge-transport-multi.csv
 % 2022-05-01,5481936581E23D2D178105D44DB6915AB06BFB7F,snowflake,12235.62,100.00
 For example, the value of 12,000 on \mbox{2022-05-01}
 means that, on average, 12,000 clients were using the service
