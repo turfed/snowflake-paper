@@ -1544,25 +1544,23 @@ and upgrade from a 1~Gbps to a 10~Gbps network link.
 % "snowflake-01: Change uplink from 1G to 10G" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40138
 In~May 2022, according to Tor's IP geolocation.
 about 70\% of Snowflake users were in Russia.
-% https://metrics.torproject.org/collector.html#type-bridge-extra-info
-%
-% @type bridge-extra-info 1.3
-% extra-info flakey3 5481936581E23D2D178105D44DB6915AB06BFB7F
-% published 2022-05-20 21:10:47
-% transport snowflake
-% dirreq-v3-ips ru=12216,us=1640,cn=704,de=400,gb=296,by=272,in=224,??=208,ua=168,fr=160,ir=136,nl=128,ca=88,br=80,it=80,au=72,pl=72,sa=72,es=64,se=64,ch=48,cz=48,mx=48,tr=48,ae=40,jp=40,ro=40,za=40,at=32,eg=32,id=32,co=24,dk=24,dz=24,fi=24,hk=24,hu=24,no=24,ph=24,pk=24,ar=16,bd=16,be=16,cl=16,gr=16,ie=16,il=16,kr=16,kz=16,lt=16,ma=16,mm=16,my=16,ng=16,nz=16,pt=16,sg=16,sk=16,vn=16,al=8,ao=8,az=8,ba=8,bf=8,bg=8,bh=8,bj=8,bo=8,ci=8,cm=8,cr=8,cu=8,cy=8,do=8,ec=8,ee=8,et=8,eu=8,ge=8,gf=8,gh=8,gt=8,hr=8,iq=8,jm=8,jo=8,ke=8,kg=8,km=8,kw=8,lb=8,lk=8,lu=8,lv=8,ly=8,md=8,mk=8,ml=8,mo=8,mu=8,mv=8,mw=8,mz=8,na=8,om=8,pa=8,pe=8,pg=8,pr=8,py=8,qa=8,re=8,rs=8,rw=8,sb=8,sc=8,sd=8,si=8,so=8,sv=8,sy=8,th=8,tm=8,tn=8,tw=8,tz=8,ug=8,uy=8,uz=8,ve=8,ye=8,zm=8
-% dirreq-v3-reqs ru=21688,us=2728,cn=1280,de=664,??=648,gb=504,by=464,fr=368,ua=344,in=336,nl=280,ir=248,ca=168,au=152,br=128,it=120,pl=112,es=96,mx=96,ro=96,sa=96,se=88,id=80,ch=72,tr=72,za=72,cz=64,jp=64,ae=56,eg=56,co=48,hk=48,at=40,dk=40,no=40,ar=32,be=32,dz=32,fi=32,ie=32,lv=32,ng=32,nz=32,ph=32,pk=32,pt=32,bd=24,hu=24,il=24,jo=24,kr=24,kz=24,vn=24,az=16,ba=16,cl=16,ec=16,et=16,ge=16,gr=16,hr=16,ke=16,lt=16,ma=16,mm=16,mu=16,my=16,pa=16,sg=16,sk=16,th=16,tm=16,tw=16,uy=16,uz=16,al=8,ao=8,bf=8,bg=8,bh=8,bj=8,bo=8,ci=8,cm=8,cr=8,cu=8,cy=8,do=8,ee=8,eu=8,gf=8,gh=8,gt=8,iq=8,jm=8,kg=8,km=8,kw=8,lb=8,lk=8,lu=8,ly=8,md=8,mk=8,ml=8,mo=8,mv=8,mw=8,mz=8,na=8,om=8,pe=8,pg=8,pr=8,py=8,qa=8,re=8,rs=8,rw=8,sb=8,sc=8,sd=8,si=8,so=8,sv=8,sy=8,tn=8,tz=8,ug=8,ve=8,ye=8,zm=8
-% dirreq-v3-resp ok=32240,not-enough-sigs=0,unavailable=0,not-found=0,not-modified=3208,busy=0
-% dirreq-v3-direct-dl complete=0,timeout=0,running=0
-% dirreq-v3-tunneled-dl complete=27256,timeout=4948,running=32,min=963,d1=112650,d2=280773,q1=417567,d3=637384,d4=13253000,md=22649666,d6=25108500,d7=28307500,q3=31003000,d8=36534666,d9=50908500,max=121278000
-% bridge-ips ru=16720,us=2744,cn=1024,de=672,gb=440,by=400,in=400,??=272,fr=264,ua=232,ir=200,nl=200,br=152,ca=152,au=136,it=136,pl=128,sa=112,se=96,tr=96,es=80,jp=80,mx=72,ro=72,ch=64,eg=64,za=64,ae=56,cz=56,at=48,id=48,co=40,dz=40,hk=40,no=40,pk=40,bd=32,be=32,fi=32,kr=32,kz=32,ng=32,pt=32,ar=24,cl=24,dk=24,gr=24,hu=24,ie=24,il=24,ma=24,my=24,ph=24,sk=24,vn=24,bg=16,cu=16,ec=16,gh=16,jo=16,ke=16,kw=16,lk=16,lt=16,lv=16,mm=16,mu=16,nz=16,sg=16,th=16,tw=16,uz=16,ye=16,al=8,ao=8,ap=8,az=8,ba=8,bf=8,bh=8,bj=8,bn=8,bo=8,ci=8,cm=8,cr=8,cy=8,do=8,ee=8,et=8,eu=8,ge=8,gf=8,gn=8,gt=8,hn=8,hr=8,iq=8,is=8,jm=8,kg=8,km=8,lb=8,lu=8,ly=8,md=8,mk=8,ml=8,mo=8,mv=8,mw=8,mz=8,na=8,np=8,om=8,pa=8,pe=8,pg=8,pr=8,ps=8,py=8,qa=8,re=8,rs=8,rw=8,sb=8,sc=8,sd=8,si=8,sn=8,so=8,sr=8,sv=8,sy=8,tm=8,tn=8,tt=8,tz=8,ug=8,uy=8,ve=8,zm=8
-% bridge-ip-versions v4=23424,v6=2840
-% bridge-ip-transports <OR>=8,snowflake=26264
-%
-% >>> 21688 / 32240 # dirreq-v3-reqs=ru / dirreq-v3-resp=ok
-% 0.6727047146401985
-% >>> 16720 / 26264 # bridge-ips=ru / bridge-ip-transports=snowflake
-% 0.7137978142076503
+% > library("tidyverse")
+% > WANTED_FINGERPRINTS <- c(
+%     "5481936581E23D2D178105D44DB6915AB06BFB7F" = "snowflake-01",
+%     "91DA221A149007D0FD9E5515F5786C3DD07E4BB0" = "snowflake-02"
+%   )
+% > userstats <- read_csv("figures/users/userstats-bridge-combined-multi.csv") %>%
+%     filter(transport == "snowflake" & fingerprint %in% names(WANTED_FINGERPRINTS)) %>%
+%     mutate(across(c(low, high), ~ .x * frac / 100), frac = NULL, mean = (low + high) / 2) %>%
+%     # Combine the contributions of all bridges.
+%     group_by(date, transport, country) %>% summarize(across(c(low, high, mean), sum), .groups = "drop")
+% > userstats %>% filter(date == "2022-05-20") %>% arrange(desc(mean)) %>%
+%     mutate(percent = mean / sum(mean) * 100)
+%   date       transport country   low  high  mean percent
+% 1 2022-05-20 snowflake ru      9123. 9125. 9124.  68.9
+% 2 2022-05-20 snowflake us      1085. 1087. 1086.   8.21
+% 3 2022-05-20 snowflake cn       523.  524.  523.   3.96
+% 4 2022-05-20 snowflake ??       265.  267.  266.   2.01
 The count of users in Russia get an additional small boost,
 visible in the graph,
 starting on \mbox{2022-07-14},
