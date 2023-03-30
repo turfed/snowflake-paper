@@ -1479,7 +1479,7 @@ at any time during the day.
 The chart counts clients, not proxies:
 a~client's contribution is the same no matter how many
 temporary proxies they use over the course of a session.
-(See \autoref{fig:proxy-type-counts} for a count of proxies
+(See \autoref{fig:proxy-type-counts} instead for a count of proxies
 and \autoref{sec:proxy-churn} for an estimate of how frequently they change.)
 The counts should not be taken as exact,
 as the formulas involve an estimated parameter~\cite[\S 4]{tor-tr-2012-10-001},
@@ -1624,10 +1624,16 @@ the domain used for domain-fronting rendezvous
 was blocking in certain ISPs,
 which temporarily reduced the number of users.
 
+% |2022-12-01|||snowflake|Release of Tor Browser 12.0a5, the first release to contain both the snowflake-01 and snowflake-02 bridges.|[issue](https://bugs.torproject.org/tpo/applications/tor-browser-build/40674) [announcement](https://lists.torproject.org/pipermail/tor-announce/2022-December/000256.html) [BBS comment](https://github.com/net4people/bbs/issues/152#issuecomment-1336220171)||
+% |2022-12-07|||snowflake|Release of Tor Browser 12.0, the first stable release to contain both the snowflake-01 and snowflake-02 bridges.|[issue](https://bugs.torproject.org/tpo/applications/tor-browser-build/40674) [blog post](https://blog.torproject.org/new-release-tor-browser-120/) [BBS comment](https://github.com/net4people/bbs/issues/152#issuecomment-1342800169) [NTC comment](https://ntc.party/t/second-snowflake-bridge-available-for-testing/3445/2)||
 snowflake-02
+
+Undo the harmful optimization of
+\href{https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40260}{\#40260}
 
 % david
 $X$ TB of user data transferred\todo{Compute this, make it reproducible.}
+\% of all Tor users
 
 \subsection{Proxy recruitment and growth}
 \label{sec:proxies}
@@ -1977,7 +1983,7 @@ China Digital Times,
 Greenhost, % Early hosting of bridge and continued hosting of broker
 Guardian Project, % Orbot deployment
 Mullvad, % Donation of hardware for snowflake-01 bridge
-OONI, % Reports, torsf and stunreachability tests.
+OONI, % Reports, torsf and stunreachability tests
 the Open Technology Fund, % Serene's ICFP fellowship, rapid response bridge funding April–September 2022
 Pion,\todo{Anyone in particular at Pion?}
 the Tor Project,
