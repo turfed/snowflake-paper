@@ -1663,32 +1663,30 @@ rather than Tor Browser.
 %     "5481936581E23D2D178105D44DB6915AB06BFB7F" = "snowflake-01",
 %     "91DA221A149007D0FD9E5515F5786C3DD07E4BB0" = "snowflake-02"
 %   )
-% > userstats <- read_csv("figures/users/userstats-bridge-combined-multi.csv") %>%
+% > userstats <- read_csv("figures/users/userstats-bridge-transport-multi.csv") %>%
 %     filter(transport == "snowflake" & fingerprint %in% names(WANTED_FINGERPRINTS)) %>%
-%     mutate(across(c(low, high), ~ .x * frac / 100), frac = NULL, mean = (low + high) / 2, high = NULL, low = NULL) %>%
-%     # Combine the contributions of all countries.
-%     group_by(date, transport, fingerprint) %>% summarize(mean = sum(mean), .groups = "drop") %>%
+%     mutate(users = users * frac / 100, frac = NULL) %>%
 %     mutate(instance = WANTED_FINGERPRINTS[fingerprint], fingerprint = NULL) %>%
-%     pivot_wider(names_from = c(instance), values_from = c("mean")) %>%
-%     mutate(ratio_02_01 = `snowflake-02` / (`snowflake-01` + `snowflake-02`))
+%     pivot_wider(names_from = c(instance), values_from = c("users")) %>%
+%     mutate(percent_02 = 100 * `snowflake-02` / (`snowflake-01` + `snowflake-02`))
 % > print(userstats %>% filter("2023-02-15" <= date & date < "2023-03-01"), n = 100)
 % # A tibble: 14 x 5
-%    date       transport `snowflake-01` `snowflake-02` ratio_02_01
-%    <date>     <chr>              <dbl>          <dbl>       <dbl>
-%  1 2023-02-15 snowflake         79217.          2991.      0.0364
-%  2 2023-02-16 snowflake         24876.          1194.      0.0458
-%  3 2023-02-17 snowflake        120075.          3222.      0.0261
-%  4 2023-02-18 snowflake         79530.          3283.      0.0396
-%  5 2023-02-19 snowflake         78482.          3333.      0.0407
-%  6 2023-02-20 snowflake         76269.          3400.      0.0427
-%  7 2023-02-21 snowflake         73453.          3353.      0.0437
-%  8 2023-02-22 snowflake         79013.          3348.      0.0406
-%  9 2023-02-23 snowflake         79486.          3400.      0.0410
-% 10 2023-02-24 snowflake         68332.          3437.      0.0479
-% 11 2023-02-25 snowflake         73266.          3466.      0.0452
-% 12 2023-02-26 snowflake         68722.          3458.      0.0479
-% 13 2023-02-27 snowflake         68092.          3398.      0.0475
-% 14 2023-02-28 snowflake         66660.          3490.      0.0497
+%    date       transport `snowflake-01` `snowflake-02` percent_02
+%    <date>     <chr>              <dbl>          <dbl>      <dbl>
+%  1 2023-02-15 snowflake         80874.          3010.       3.59
+%  2 2023-02-16 snowflake         23603.          1188.       4.79
+%  3 2023-02-17 snowflake         70305.          3221.       4.38
+%  4 2023-02-18 snowflake         81178.          3284.       3.89
+%  5 2023-02-19 snowflake         80407.          3342.       3.99
+%  6 2023-02-20 snowflake         78307.          3407.       4.17
+%  7 2023-02-21 snowflake         75323.          3354.       4.26
+%  8 2023-02-22 snowflake         72017.          3356.       4.45
+%  9 2023-02-23 snowflake         66461.          3408.       4.88
+% 10 2023-02-24 snowflake         70175.          3444.       4.68
+% 11 2023-02-25 snowflake         70087.          3508.       4.77
+% 12 2023-02-26 snowflake         70174.          3531.       4.79
+% 13 2023-02-27 snowflake         68905.          3477.       4.80
+% 14 2023-02-28 snowflake         68342.          3561.       4.95
 
 % david
 $X$ TB of user data transferred (goodput)\todo{Compute this, make it reproducible.}
