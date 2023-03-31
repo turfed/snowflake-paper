@@ -815,7 +815,11 @@ fall into the ``restricted'' category.
 \autoref{fig:proxies-by-nats} shows the distribution of proxies by NAT type.
 Despite this, we have managed to maintain a sufficient number of unrestricted proxies,
 thanks in large part to the standalone, command-line
-version of the Snowflake proxy.
+version of the Snowflake proxy,
+which tends to be run on rented VPSes in less restricted networks.
+\todo{Perhaps dwell on the duality here:
+standalone proxies knowingly sacrifice some address diversity
+for better NAT compatibility in a common case.}
 
 \begin{figure}
 \framebox[\columnwidth]{\vbox to 2in{\vfil\centering TODO\vfil}}
@@ -1479,7 +1483,7 @@ at any time during the day.
 The chart counts clients, not proxies:
 a~client's contribution is the same no matter how many
 temporary proxies they use over the course of a session.
-(See \autoref{fig:proxy-type-counts} instead for a count of proxies
+(See \autoref{fig:proxy-type-counts} instead for a count of proxies,
 and \autoref{sec:proxy-churn} for an estimate of how frequently they change.)
 The counts should not be taken as exact,
 as the formulas involve an estimated parameter~\cite[\S 4]{tor-tr-2012-10-001},
@@ -1557,13 +1561,17 @@ about 70\% of Snowflake users were in Russia.
 %     mutate(across(c(low, high), ~ .x * frac / 100), frac = NULL, mean = (low + high) / 2) %>%
 %     # Combine the contributions of all bridges.
 %     group_by(date, transport, country) %>% summarize(across(c(low, high, mean), sum), .groups = "drop")
-% > userstats %>% filter(date == "2022-05-20") %>% arrange(desc(mean)) %>%
-%     mutate(percent = mean / sum(mean) * 100)
+% > head(userstats %>% filter(date == "2022-05-20") %>% arrange(desc(mean)) %>%
+%     mutate(percent = mean / sum(mean) * 100))
+% # A tibble: 6 x 7
 %   date       transport country   low  high  mean percent
-% 1 2022-05-20 snowflake ru      9123. 9125. 9124.  68.9
-% 2 2022-05-20 snowflake us      1085. 1087. 1086.   8.21
-% 3 2022-05-20 snowflake cn       523.  524.  523.   3.96
-% 4 2022-05-20 snowflake ??       265.  267.  266.   2.01
+%   <date>     <chr>     <chr>   <dbl> <dbl> <dbl>   <dbl>
+% 1 2022-05-20 snowflake ru      9123. 9125. 9124.   68.9
+% 2 2022-05-20 snowflake us      1085. 1087. 1086.    8.21
+% 3 2022-05-20 snowflake cn       523.  524.  523.    3.96
+% 4 2022-05-20 snowflake ??       265.  267.  266.    2.01
+% 5 2022-05-20 snowflake de       251.  253.  252.    1.90
+% 6 2022-05-20 snowflake by       196.  198.  197.    1.49
 The count of users in Russia get an additional small boost,
 visible in the graph,
 starting on \mbox{2022-07-14},
@@ -1598,7 +1606,10 @@ on~\mbox{2022-09-24} it was 59\%.
 %     group_by(date, transport, country) %>% summarize(across(c(low, high, mean), sum), .groups = "drop")
 % > userstats %>% filter("2022-09-19" <= date & date <= "2022-09-25") %>%
 %     group_by(date, transport) %>% mutate(percent = mean / sum(mean) * 100) %>% filter(country == "ir")
+% # A tibble: 7 x 7
+% # Groups:   date, transport [7]
 %   date       transport country    low   high   mean percent
+%   <date>     <chr>     <chr>    <dbl>  <dbl>  <dbl>   <dbl>
 % 1 2022-09-19 snowflake ir        186.   188.   187.    1.09
 % 2 2022-09-20 snowflake ir        207.   209.   208.    1.20
 % 3 2022-09-21 snowflake ir        933.   935.   934.    5.00
@@ -1615,7 +1626,7 @@ About two weeks later, on \mbox{2022-10-04},
 usage dropped as quickly as had risen,
 due to the censors in Iran blocking a TLS fingerprint
 used for rendezvous.
-% https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40207
+% "Sudden reduction in snowflake-01 bridge bandwidth, 2022-10-04 17:15" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40207
 We will have more to say about that in \autoref{sec:block-ir}.
 After deploying fixes for the TLS fingerprint issue,
 users in Iran began to recover going into~2023.
@@ -1680,7 +1691,7 @@ rather than Tor Browser.
 % 14 2023-02-28 snowflake         66660.          3490.      0.0497
 
 % david
-$X$ TB of user data transferred\todo{Compute this, make it reproducible.}
+$X$ TB of user data transferred (goodput)\todo{Compute this, make it reproducible.}
 \% of all Tor users
 
 \subsection{Proxy recruitment and growth}
@@ -1981,7 +1992,9 @@ For any proxies that communicate with the broker during a given period of time, 
 
 % hooman
 Centralized bridge
-- (notionally centralized, though may be realized as multiple instances for performance reasons, see \autoref{sec:experience})
+- (notionally centralized, though now realized as multiple instances for performance reasons)
+- load balancing at the client, not ideal, though hard to do otherwise given the restrictions of working with Tor
+- not a perfect solution because of double rendezvous
 
 \section{Future work}
 \label{sec:future}
