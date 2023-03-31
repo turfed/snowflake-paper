@@ -1619,17 +1619,65 @@ used for rendezvous.
 We will have more to say about that in \autoref{sec:block-ir}.
 After deploying fixes for the TLS fingerprint issue,
 users in Iran began to recover going into~2023.
-There were brief intervals during which
+One of the the emergency performance optimizations we had deployed in late September
+turned out to be mistaken and actually be harmful for performance,
+% "Weird KCP packets received by the client" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40260
+though the problem was masked, for a time, by the great demand for the service.
+The user count had declined from February~2023,
+until we reverted the erroneous change in mid-March,
+after which the count started to recover.
+Around this time, there were also short intervals during which
 the domain used for domain-fronting rendezvous
-was blocking in certain ISPs,
-which temporarily reduced the number of users.
+was blocking in some ISPs in Iran,
+an evident attempt at blocking that was not sustained.
 
-% |2022-12-01|||snowflake|Release of Tor Browser 12.0a5, the first release to contain both the snowflake-01 and snowflake-02 bridges.|[issue](https://bugs.torproject.org/tpo/applications/tor-browser-build/40674) [announcement](https://lists.torproject.org/pipermail/tor-announce/2022-December/000256.html) [BBS comment](https://github.com/net4people/bbs/issues/152#issuecomment-1336220171)||
-% |2022-12-07|||snowflake|Release of Tor Browser 12.0, the first stable release to contain both the snowflake-01 and snowflake-02 bridges.|[issue](https://bugs.torproject.org/tpo/applications/tor-browser-build/40674) [blog post](https://blog.torproject.org/new-release-tor-browser-120/) [BBS comment](https://github.com/net4people/bbs/issues/152#issuecomment-1342800169) [NTC comment](https://ntc.party/t/second-snowflake-bridge-available-for-testing/3445/2)||
-snowflake-02
-
-Undo the harmful optimization of
-\href{https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40260}{\#40260}
+Through most of this history,
+we had run the system's backend bridge on a single server,
+upgrading and optimizing it as needed.
+Recall from \autoref{sec:mechanics} that it is not a weakness
+for the bridge to be a single entity at a well-known address,
+because a censor's target of blocking can only be the temporary proxies, not the bridge.
+But as the first bridge began to reach its hardware capacity
+and performance wins got harder to achieve,
+we deployed a second bridge to share the load.
+Challenges and design considerations of doing so are discussed in \autoref{sec:performance}.
+The second bridge was made available to users in
+Tor Browser~12.0 on \mbox{2022-12-07}.
+By~February, however, the second bridge only accounted for about~5\%
+of users---evidently the majority of Snowflake users used Orbot
+rather than Tor Browser.
+\todo{Revisit this when Orbot~17 hits the \href{https://play.google.com/store/apps/details?id=org.torproject.android}{Play Store}}
+% > library("tidyverse")
+% > WANTED_FINGERPRINTS <- c(
+%     "5481936581E23D2D178105D44DB6915AB06BFB7F" = "snowflake-01",
+%     "91DA221A149007D0FD9E5515F5786C3DD07E4BB0" = "snowflake-02"
+%   )
+% > userstats <- read_csv("figures/users/userstats-bridge-combined-multi.csv") %>%
+%     filter(transport == "snowflake" & fingerprint %in% names(WANTED_FINGERPRINTS)) %>%
+%     mutate(across(c(low, high), ~ .x * frac / 100), frac = NULL, mean = (low + high) / 2, high = NULL, low = NULL) %>%
+%     # Combine the contributions of all countries.
+%     group_by(date, transport, fingerprint) %>% summarize(mean = sum(mean), .groups = "drop") %>%
+%     mutate(instance = WANTED_FINGERPRINTS[fingerprint], fingerprint = NULL) %>%
+%     pivot_wider(names_from = c(instance), values_from = c("mean")) %>%
+%     mutate(ratio_02_01 = `snowflake-02` / (`snowflake-01` + `snowflake-02`))
+% > print(userstats %>% filter("2023-02-15" <= date & date < "2023-03-01"), n = 100)
+% # A tibble: 14 x 5
+%    date       transport `snowflake-01` `snowflake-02` ratio_02_01
+%    <date>     <chr>              <dbl>          <dbl>       <dbl>
+%  1 2023-02-15 snowflake         79217.          2991.      0.0364
+%  2 2023-02-16 snowflake         24876.          1194.      0.0458
+%  3 2023-02-17 snowflake        120075.          3222.      0.0261
+%  4 2023-02-18 snowflake         79530.          3283.      0.0396
+%  5 2023-02-19 snowflake         78482.          3333.      0.0407
+%  6 2023-02-20 snowflake         76269.          3400.      0.0427
+%  7 2023-02-21 snowflake         73453.          3353.      0.0437
+%  8 2023-02-22 snowflake         79013.          3348.      0.0406
+%  9 2023-02-23 snowflake         79486.          3400.      0.0410
+% 10 2023-02-24 snowflake         68332.          3437.      0.0479
+% 11 2023-02-25 snowflake         73266.          3466.      0.0452
+% 12 2023-02-26 snowflake         68722.          3458.      0.0479
+% 13 2023-02-27 snowflake         68092.          3398.      0.0475
+% 14 2023-02-28 snowflake         66660.          3490.      0.0497
 
 % david
 $X$ TB of user data transferred\todo{Compute this, make it reproducible.}
