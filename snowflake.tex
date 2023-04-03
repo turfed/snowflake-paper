@@ -734,7 +734,7 @@ The incompatible cases are when one peer's NAT is symmetric
 and the other's is symmetric or port-restricted.
 }
 \label{tab:nat-matching}
-\todo[inline]{Update this figure with one that shows how the ``restricted'' and ``unrestricted'' label is alloted differently for clients and proxies.}
+\todo[inline]{Update this figure with one that shows how the ``restricted'' and ``unrestricted'' label is allotted differently for clients and proxies.}
 \end{table}
 
 Table~\ref{tab:nat-matching}
@@ -754,7 +754,7 @@ symmetric NAT clients. Our measurements show that clients with port-restricted N
 can still connect to around 80\% of ``restricted'' proxies and will establish a working
 connection in a reasonable amount of time.\todo{measure that 80\% number again}
 
-We determine the NAT and firewall behaviour of snowflake peers
+We determine the NAT and firewall behavior of snowflake peers
 differently for clients and proxies, due to
 limitations in browsers and potential censorship vectors that
 only matter for client connections.
@@ -1974,7 +1974,7 @@ its ICE candidates before they are sent to the peer. Through a few rounds of sen
 the resulting log messages, we were able to track the cause to port-based blocking of STUN servers.
 % https://gitlab.torproject.org/tpo/anti-censorship/censorship-analysis/-/issues/40024#note_2829127
 % https://gitlab.torproject.org/tpo/anti-censorship/censorship-analysis/-/issues/40024#note_2829157
-Our use of NAT behaviour capable STUN servers came in handy here because the alternate STUN port 3479 remained
+Our use of NAT behavior capable STUN servers came in handy here because the alternate STUN port 3479 remained
 unblocked in AGTS, one of the two major affected ISPs, and users were able to establish a connection
 with Snowflake again. TurkmenTelecom, the other major ISP, blocked both ports.
 % https://gitlab.torproject.org/tpo/anti-censorship/censorship-analysis/-/issues/40024#note_2829394
