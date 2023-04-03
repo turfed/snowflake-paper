@@ -1608,9 +1608,8 @@ on~\mbox{2022-09-24} it was 59\%.
 %     # Combine the contributions of all bridges.
 %     group_by(date, transport, country) %>% summarize(across(c(low, high, mean), sum), .groups = "drop")
 % > userstats %>% filter("2022-09-19" <= date & date <= "2022-09-25") %>%
-%     group_by(date, transport) %>% mutate(percent = mean / sum(mean) * 100) %>% filter(country == "ir")
+%     group_by(date, transport) %>% mutate(percent = mean / sum(mean) * 100) %>% filter(country == "ir") %>% ungroup()
 % # A tibble: 7 x 7
-% # Groups:   date, transport [7]
 %   date       transport country    low   high   mean percent
 %   <date>     <chr>     <chr>    <dbl>  <dbl>  <dbl>   <dbl>
 % 1 2022-09-19 snowflake ir        186.   188.   187.    1.09
@@ -1671,26 +1670,27 @@ rather than Tor Browser.
 %     filter(transport == "snowflake" & fingerprint %in% names(WANTED_FINGERPRINTS)) %>%
 %     mutate(users = users * frac / 100, frac = NULL) %>%
 %     mutate(instance = WANTED_FINGERPRINTS[fingerprint], fingerprint = NULL) %>%
-%     pivot_wider(names_from = c(instance), values_from = c("users")) %>%
-%     mutate(percent_02 = 100 * `snowflake-02` / (`snowflake-01` + `snowflake-02`))
-% > print(userstats %>% filter("2023-02-15" <= date & date < "2023-03-01"), n = 100)
-% # A tibble: 14 x 5
-%    date       transport `snowflake-01` `snowflake-02` percent_02
-%    <date>     <chr>              <dbl>          <dbl>      <dbl>
-%  1 2023-02-15 snowflake         80874.          3010.       3.59
-%  2 2023-02-16 snowflake         23603.          1188.       4.79
-%  3 2023-02-17 snowflake         70305.          3221.       4.38
-%  4 2023-02-18 snowflake         81178.          3284.       3.89
-%  5 2023-02-19 snowflake         80407.          3342.       3.99
-%  6 2023-02-20 snowflake         78307.          3407.       4.17
-%  7 2023-02-21 snowflake         75323.          3354.       4.26
-%  8 2023-02-22 snowflake         72017.          3356.       4.45
-%  9 2023-02-23 snowflake         66461.          3408.       4.88
-% 10 2023-02-24 snowflake         70175.          3444.       4.68
-% 11 2023-02-25 snowflake         70087.          3508.       4.77
-% 12 2023-02-26 snowflake         70174.          3531.       4.79
-% 13 2023-02-27 snowflake         68905.          3477.       4.80
-% 14 2023-02-28 snowflake         68342.          3561.       4.95
+%     group_by(date, transport) %>% mutate (percent = 100 * users / sum(users, na.rm = TRUE)) %>% ungroup()
+% > print(userstats %>% filter("2023-02-20" <= date & date < "2023-02-28"), n = 100)
+% # A tibble: 16 x 5
+%    date       transport  users instance     percent
+%    <date>     <chr>      <dbl> <chr>          <dbl>
+%  1 2023-02-20 snowflake 78307. snowflake-01   95.8
+%  2 2023-02-20 snowflake  3407. snowflake-02    4.17
+%  3 2023-02-21 snowflake 75323. snowflake-01   95.7
+%  4 2023-02-21 snowflake  3354. snowflake-02    4.26
+%  5 2023-02-22 snowflake 72017. snowflake-01   95.5
+%  6 2023-02-22 snowflake  3356. snowflake-02    4.45
+%  7 2023-02-23 snowflake 66461. snowflake-01   95.1
+%  8 2023-02-23 snowflake  3408. snowflake-02    4.88
+%  9 2023-02-24 snowflake 70175. snowflake-01   95.3
+% 10 2023-02-24 snowflake  3444. snowflake-02    4.68
+% 11 2023-02-25 snowflake 70087. snowflake-01   95.2
+% 12 2023-02-25 snowflake  3508. snowflake-02    4.77
+% 13 2023-02-26 snowflake 70174. snowflake-01   95.2
+% 14 2023-02-26 snowflake  3531. snowflake-02    4.79
+% 15 2023-02-27 snowflake 68905. snowflake-01   95.2
+% 16 2023-02-27 snowflake  3477. snowflake-02    4.80
 
 % david
 $X$ TB of user data transferred (goodput)\todo{Compute this, make it reproducible.}
