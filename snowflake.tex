@@ -1692,8 +1692,8 @@ rather than Tor Browser.
 % 15 2023-02-27 snowflake 68905. snowflake-01   95.2
 % 16 2023-02-27 snowflake  3477. snowflake-02    4.80
 
-Snowflake has transferred 4.06~PB of user data
-since~2017.\todo{Estimate and subtract non-Snowflake (i.e.~$\langle\mathrm{OR}\rangle$) bytes, even though likely negligible.}
+As~of \mbox{2023-03-31},
+Snowflake has transferred 4.06~PB of user data.\todo{Estimate and subtract non-Snowflake (i.e.~$\langle\mathrm{OR}\rangle$) bytes, even though likely negligible.}
 % > library("tidyverse")
 % > options(width = 200)
 % > WANTED_FINGERPRINTS <- c(
@@ -1724,8 +1724,38 @@ The bandwidth at the bridges' network interfaces is
 higher than the goodput bandwidth,
 because of the overhead of WebRTC, WebSocket, and
 the internal Turbo Tunnel layer.
-
-\% of all Tor users
+At~that time, about 2.7\% of all Tor users
+(31\% when looking at just bridge users) used Snowflake to connect to Tor.
+\todo{Think about this slight inconsistency: we don't use
+\href{https://lists.torproject.org/pipermail/tor-dev/2022-April/014725.html}{\texttt{frac}}
+in other estimates/\allowbreak graphs, but here we effectively do.}
+% > library("tidyverse")
+% > DATE_RANGE <- as.Date(c(
+%     "2023-03-23",
+%     "2023-03-30"
+%   ))
+% > x <- bind_rows(
+%     read_csv("figures/users/userstats-relay-country-2023-01-04-all-2023-04-04-off.csv", comment = "#") %>%
+%       mutate(mode = "relay"),
+%     read_csv("figures/users/userstats-bridge-transport-2023-01-04-2023-04-04-! OR -snowflake- OR .csv", comment = "#") %>%
+%       mutate(mode = "bridge")
+%   ) %>%
+% > filter(lubridate::`%within%`(date, do.call(lubridate::interval, as.list(DATE_RANGE)))) %>%
+% > mutate(transport = if_else(mode == "bridge" & transport != "snowflake", "non-snowflake", transport)) %>%
+% > group_by(mode, transport) %>% summarize(users = sum(users, na.rm = TRUE), .groups = "drop")
+% > x %>% mutate(percent = 100 * users / sum(users))
+% # A tibble: 3 x 4
+%   mode   transport        users percent
+% * <chr>  <chr>            <dbl>   <dbl>
+% 1 bridge non-snowflake  1374662    6.01
+% 2 bridge snowflake       607905    2.66
+% 3 relay  NA            20872771   91.3
+% > x %>% filter(mode == "bridge") %>% mutate(percent = 100 * users / sum(users))
+% # A tibble: 2 x 4
+%   mode   transport       users percent
+%   <chr>  <chr>           <dbl>   <dbl>
+% 1 bridge non-snowflake 1374662    69.3
+% 2 bridge snowflake      607905    30.7
 
 \subsection{Proxy recruitment and growth}
 \label{sec:proxies}

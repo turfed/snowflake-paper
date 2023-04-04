@@ -2,3 +2,9 @@ The files userstats-bridge-transport-multi.csv and
 userstats-bridge-combined-multi.csv are
 produced by the scripts in this external repository:
 https://gitlab.torproject.org/dcf/snowflake-graphs
+
+"userstats-bridge-transport-2023-01-04-2023-04-04-! OR -snowflake- OR .csv" and
+"userstats-relay-country-2023-01-04-all-2023-04-04-off.csv"
+are from, respectively:
+	https://metrics.torproject.org/userstats-relay-country.csv?start=2023-01-04&end=2023-04-04&country=all&events=off
+	https://metrics.torproject.org/userstats-bridge-transport.csv?start=2023-01-04&end=2023-04-04&transport=!%3COR%3E&transport=snowflake&transport=%3COR%3E
