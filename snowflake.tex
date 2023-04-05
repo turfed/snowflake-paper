@@ -1359,6 +1359,7 @@ is~133, on \mbox{2020-12-09}.
 \todo[inline]{Cut off the \(y\)-axis at the maximum of the data,
 so that the vertical annotations at the top fall outside the plot area.}
 \todo[inline]{Bandwidth chart? Ideally with aligned horizontal axis.}
+\todo[inline]{Find a good way to represent the intermittent blocking of the domain front in Iran, January--March~2023.}
 \end{figure*}
 
 The deployment of Snowflake to end users was gradual,
@@ -1643,6 +1644,7 @@ turned out to be mistaken and actually be harmful for performance,
 though the problem was masked, for a time, by the great demand for the service.
 The user count had declined from February~2023,
 until we reverted the erroneous change in mid-March,
+% "Deploy snowflake-server for QueuePacketConn buffer reuse fix (#40260)" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40262
 after which the count started to recover.
 Around this time, there were also short intervals during which
 the domain used for domain-fronting rendezvous
@@ -1810,6 +1812,8 @@ which people seem to like
 Orbot---as proxy (``kindness'' mode)?
 % 2021-02-23 https://github.com/guardianproject/orbot/releases/tag/16.4.1-BETA-2-tor.0.4.4.6
 % "experimental mode to enable running as a Snowflake proxy"
+% 2023-01-13 https://github.com/guardianproject/orbot/releases/tag/17.0.0-BETA-1-tor.0.4.7.11
+% "easy access to Snowflake proxy 'kindness' mode"
 
 \subsection{Development challenges}
 \label{sec:challenges}
@@ -1863,6 +1867,10 @@ if the demands of maintenance exceed what the maintainers can provide.
 Managing complexity and designing for low maintenance
 are material concerns,
 and must sometimes take priority over speed of development.
+
+Confusion with browser extension---do I install it if I \emph{am} censored,
+or if I want to \emph{help} someone who is censored.
+Evident in the number of Snowflake proxies in Iran.
 
 % Safe Browsing / zip bomb problem (2019)
 % https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/issues/31250
