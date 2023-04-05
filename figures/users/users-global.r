@@ -10,7 +10,7 @@ source("../common.r")
 
 DATE_LIMITS <- lubridate::ymd(c(
 	"2020-12-31",
-	"2023-02-14"
+	"2023-03-31"
 ))
 
 WANTED_FINGERPRINTS <- c(
@@ -40,7 +40,7 @@ EVENTS <- tribble(
 	# "2020-05-22 19:51:29",  1000, T, "Tor Browser 9.5a13\nadds Turbo Tunnel",       # https://blog.torproject.org/new-release-tor-browser-95a13
 	# "2020-06-02 18:09:48",  1000, T, "Tor Browser 10.0a1\nSnowflake for Android",   # https://blog.torproject.org/new-release-tor-browser-100a1
 	"2021-01-12 00:00:00", 20000, F, "Orbot 16.4.0\nincludes Snowflake",              # https://github.com/guardianproject/orbot/releases/tag/16.4.0-RC-1-tor-0.4.4.6
-	"2021-07-06 16:56:37", 25000, T, "Tor Browser 10.5\nincludes Snowflake",          # https://blog.torproject.org/new-release-tor-browser-105
+	"2021-07-06 16:56:37", 28000, T, "Tor Browser 10.5\nincludes Snowflake",          # https://blog.torproject.org/new-release-tor-browser-105
 	"2021-12-01 00:00:00", 25000, T, "Onset of Tor blocking in Russia",               # https://bugs.torproject.org/tpo/community/support/40050
 	"2021-12-14 00:00:00", 28000, T, "",                                              # https://blog.torproject.org/new-release-tor-browser-115a1/
 	"2021-12-20 00:00:00", 42000, T, "Tor Browser 11.5a1 and 11.0.3\nalter DTLS fingerprint", # https://blog.torproject.org/new-release-tor-browser-1103/
@@ -62,12 +62,21 @@ EVENTS <- tribble(
 	# "2023-02-02 00:00:00",  8000, T, "Domain fronting rendezvous again blocked in Iran", # https://bugs.torproject.org/tpo/anti-censorship/team/115#note_2876012
 	# "2023-02-10 00:00:00", 33000, T, "",                                            # https://gitlab.torproject.org/tpo/anti-censorship/team/-/issues/115#note_2883298
 	# "2023-02-14 00:00:00",  8000, T, "Domain fronting rendezvous again blocked in Iran", # https://gitlab.torproject.org/tpo/anti-censorship/team/-/issues/115#note_2883298
-	"2023-02-15 00:00:00",118000, T, "Tor Browser 12.0.3\nalters DTLS fingerprint"     # https://blog.torproject.org/new-release-tor-browser-1203/
+	"2023-02-15 00:00:00",117000, T, "Tor Browser 12.0.3\nalters DTLS fingerprint",   # https://blog.torproject.org/new-release-tor-browser-1203/
 	# "2023-02-19 00:00:00",  8000, T, "",                                            # https://gitlab.torproject.org/tpo/anti-censorship/team/-/issues/115#note_2883298
 	# "2023-02-20 00:00:00",  8000, T, "Domain fronting rendezvous again blocked in Iran", # https://gitlab.torproject.org/tpo/anti-censorship/team/-/issues/115#note_2883298
 	# "2023-02-22 00:00:00",  8000, T, "",                                            # https://gitlab.torproject.org/tpo/anti-censorship/team/-/issues/115#note_2883298
 	# "2023-02-23 00:00:00",  8000, T, "Domain fronting rendezvous again blocked in Iran", # https://gitlab.torproject.org/tpo/anti-censorship/team/-/issues/115#note_2883298
-	# "2023-03-15 00:00:00", 10000, T, "Orbot 17.0.0 BETA 2 adds a second bridge",       # [release](https://github.com/guardianproject/orbot/releases/tag/17.0.0-BETA-2-tor.0.4.7.11
+	"2023-03-13 00:00:00",128000, T, "Bridge performance fix",                        # https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40262#note_2886041
+	# "2023-03-15 00:00:00", 10000, T, "Orbot 17.0.0 BETA 2 adds a second bridge",    # https://github.com/guardianproject/orbot/releases/tag/17.0.0-BETA-2-tor.0.4.7.11
+	# "2023-03-03 00:00:00",  8000, T, "",                                            # https://gitlab.torproject.org/tpo/anti-censorship/team/-/issues/115#note_2892825
+	# "2023-03-04 00:00:00",  8000, T, "Domain fronting rendezvous again blocked in Iran", # https://gitlab.torproject.org/tpo/anti-censorship/team/-/issues/115#note_2892825
+	# "2023-03-08 00:00:00",  8000, T, "",                                            # https://gitlab.torproject.org/tpo/anti-censorship/team/-/issues/115#note_2892825
+	# "2023-03-09 00:00:00",  8000, T, "Domain fronting rendezvous again blocked in Iran", # https://gitlab.torproject.org/tpo/anti-censorship/team/-/issues/115#note_2892825
+	# "2023-03-13 00:00:00",  8000, T, "",                                            # https://gitlab.torproject.org/tpo/anti-censorship/team/-/issues/115#note_2892825
+	# "2023-03-14 00:00:00",  8000, T, "Domain fronting rendezvous again blocked in Iran", # https://gitlab.torproject.org/tpo/anti-censorship/team/-/issues/115#note_2892825
+	# "2023-03-19 00:00:00",  8000, T, "",                                            # https://gitlab.torproject.org/tpo/anti-censorship/team/-/issues/115#note_2892825
+	# "2023-03-20 00:00:00",  8000, T, "Domain fronting rendezvous again blocked in Iran", # https://gitlab.torproject.org/tpo/anti-censorship/team/-/issues/115#note_2892825
 ) %>% mutate(date = lubridate::ymd_hms(date) %>% lubridate::as_date())
 
 # Return an abbreviation for the month, followed by a year for January only.
