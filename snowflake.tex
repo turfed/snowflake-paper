@@ -1768,10 +1768,12 @@ in other estimates/\allowbreak graphs, but here we effectively do.}
 \label{sec:proxies}
 
 \begin{figure}
-\framebox[\linewidth]{\vbox to 1.1in{\vfil\centering TODO\vfil}}
-\framebox[\linewidth]{\vbox to 1.1in{\vfil\centering TODO\vfil}}
-\caption{Number and type of Snowflake proxies over time.}
-\label{fig:proxy-counts}
+\includegraphics{figures/proxies/proxy-type}
+\caption{
+Number of unique Snowflake proxy IP addresses per day,
+by proxy type.
+}
+\label{fig:proxy-type}
 \end{figure}
 
 Snowflake's effectiveness depends crucially on its pool of proxies.
@@ -1791,7 +1793,7 @@ of three standalone Go proxies all on the same IP address as the Snowflake bridg
 as well as a few proxies from deployed Snowflake badges.
 % for alpha testers
 We began to collect metrics on the number of deployed proxies on \mbox{2019-06-29}.
-\autoref{fig:proxy-counts} shows the total count of unique proxy IP addresses
+\autoref{fig:proxy-type} shows the total count of unique proxy IP addresses
 from the beginning of our collection to the writing of this paper.
 The majority of the growth in Snowflake proxies over the last three years comes from
 the success of the Snowflake browser add-on.\todo{Audit ``add-on'' vs.\ ``extension''.}
@@ -1802,7 +1804,7 @@ The number of Cupcake proxies dropped off completely later that year,
 but Snowflake add-on usage had already risen to compensate.
 % "Link Cupcake from snowflake.torproject.org" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/31497
 Currently, the vast majority of Snowflake proxies are from the browser add-on,
-as shown in \autoref{fig:proxy-counts}.
+as shown in \autoref{fig:proxy-type}.
 
 While early growth in the number of unique Snowflake proxy IPs
 was due to the development of easier deployment methods and UX features for proxy volunteers,

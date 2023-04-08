@@ -3,7 +3,8 @@ BIBTEX = bibtex
 
 FIGURES = \
 	figures/rendezvous/rendezvous.pdf \
-	figures/users/users-global.pdf
+	figures/users/users-global.pdf \
+	figures/proxies/proxy-type.pdf
 
 snowflake.pdf: *.tex *.bib $(FIGURES)
 
