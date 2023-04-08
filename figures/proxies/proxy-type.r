@@ -14,9 +14,6 @@ DATE_LIMITS <- lubridate::ymd(c(
 	"2023-03-31"
 ))
 
-# TODO: LINE_SIZE to common.r?
-LINE_SIZE <- 0.2
-
 # TODO: date thresholds where labeling changed, notably "unknown"→"iptproxy" on 2022-06-21.
 #
 # 2022-03-21 Snowflake begins to recognize "iptproxy" as a probe type.

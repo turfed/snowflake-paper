@@ -18,8 +18,6 @@ WANTED_FINGERPRINTS <- c(
 	"91DA221A149007D0FD9E5515F5786C3DD07E4BB0" = "snowflake-02"
 )
 
-LINE_SIZE <- 0.2
-
 GAPS <- tribble(
 	~begin, ~end, ~y, ~left_side,
 	# https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40033#note_2735468
