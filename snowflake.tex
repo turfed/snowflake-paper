@@ -769,17 +769,20 @@ in its rendezvous message.
 The broker conservatively assumes that clients
 with an ``unknown'' NAT type have a symmetric NAT.
 Most clients work well with the majority of Snowflake proxies, as
-shown in \autoref{fig:clients-by-nat}.
+shown in \autoref{fig:client-nat}.
 However, approximately one quarter of client polls
 self report having a restricted NAT type.\todo{Double check this number and update if needed.}
 
 \begin{figure}
-\centering
 \includegraphics[width=\columnwidth]{figures/clients-by-nat}
 \caption{Snowflake client poll counts by NAT type.}
-\label{fig:clients-by-nat}
+\label{fig:client-nat}
 \todo[inline]{Replace provisional figure.}
 \todo[inline]{Commit source data (e.g.\ CSV) to repository.}
+\bigskip
+\framebox[\columnwidth]{\vbox to 1.1in{\vfil\centering TODO\vfil}}
+\caption{Proxy counts by NAT type.}
+\label{fig:proxy-nat}
 \end{figure}
 
 We use a different technique to determine the NAT type of Snowflake proxies,
@@ -812,7 +815,7 @@ until its next successful NAT check.
 
 The majority of browser-based Snowflake proxies
 fall into the ``restricted'' category.
-\autoref{fig:proxies-by-nats} shows the distribution of proxies by NAT type.
+\autoref{fig:proxy-nat} shows the distribution of proxies by NAT type.
 Despite this, we have managed to maintain a sufficient number of unrestricted proxies,
 thanks in large part to the standalone, command-line
 version of the Snowflake proxy,
@@ -820,12 +823,6 @@ which tends to be run on rented VPSes in less restricted networks.
 \todo{Perhaps dwell on the duality here:
 standalone proxies knowingly sacrifice some address diversity
 for better NAT compatibility in a common case.}
-
-\begin{figure}
-\framebox[\columnwidth]{\vbox to 2in{\vfil\centering TODO\vfil}}
-\caption{Proxy counts by NAT type.}
-\label{fig:proxies-by-nats}
-\end{figure}
 
 At the same time as the snowflake proxy makes a connection to its assigned client,
 % "At the same time": https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40228
