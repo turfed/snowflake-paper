@@ -1845,6 +1845,21 @@ Orbot---as proxy (``kindness'' mode)?
 % "experimental mode to enable running as a Snowflake proxy"
 % 2023-01-13 https://github.com/guardianproject/orbot/releases/tag/17.0.0-BETA-1-tor.0.4.7.11
 % "easy access to Snowflake proxy 'kindness' mode"
+\todo{Figure out timing of Orbot ``iptproxy'' self-labeling.}
+% On June 2022-06-21 there is a shift from "Unknown" to "Orbot", but it doesn't
+% quite add up. One thing is that the series do not quite match up at the seam:
+% "Orbot" is about 40% higher than "Unknown" had been up to that point. I know
+% that at one point Orbot started self-reporting its proxy type as "iptproxy"
+% and the broker started recognizing it, but I can't get the timeline to make
+% sense. It seems like the first version of Orbot to report itself as
+% "iptproxy" was *after* the change in the graph.
+% * 2022-03-21 Broker begins to recognize "iptproxy" as a probe type.
+%   https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/merge_requests/82
+% * 2022-05-03 iPtProxy 1.6.0 adds 'ProxyType: "iptproxy"'.
+%   https://github.com/tladesignz/IPtProxy/commit/c6ba25ef6ce8449476f734c626eadffdf55d0519
+% * 2022-06-21 "unknown" disappears and "iptproxy" appears in descriptors.
+% * 2022-07-05 Orbot 16.6.2 RC 1 upgrades to iPtProxy 1.6.0.
+%   https://github.com/guardianproject/orbot/releases/tag/16.6.2-RC-1-tor.0.4.7.8
 
 \subsection{Development challenges}
 \label{sec:challenges}
