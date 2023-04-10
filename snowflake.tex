@@ -773,16 +773,20 @@ shown in \autoref{fig:client-nat}.
 However, approximately one quarter of client polls
 self report having a restricted NAT type.\todo{Double check this number and update if needed.}
 
-\begin{figure}
+\begin{figure}[t]
 \includegraphics[width=\columnwidth]{figures/clients-by-nat}
 \caption{Snowflake client poll counts by NAT type.}
 \label{fig:client-nat}
 \todo[inline]{Replace provisional figure.}
 \todo[inline]{Commit source data (e.g.\ CSV) to repository.}
 \bigskip
-\framebox[\columnwidth]{\vbox to 1.1in{\vfil\centering TODO\vfil}}
-\caption{Proxy counts by NAT type.}
+\includegraphics{figures/proxies/proxy-nat-type}
+\caption{
+Number of unique Snowflake proxy IP addresses per day,
+by NAT type.
+}
 \label{fig:proxy-nat}
+\todo[inline]{Explain temporary inversions of restricted and unknown.}
 \end{figure}
 
 We use a different technique to determine the NAT type of Snowflake proxies,
@@ -816,6 +820,7 @@ until its next successful NAT check.
 The majority of browser-based Snowflake proxies
 fall into the ``restricted'' category.
 \autoref{fig:proxy-nat} shows the distribution of proxies by NAT type.
+\todo{Consider moving \autoref{fig:client-nat} and \autoref{fig:proxy-nat} to \autoref{sec:experience} so as not to slow the pace here.}
 Despite this, we have managed to maintain a sufficient number of unrestricted proxies,
 thanks in large part to the standalone, command-line
 version of the Snowflake proxy,
