@@ -9,8 +9,8 @@ library("tidyverse")
 source("../common.r")
 
 DATE_LIMITS <- lubridate::ymd(c(
-	"2019-07-01",
-	# "2021-01-01",
+	# "2019-07-01",
+	"2021-01-01",
 	"2023-03-31"
 ))
 
@@ -115,4 +115,4 @@ p <- ggplot() +
 	# Make room for the margin labels added by geom_text above.
 	theme(plot.margin = unit(c(0, 11, 0, 0), "mm")) +
 	guides(color = "none")
-ggsave(output_path, p, width = 8, height = 5)
+ggsave(output_path, p, width = DOCUMENT_LINEWIDTH, height = 1.5)
