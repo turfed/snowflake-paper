@@ -53,7 +53,7 @@ proxy_type <- read_csv(proxy_type_csv_path) %>%
 	mutate(type = fct_recode(type,
 		"WebExtension" = "webext",
 		"Orbot" = "iptproxy",
-		"Command-line" = "standalone",
+		"Standalone" = "standalone",
 		"Web badge" = "badge",
 		"Unknown" = "unknown"
 	)) %>%
@@ -103,9 +103,7 @@ p <- ggplot() +
 			x = date,
 			y = y,
 			color = type,
-			# \u00ad (soft hyphen) is a hack to avoid the hypohen
-			# turning into a minus sign: https://stackoverflow.com/a/48510383.
-			label = gsub("-", "\u00ad", type),
+			label = type
 		),
 		position = position_nudge(x = 5),
 		family = FONT_FAMILY,
