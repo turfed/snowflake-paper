@@ -782,7 +782,7 @@ self report having a restricted NAT type.\todo{Double check this number and upda
 \bigskip
 \includegraphics{figures/proxies/proxy-nat-type}
 \caption{
-Number of unique Snowflake proxy IP addresses per day,
+Unique proxy IP addresses per day,
 by NAT type.
 }
 \label{fig:proxy-nat}
@@ -1650,7 +1650,7 @@ until we reverted the erroneous change in mid-March,
 after which the count started to recover.
 Around this time, there were also short intervals during which
 the domain used for domain-fronting rendezvous
-was blocking in some ISPs in Iran,
+was blocked in some ISPs in Iran,
 an evident attempt at blocking that was not sustained.
 
 Through most of this history,
@@ -1802,7 +1802,7 @@ a~feature called ``kindness mode.''
 \begin{figure}
 \includegraphics{figures/proxies/proxy-type}
 \caption{
-Number of unique Snowflake proxy IP addresses per day,
+Unique proxy IP addresses per day,
 by proxy type.
 }
 \label{fig:proxy-type}
@@ -1835,7 +1835,7 @@ by proxy type.
 comparative counts of the different types of proxy,
 counting unique IP addresses per 24~hours.
 
-% "Start producing snowflakes" https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/20813
+% "Start producing snowflakes" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/20813
 The deployment of Snowflake proxies began with a bare minimum deployment
 of three standalone Go proxies all on the same IP address as the Snowflake bridge,
 as well as a few proxies from deployed Snowflake badges.
@@ -1851,6 +1851,7 @@ of Snowflake with the existing flash proxy add-on, Cupcake.
 The number of Cupcake proxies dropped off completely later that year,
 but Snowflake add-on usage had already risen to compensate.
 % "Link Cupcake from snowflake.torproject.org" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/31497
+% "Snowflake integration" https://github.com/glamrock/cupcake/issues/24
 Currently, the vast majority of Snowflake proxies are from the browser add-on,
 as shown in \autoref{fig:proxy-type}.
 
@@ -1865,9 +1866,11 @@ Timeline of proxy + webext deployment
 % |2019-07-03|||snowflake|Deployed version 0.0.1 of the Snowflake WebExtension for Chrome.|[comment](https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/30999#note_2593718)||
 Cupcake
 Relative ineffectiveness of web badge (i.e. the flash proxy model)
+% "Chrome browser add-on" [Cupcake for flash proxy] https://bugs.torproject.org/legacy/trac/7721
+% https://www.bamsoftware.com/talks/ee380-flashproxy/index.html#s15
+% - Browser plugin, Facebook app, standalone node.js, flash+obfs.
 people love the add-on and the daily count of connections
 We decided early on that the opt-out proxying model had been a mistake,
-and that Snowflake would be only opt-in.
 % Date: Tue, 6 Dec 2016 18:38:40 -0800
 % From: David Fifield <dcf@torproject.org>
 % To: Arlo Breault <arlo@torproject.org>
@@ -1881,6 +1884,8 @@ and that Snowflake would be only opt-in.
 % proxy always bothered me. I think there's a good chance it would cause
 % trouble for us if Snowflake becomes popular. So I'd like to see
 % Snowflake use opt-in badges (and Cupcake) only.
+and that Snowflake would be only opt-in.
+% "Prepare a Snowflake 'options' page, like in flashproxy" https://github.com/keroserene/snowflake/issues/21
 
 browser proxy shows a count of how many sessions
 have happened in the last 24 hours,
@@ -1942,6 +1947,7 @@ and must sometimes take priority over speed of development.
 Confusion with browser extension---do I install it if I \emph{am} censored,
 or if I want to \emph{help} someone who is censored.
 Evident in the number of Snowflake proxies in Iran.
+Similar confusion with Orbot, which lets use both \emph{use} a proxy and \emph{be} a proxy.
 
 % Safe Browsing / zip bomb problem (2019)
 % https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/issues/31250

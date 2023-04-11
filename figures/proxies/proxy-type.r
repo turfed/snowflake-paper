@@ -16,11 +16,14 @@ DATE_LIMITS <- lubridate::ymd(c(
 
 # TODO: date thresholds where labeling changed, notably "unknown"→"iptproxy" on 2022-06-21.
 #
+# 2019-12-03 WebExtension version 0.2.0 is released, broker starts recording proxy types.
+# https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/31157#note_2593925
+#
 # 2022-03-21 Snowflake begins to recognize "iptproxy" as a probe type.
 # https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40104
 # https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/merge_requests/82
 #
-# 2022-05-03 iPtProxy 1.6.0 adds 'ProxyType: "iptproxy"'.
+# 2022-05-03 IPtProxy 1.6.0 adds 'ProxyType: "iptproxy"'.
 # https://github.com/tladesignz/IPtProxy/commit/c6ba25ef6ce8449476f734c626eadffdf55d0519
 #
 # 2022-06-21 "unknown" disappears and "iptproxy" appears in proxy-type.csv.
