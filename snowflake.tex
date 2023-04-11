@@ -1769,6 +1769,36 @@ in other estimates/\allowbreak graphs, but here we effectively do.}
 \subsection{Proxy recruitment and growth}
 \label{sec:proxies}
 
+Snowflake's effectiveness depends crucially on its pool of proxies.
+At the outset it was not clear
+that it would even be possible to build and sustain
+a population of proxies large enough
+to be meaningfully blocking resistant.
+\todo{Give estimated count of flash proxies from
+\href{https://people.torproject.org/~dcf/graphs/}{fp-num-proxies-201601.png}.}
+
+Snowflake supports several types of proxies.
+The primary one is the browser WebExtension,
+which, once installed, runs the background of a person's web browsing sessions.
+There is a ``web badge'' version of the proxy that does not require installation;
+it is the same JavaScript code as the WebExtension, but running in a normal web page.
+Rather than install a browser extension,
+some people leave a browser tab open on a web badge proxy.
+There is also a standalone proxy that runs in the command line
+and does not require a browser;
+% "Golang implementation of standalone snowflake proxy" https://github.com/keroserene/snowflake/pull/41
+this version is convenient to install on a rented VPS, for example.
+Running a long-term headless snowflake proxy at a fixed IP address
+is somewhat at odds with the goal of proxy address diversity,
+but these standalone proxy are valuable because
+they tend to have less restrictive NATs,
+making them compatible with more clients.
+Finally, Orbot, a mobile app for accessing Tor,
+in addition to being able to \emph{use} a snowflake proxy for circumvention,
+can also \emph{provide} snowflake proxy service to others,
+a~feature called ``kindness mode.''
+% Only so called in Orbot v17+, which should be current by the time the paper is submitted.
+
 \begin{figure}
 \includegraphics{figures/proxies/proxy-type}
 \caption{
@@ -1776,20 +1806,36 @@ Number of unique Snowflake proxy IP addresses per day,
 by proxy type.
 }
 \label{fig:proxy-type}
+\todo[inline]{Disentangle ``Orbot'' from ``Standalone'' and ``Unknown'' according to known deployment dates.}
+% 2021-02-23 https://github.com/guardianproject/orbot/releases/tag/16.4.1-BETA-2-tor.0.4.4.6
+% "experimental mode to enable running as a Snowflake proxy"
+% 2021-07-14 https://github.com/tladesignz/IPtProxy/commit/228e9e61e285ee548a42d6bee487577e44630695
+% IPtProxy 1.1.0 changes its proxy type from "standalone" to "iptproxy"
+% 2021-12-20 https://github.com/guardianproject/orbot/releases/tag/16.5.2-RC-1-tor.0.4.6.8
+% Orbot updates IPtProxy from 1.0.0 to 1.2.0 https://github.com/guardianproject/orbot/commit/57add48cd904afe94363219887cd142bb5cf6696
+% 2022-01-03 https://github.com/guardianproject/orbot/releases/tag/16.5.2-RC-5-tor.0.4.6.9
+% This is close to the date (2022-01-05) when there's sudden growth in "Unknown",
+% which is probably Orbot self-reporting as "iptproxy" and the broker throwing away that label for being unrecognized.
+% 2022-03-21 https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/merge_requests/82
+% Broker starts to recognize "iptproxy" as a probe type, but not deployed yet.
+% 2022-05-03 https://github.com/tladesignz/IPtProxy/commit/c6ba25ef6ce8449476f734c626eadffdf55d0519
+% IPtProxy 1.6.0 adds 'ProxyType: "iptproxy"' (no effective change, had already been done in a patch).
+% 2022-06-21 https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40151
+% Broker deployment, broker starts recording "iptproxy" in descriptors.
+% 2022-07-05 https://github.com/guardianproject/orbot/releases/tag/16.6.2-RC-1-tor.0.4.7.8
+% Orbot 16.6.2 RC 1 upgrades to IPtProxy 1.6.0.
+% 2022-08-02 https://github.com/guardianproject/orbot/releases/tag/17.0.0-ALPHA-1-tor.0.4.7.8
+% "updated UI based on new design spec: https://github.com/guardianproject/orbot/blob/NEW_UX/docs/design-spec-kindness-mode.md"
+% "improved support for Snowflake Proxying "kindness" / volunteer mode"
+% 2023-01-13 https://github.com/guardianproject/orbot/releases/tag/17.0.0-BETA-1-tor.0.4.7.11
+% "easy access to Snowflake proxy 'kindness' mode"
 \end{figure}
 
-Snowflake's effectiveness depends crucially on its pool of proxies.
-
-In~the early days of development
-it was far from certain that it would be possible to recruit
-enough volunteer proxies
-to be meaningfully blocking resistant
-and support a respectable number of users.
-\todo{Give estimated count of flash proxies from
-\href{https://people.torproject.org/~dcf/graphs/}{fp-num-proxies-201601.png}.}
+\autoref{fig:proxy-type} shows the
+comparative counts of the different types of proxy,
+counting unique IP addresses per 24~hours.
 
 % "Start producing snowflakes" https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/20813
-% "Golang implementation of standalone snowflake proxy" https://github.com/keroserene/snowflake/pull/41
 The deployment of Snowflake proxies began with a bare minimum deployment
 of three standalone Go proxies all on the same IP address as the Snowflake bridge,
 as well as a few proxies from deployed Snowflake badges.
@@ -1839,27 +1885,6 @@ and that Snowflake would be only opt-in.
 browser proxy shows a count of how many sessions
 have happened in the last 24 hours,
 which people seem to like
-
-Orbot---as proxy (``kindness'' mode)?
-% 2021-02-23 https://github.com/guardianproject/orbot/releases/tag/16.4.1-BETA-2-tor.0.4.4.6
-% "experimental mode to enable running as a Snowflake proxy"
-% 2023-01-13 https://github.com/guardianproject/orbot/releases/tag/17.0.0-BETA-1-tor.0.4.7.11
-% "easy access to Snowflake proxy 'kindness' mode"
-\todo{Figure out timing of Orbot ``iptproxy'' self-labeling.}
-% On June 2022-06-21 there is a shift from "Unknown" to "Orbot", but it doesn't
-% quite add up. One thing is that the series do not quite match up at the seam:
-% "Orbot" is about 40% higher than "Unknown" had been up to that point. I know
-% that at one point Orbot started self-reporting its proxy type as "iptproxy"
-% and the broker started recognizing it, but I can't get the timeline to make
-% sense. It seems like the first version of Orbot to report itself as
-% "iptproxy" was *after* the change in the graph.
-% * 2022-03-21 Broker begins to recognize "iptproxy" as a probe type.
-%   https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/merge_requests/82
-% * 2022-05-03 iPtProxy 1.6.0 adds 'ProxyType: "iptproxy"'.
-%   https://github.com/tladesignz/IPtProxy/commit/c6ba25ef6ce8449476f734c626eadffdf55d0519
-% * 2022-06-21 "unknown" disappears and "iptproxy" appears in descriptors.
-% * 2022-07-05 Orbot 16.6.2 RC 1 upgrades to iPtProxy 1.6.0.
-%   https://github.com/guardianproject/orbot/releases/tag/16.6.2-RC-1-tor.0.4.7.8
 
 \subsection{Development challenges}
 \label{sec:challenges}
