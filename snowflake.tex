@@ -31,6 +31,7 @@
 \fi
 
 \hyphenation{Web-RTC}
+\hyphenation{Web-Exten-sion}
 \hyphenation{Java-Script}
 \hyphenation{uProxy}
 
@@ -1769,16 +1770,10 @@ in other estimates/\allowbreak graphs, but here we effectively do.}
 \subsection{Proxy recruitment and growth}
 \label{sec:proxies}
 
-Snowflake's effectiveness depends crucially on its pool of proxies.
-At the outset it was not clear
-that it would even be possible to build and sustain
-a population of proxies large enough
-to be meaningfully blocking resistant.
-\todo{Give estimated count of flash proxies from
-\href{https://people.torproject.org/~dcf/graphs/}{fp-num-proxies-201601.png}.}
-
-Snowflake supports several types of proxies.
-The primary one is the browser WebExtension,
+Snowflake's effectiveness depends crucially on its pool of proxies,
+of which there are several types.
+The primary type is the browser WebExtension,\todo{Audit ``add-on'' vs.\ ``extension'' vs.\ ``WebExtension''.}
+% "Creating a Snowflake WebExtension addon" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/23888
 which, once installed, runs the background of a person's web browsing sessions.
 There is a ``web badge'' version of the proxy that does not require installation;
 it is the same JavaScript code as the WebExtension, but running in a normal web page.
@@ -1834,43 +1829,89 @@ by proxy type.
 \autoref{fig:proxy-type} shows the
 comparative counts of the different types of proxy,
 counting unique IP addresses per 24~hours.
+The WebExtension proxies clearly predominate,
+representing about 90\% of daily IP addresses.
+% > tail(read_csv("figures/proxies/proxy-type.csv", col_types = cols()) %>% group_by(date) %>% mutate(percent = 100 * unique_ips / sum(unique_ips)), 8) %>% ungroup()
+% # A tibble: 8 x 5
+%   date       type       unique_ips coverage percent
+%   <date>     <chr>           <dbl>    <dbl>   <dbl>
+% 1 2023-04-03 badge           1397.     1       1.07
+% 2 2023-04-03 iptproxy        8589.     1       6.57
+% 3 2023-04-03 standalone      5084.     1       3.89
+% 4 2023-04-03 webext        115652.     1      88.5
+% 5 2023-04-04 badge           1009.     0.69    1.11
+% 6 2023-04-04 iptproxy        5932.     0.69    6.51
+% 7 2023-04-04 standalone      3471.     0.69    3.81
+% 8 2023-04-04 webext         80741.     0.69   88.6
+The two large steps visible in the graph correspond
+to the invasion of Ukraine by Russia in late February~2022,
+% 2022-02-25 https://twitter.com/torproject/status/1497276960556429324
+% 2022-02-25 https://twitter.com/0xggus/status/1497224413829283877
+and protests in Iran beginning late September~2022,
+% 2022-09-24 https://twitter.com/torproject/status/1573670895696183303
+% 2022-10-03 https://www.eff.org/deeplinks/2022/10/snowflake-makes-it-easy-anyone-fight-censorship
+at which times there were campaigns
+to encourage people to install the browser extension.
 
+At the outset, it was not clear
+that it would be possible to build and sustain
+a large enough population of proxies
+to be meaningfully blocking resistant
+and support a reasonable number of users.
+\todo{Give estimated count of flash proxies from
+\href{https://people.torproject.org/~dcf/graphs/}{fp-num-proxies-201601.png}.}
 % "Start producing snowflakes" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/20813
-The deployment of Snowflake proxies began with a bare minimum deployment
-of three standalone Go proxies all on the same IP address as the Snowflake bridge,
-as well as a few proxies from deployed Snowflake badges.
-% for alpha testers
-We began to collect metrics on the number of deployed proxies on \mbox{2019-06-29}.
-\autoref{fig:proxy-type} shows the total count of unique proxy IP addresses
-from the beginning of our collection to the writing of this paper.
-The majority of the growth in Snowflake proxies over the last three years comes from
-the success of the Snowflake browser add-on.\todo{Audit ``add-on'' vs.\ ``extension''.}
-The add-on was released for Firefox on \mbox{2019-06-26} and Chrome on \mbox{2019-07-03},
-but the first major spike in proxy counts was thanks to the integration
-of Snowflake with the existing flash proxy add-on, Cupcake.
-The number of Cupcake proxies dropped off completely later that year,
-but Snowflake add-on usage had already risen to compensate.
-% "Link Cupcake from snowflake.torproject.org" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/31497
-% "Snowflake integration" https://github.com/glamrock/cupcake/issues/24
-Currently, the vast majority of Snowflake proxies are from the browser add-on,
-as shown in \autoref{fig:proxy-type}.
-
-While early growth in the number of unique Snowflake proxy IPs
-was due to the development of easier deployment methods and UX features for proxy volunteers,
-the later growth in proxy counts was due to outreach
-and follows the increase in demand for Snowflake proxy capacity from the increase in client usage. 
-
-Counts of web badge vs. browser add-on vs. standalone daemon
-Timeline of proxy + webext deployment
+While early growth in the number proxies
+was due developing new and easier ways to run one,
+later growth depended on advocacy and outreach.
+In~the early days, circa~2017,
+the only round-the-clock proxy support was
+a few standalone proxies,
+% 2018 "The three fallback proxy-go instances..." https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/25688
+run by us for the benefit of alpha testers.
+A~page with the web badge existed,
+but did not get enough traffic to produce proxies reliably.
+The WebExtension was first made available in mid-2019.
 % |2019-06-26|||snowflake|Deployed version 0.0.1 of the Snowflake WebExtension for Firefox.|[comment](https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/30931#note_2593598)||
 % |2019-07-03|||snowflake|Deployed version 0.0.1 of the Snowflake WebExtension for Chrome.|[comment](https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/30999#note_2593718)||
-Cupcake
-Relative ineffectiveness of web badge (i.e. the flash proxy model)
-% "Chrome browser add-on" [Cupcake for flash proxy] https://bugs.torproject.org/legacy/trac/7721
+% |2019-07-26|||flashproxy snowflake|Cupcake 2.0 is released, now working with Snowflake rather than flash proxy.|[Chrome Web Store page](https://chrome.google.com/webstore/detail/cupcake/dajjbehmbnbppjkcnpdkaniapgdppdnc)||
+It~got early assistance when Cupcake,
+a~browser extension for flash proxy with an existing user base,
+% "Link Cupcake from snowflake.torproject.org" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/31497
+% "Snowflake integration" https://github.com/glamrock/cupcake/issues/24
+was repurposed for Snowflake, at about the same time.
+Orbot's Snowflake proxy feature was added in version 16.4.1 in February~2021,\todo{Check this timing with Guardian Project.}
+% 2021-02-23 https://github.com/guardianproject/orbot/releases/tag/16.4.1-BETA-2-tor.0.4.4.6
+% https://m.apkpure.com/orbot-tor-for-android/org.torproject.android/download/1641300201-APK has 2021-04-30,
+% but I tend to believe the 2021-02-23 because it matches up with features in the graph.
+though it was counted with the standalone proxies
+until becoming its own proxy type in January~2022.
+% 2021-07-14 https://github.com/tladesignz/IPtProxy/commit/228e9e61e285ee548a42d6bee487577e44630695
+% IPtProxy 1.1.0 changes its proxy type from "standalone" to "iptproxy"
+% 2021-12-20 https://github.com/guardianproject/orbot/releases/tag/16.5.2-RC-1-tor.0.4.6.8
+% Orbot updates IPtProxy from 1.0.0 to 1.2.0 https://github.com/guardianproject/orbot/commit/57add48cd904afe94363219887cd142bb5cf6696
+% 2022-01-03 https://github.com/guardianproject/orbot/releases/tag/16.5.2-RC-5-tor.0.4.6.9
+% Changes from "standalone" to "unknown" because the broker does not recognize "iptproxy".
+% 2022-06-21 https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40151
+% Broker deployment, starts recognizing "iptproxy".
+
+It~is worth reflecting briefly
+on the relative ineffectiveness of the web badge
+compared to the WebExtension.
+The web badge had been the primary envisioned deployment model of flash proxy
+(though by the end of its run, flash proxy had also gained
 % https://www.bamsoftware.com/talks/ee380-flashproxy/index.html#s15
-% - Browser plugin, Facebook app, standalone node.js, flash+obfs.
-people love the add-on and the daily count of connections
-We decided early on that the opt-out proxying model had been a mistake,
+browser extensions including Cupcake
+% "Chrome browser add-on" [Cupcake for flash proxy] https://bugs.torproject.org/legacy/trac/7721
+% "Tor Flashproxy Badge" [for Firefox] https://github.com/reezer/tor-flashproxy-badge/
+and a standalone proxy,
+% "Node.js standalone flash proxy" https://bugs.torproject.org/legacy/trac/7944
+much like Snowflake later would).
+The idea had been that people's browsers
+would automatically become proxies
+while they browsed sites that had the flash proxy code installed,
+unless they had checked an option to prevent~it.
+We decided, early on, that flash proxy's opt-out model had been a mistake,
 % Date: Tue, 6 Dec 2016 18:38:40 -0800
 % From: David Fifield <dcf@torproject.org>
 % To: Arlo Breault <arlo@torproject.org>
@@ -1884,12 +1925,18 @@ We decided early on that the opt-out proxying model had been a mistake,
 % proxy always bothered me. I think there's a good chance it would cause
 % trouble for us if Snowflake becomes popular. So I'd like to see
 % Snowflake use opt-in badges (and Cupcake) only.
-and that Snowflake would be only opt-in.
+and that Snowflake would be only opt-in:
+before becoming a proxy, a person would have to take a positive action
+such as installing a browser extension
+or activating a toggle on a web page.
 % "Prepare a Snowflake 'options' page, like in flashproxy" https://github.com/keroserene/snowflake/issues/21
-
-browser proxy shows a count of how many sessions
-have happened in the last 24 hours,
-which people seem to like
+Our initial concerns that this decision
+would reduce the number of proxies were unfounded:
+people find an informative, interactable proxy control panel more appealing,
+and install the WebExtension in greater numbers.
+The browser-based proxies display the number of censored clients
+helped in the last 24~hours,
+which proxy operators find rewarding.
 
 \subsection{Development challenges}
 \label{sec:challenges}
