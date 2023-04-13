@@ -2194,14 +2194,6 @@ Centralized bridge
 - load balancing at the client, not ideal, though hard to do otherwise given the restrictions of working with Tor
 - not a perfect solution because of double rendezvous
 
-The Snowflake bridges stand among the largest relays in the Tor network.
-\todo{Do some analysis from the \href{https://metrics.torproject.org/rs.html\#toprelays}{toprelays}.}
-
-\section{Future work}
-\label{sec:future}
-
-% shelikhoo
-
 Distributed bridge architecture
 \url{https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40129}
 
@@ -2210,6 +2202,12 @@ Snowflake have experienced a significant increase of active users since its init
 Among many alternative designs, a snowflake client initiated server identity indication system was chosen. The snowflake client would send the server fingerprint it intended to connect to the broker. The broker then translate this server identity fingerprint to a server WebSocket relay address that corresponding to this server identify fingerprint and send this relay WebSocket address to the snowflake proxy matched. Upon receiving the address together with snowflake client's Session Description Protocol, the proxy will connect the client and the relay before tunneling the connection between them.
 
 To protect the proxy against a compromised broker that lead to send unsolicited traffic to servers, the proxy can be configured to check the WebSocket address's hostname and reject those without predefined suffix. Combining with mandatory TLS the proxy with distributed snowflake support does not introduce network abuse risk. This hostname check system is also used to check the compatibility between the proxy and the broker, as the broker will reject any proxy with a host name rejection policy that is incompatible with the brokers', including the case when a legacy proxy connect to a broker with distributed snowflake support enabled.
+
+The Snowflake bridges stand among the largest relays in the Tor network.
+\todo{Do some analysis from the \href{https://metrics.torproject.org/rs.html\#toprelays}{toprelays}.}
+
+\section{Future work}
+\label{sec:future}
 
 Multiplexing?
 
