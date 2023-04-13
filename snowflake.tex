@@ -1661,7 +1661,7 @@ because a censor's target of blocking can only be the temporary proxies, not the
 But as the first bridge began to reach its hardware capacity
 and performance wins got harder to achieve,
 we deployed a second bridge to share the load.
-Challenges and design considerations of doing so are discussed in \autoref{sec:performance}.
+The challenges and design considerations of doing so are discussed in \autoref{sec:performance}.
 The second bridge was made available to users in
 Tor Browser~12.0 on \mbox{2022-12-07}.
 By~February, however, the second bridge only accounted for about~5\%
@@ -1939,7 +1939,10 @@ which proxy operators find rewarding.
 \subsection{Development challenges}
 \label{sec:challenges}
 
-% arlo, cecylia
+Inventing an abstract design for a circumvention system,
+and building it out into something that is practical and useful,
+involve qualitatively different sets of challenges.
+
 
 Reproducible builds\ldots
 Difficulty of cross-compiling go-webrtc extracted from Chromium\ldots
@@ -1993,7 +1996,7 @@ and must sometimes take priority over speed of development.
 Confusion with browser extension---do I install it if I \emph{am} censored,
 or if I want to \emph{help} someone who is censored.
 Evident in the number of Snowflake proxies in Iran.
-Similar confusion with Orbot, which lets use both \emph{use} a proxy and \emph{be} a proxy.
+Similar confusion with Orbot, which has options both to \emph{use} a proxy and to \emph{be} a proxy.
 
 % Safe Browsing / zip bomb problem (2019)
 % https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/issues/31250
@@ -2210,6 +2213,13 @@ The Snowflake bridges stand among the largest relays in the Tor network.
 Multiplexing?
 
 Use by non-Tor systems
+
+Being integrated with Tor has advantages and disadvantages.
+- separate exit nodes
+- pluggable circumvention support
+but
+- limitations of Tor: slow speed, TCP only
+- lack of flexibility with bridge fingerprints
 
 \section*{Availability}
 
