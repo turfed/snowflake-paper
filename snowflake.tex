@@ -954,7 +954,7 @@ and smux detects the end of idle sessions and terminates them.
 There is nothing essential about KCP/smux;
 any other transport protocol that provides the necessary features
 and can be implemented in userspace would~do,
-such as QUIC, TCP, or (an additional layer of) SCTP.
+such as QUIC, TCP, or (another layer of) SCTP.
 (In~fact, we prototyped successfully with QUIC, before settling on KCP/smux.)
 The Turbo Tunnel layer does not depend on any browser features,
 because its packets are encapsulated into the data channel;
@@ -1013,7 +1013,7 @@ nor their eventual destinations.)
 But there is nothing about Tor that Snowflake depends on essentially;
 the tasks of providing a blocking-resistant to the bridge
 and then telling the bridge what to do are easily separable.
-We discuss alternatives to Tor
+We~discuss alternatives to Tor
 and other extensions of Snowflake in \autoref{sec:future}.
 Integration with Tor brings its own challenges,
 which we will get into in \autoref{sec:challenges}\todo{Check this cross reference when \autoref{sec:experience} is fleshed out.}.
@@ -1264,10 +1264,10 @@ Somewhat related to protocol fingerprinting is traffic analysis;
 that is, inferring the use of a censorship system
 by looking at features like the distribution of packet sizes,
 arrival times, and the sequence of packet directionality (in/out)---the
-kind of analysis that, in other contexts, is known as ``website fingerprinting''
+kind of analysis that, in other contexts, is known as ``website fingerprinting''---may
 % Could cite IETF survey on website fingerprinting.
 % (But don't want to give this topic more attention than it is due.)
-may potentially also be applied to detecting circumvention systems.
+potentially also be applied to detecting circumvention systems.
 In~our opinion, this possibility has remained more potential than actual.
 As our own (see \autoref{sec:experience}) and others' experience shows,
 censors still prefer to attack easier targets.
@@ -1275,7 +1275,7 @@ The Snowflake protocol supports traffic shaping (inside the WebRTC layer),
 but it is currently disabled:
 packets are sent with their ``natural'' sizes and without delay,
 reflecting the traffic dynamics of the tunneled Tor traffic
-(which in turn more or less represents the dynamics
+(which, in turn, more or less represents the dynamics
 of the user's application-layer streams deeper in the tunnel).
 Circumvention research awaits a treatment of
 what is a good strategy for traffic shaping to
@@ -1941,7 +1941,7 @@ which proxy operators find rewarding.
 
 Inventing an abstract design for a circumvention system,
 and building it out into something that is practical and useful,
-involve qualitatively different sets of challenges.
+present qualitatively different challenges.
 
 
 Reproducible builds\ldots
@@ -1957,6 +1957,8 @@ The Chromium browser\todo{Maybe \mbox{``libwebrtc''} is better than ``Chromium''
 from which go-webrtc was derived
 is a massively complex software project,
 with a multi-stage and frequently changing build system.
+A large browser team can keep up with it,
+but it's too much for a small circumvention team.
 The reproducible build environment,
 with its requirements to
 cross-compile from source,
@@ -2004,19 +2006,12 @@ Evident in the number of Snowflake proxies in Iran.
 Similar confusion with Orbot, which has options both to \emph{use} a proxy and to \emph{be} a proxy.
 
 % Safe Browsing / zip bomb problem (2019)
-% https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/issues/31250
+% https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/31250
 
 \subsection{Blocking in Russia}
 \label{sec:block-ru}
 
-% https://gitlab.torproject.org/tpo/community/support/-/issues/40050#note_2796770
-
 % mention the creeping block of VPNs? https://github.com/net4people/bbs/issues/76
-
-Snowflake client may be either the DTLS client or DTLS server
-Even a Snowflake client with a blocked fingerprint may work,
-if it happens to be paired with a browser proxy (which may be presumed to have an unblocked fingerprint)
-and it plays the DTLS server role
 
 % david
 
@@ -2043,6 +2038,11 @@ Second round of DTLS fingerprinting, this time targeting DTLS Client Hello?
 \url{https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40030#note_2803188}
 \url{https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40140}
 \url{https://ntc.party/t/a-new-snowflake-blocking-rule-offset-of-supported-groups-in-dtls-client-hello/2420}
+
+Snowflake client may be either the DTLS client or DTLS server
+Even a Snowflake client with a blocked fingerprint may work,
+if it happens to be paired with a browser proxy (which may be presumed to have an unblocked fingerprint)
+and it plays the DTLS server role
 
 That pluggable transports could not compensate fully
 for the loss of relay users points to a usability gap.
@@ -2218,6 +2218,7 @@ The Snowflake bridges stand among the largest relays in the Tor network.
 Multiplexing?
 
 Use by non-Tor systems
+- shared proxy pool
 
 Being integrated with Tor has advantages and disadvantages.
 - separate exit nodes
