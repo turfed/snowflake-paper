@@ -1941,16 +1941,36 @@ which proxy operators find rewarding.
 \subsection{Development challenges}
 \label{sec:challenges}
 
-Inventing an abstract design for a circumvention system,
+Designing a circumvention system in the abstract,
 and building it out into something that is practical and useful,
-present qualitatively different challenges.
+present different sets of challenges---and
+the latter are no less important than the former.
+Besides the obvious need
+to continually check design assumptions
+against the actual behavior of censors,
+there are all sorts of considerations around
+managing development complexity,
+deploying on multiple platforms,
+and administering servers.
+While seemingly mundane, they can mean the difference between success and failure.
+% "Under this understanding of censorship as friction, the usability of circumvention tools becomes even more important." https://github.com/net4people/bbs/issues/122
 
+The primary make-or-break challenge was finding a way to make
+WebRTC, a suite of protocols of and for the web,
+usable outside the browser,
+in order to make a general-purpose proxy capable of transmitting
+not just web, but Tor and any other traffic.
+In~2017 there were not as many options for this as there are now.
+Our own \mbox{go-webrtc} package,
+which extracted the C++ WebRTC library
+from the Chromium web browser and added bindings
+for the Go programming language,
+was one of the early efforts in this area and indeed,
+a~key ingredient in making the project feasible at all.
 
+GNU/Linux and macOS Unixy\dots
 Reproducible builds\ldots
 Difficulty of cross-compiling go-webrtc extracted from Chromium\ldots
-Difficulty of using WebRTC outside a browser\ldots
-It sounds like a trivial thing---an implementation detail---but\ldots
-seems mundane but becomes overriding\ldots
 % "windows reproducible build" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/19001#note_2591246
 % "Windows reproducible build of snowflake" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/25483
 Preparing reproducible builds the go-webrtc bindings for Windows
