@@ -490,9 +490,11 @@ In this method, the client does one HTTPS exchange
 with the broker; however routing through an intermediary such as a CDN,
 and disguising the externally visible domain name
 (the TLS Server Name Indication, or SNI) so that the exchange
-appears to be destined to a different site.
-We defer to Fifield et~al.~\cite{Fifield2015a}
-for a complete description of domain fronting.
+appears to be destined to a different site~\cite{Fifield2015a}.
+The well-known drawback of domain fronting
+is the high financial cost of CDN bandwidth,
+but because we use it only for rendezvous and not bulk data transfer,
+the cost is vastly lower than it would be in a system like~meek.
 \item[AMP cache]
 % https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/merge_requests/50
 AMP is a framework for web pages written in a restricted dialect of HTML.
