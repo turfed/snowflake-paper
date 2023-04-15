@@ -318,7 +318,7 @@ A~great deal of the interest in this kind of research
 is in the complications that emerge when idea meets practice.
 
 \todo{Origin of the name Snowflake?}
-\todo{Deployed since\ldots}
+\todo{Deployed since\ldots\allowbreak \(X\)~TB per month\ldots}
 
 \section{How it works}
 \label{sec:mechanics}
@@ -662,7 +662,7 @@ TURN is problematic for Snowflake,
 because TURN relays' IP addresses are
 generally fixed and easily discoverable by a censor.
 % "Configure TURN servers for the proxy and/or client" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/25596
-But working in our favor is the fact that
+But there is a factor working in our favor:
 a client does not need to be matched to a \emph{specific} proxy;
 any compatible proxy will~do.
 In Snowflake, client and proxies self-assess their NAT configuration.
@@ -1076,7 +1076,7 @@ Not only that, WebRTC leaves the details of
 the signaling path---where peers exchange information
 needed to set up a connection,
 corresponding to Snowflake rendezvous---unspecified~\cite[\S 3]{rfc8825},
-leaving applications to invent their own signaling mechanisms.
+leaving applications to invent their own mechanisms.
 % "The choice of protocols for client-server and inter-server signaling, and the definition of the translation between them, are outside the scope of the WebRTC protocol suite described in this document."
 % https://www.rfc-editor.org/rfc/rfc8829.html#section-3.1: "JSEP does not specify a particular signaling model or state machine, other than the generic need to exchange session descriptions in the fashion described by [RFC3264] (offer/answer)..."
 
@@ -2078,8 +2078,8 @@ The Snowflake bridges stand among the largest relays in the Tor network.
 \section{Notable attempts at blocking}
 \label{sec:block}
 
-We have looked at Snowflake's user counts in \autoref{sec:deployment},
-and how they have at times been affected by blocking actions by censors.
+We have seen Snowflake's user counts in \autoref{sec:deployment},
+and remarked on how they have at times been affected by blocking actions by censors.
 Now we take a closer look at the technical details of specific censorship events.
 The effect of these has usually been rather to increase rather than decrease
 the number of Snowflake users.
