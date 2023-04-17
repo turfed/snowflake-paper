@@ -1966,35 +1966,62 @@ which extracted the C++ WebRTC library
 from the Chromium web browser and added bindings
 for the Go programming language,
 was one of the early efforts in this area and indeed,
-a~key ingredient in making the project feasible at all.
-
-GNU/Linux and macOS Unixy\dots
-Reproducible builds\ldots
-Difficulty of cross-compiling go-webrtc extracted from Chromium\ldots
+a~key ingredient without which
+the Snowflake project could not have gotten started.
+But having Chromium as a critical dependency proved troublesome.
+Chromium is a large, complex piece of software
+with a custom and frequently changing build system.
+Every update was an ordeal.
+% 2016-06-06 "Play catch up w/ upstream" https://github.com/keroserene/go-webrtc/issues/39
+% 2016-06-22 "Bump to branch-heads/52" https://github.com/keroserene/go-webrtc/pull/42
+% 2016-09-23 "GN migration" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/19001#note_2591236
+% 2017-06-06 "libwebrtc and snowflake are not being built reproducibly (unless you build in the same month)" https://bugs.torproject.org/tpo/applications/tor-browser/22832
+% 2017-11-28 "Snowflake broken if no libatomic on host" https://bugs.torproject.org/tpo/applications/tor-browser/24465
+% 2017-03-13 "Update to branch-head/58 and add ARM support." https://github.com/keroserene/go-webrtc/pull/61
+% 2017-04-15 "Snowflake breaks the 7.0a3 build" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/21954
+% 2018-03-29 "Update to branch-heads/64" https://github.com/keroserene/go-webrtc/pull/79
+% 2018-04-03 "Figure out something for CI so we don't have to build w/ -D_GLIBCXX_USE_CXX11_ABI=0" https://github.com/keroserene/go-webrtc/issues/81
+% 2018-05-31 "Adapt macOS snowflake compilation to new toolchain" https://bugs.torproject.org/tpo/applications/tor-browser/26251
+% 2018-12-07 "Assembling WebRTC sources fails with error 'You have unstaged changes'" https://bugs.torproject.org/tpo/applications/tor-browser/28784
+% 2019-08-06 "Provide support for v21 SCTP offer spec" https://github.com/keroserene/go-webrtc/issues/107
+It~was the kind of thing
+a large team of web browser build engineers could keep up with,
+but not a small team of circumvention developers.
+Tor Browser requires that all its software components
+build reproducibly from source,
+in a cross-compiling environment without any
+pre-built or proprietary dependencies.
+Despite extensive hacking,
+we were never able to make a Windows build
+work in this environment---and
 % "windows reproducible build" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/19001#note_2591246
 % "Windows reproducible build of snowflake" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/25483
-Preparing reproducible builds the go-webrtc bindings for Windows
-presented enormous difficulties.
-The Chromium browser\todo{Maybe \mbox{``libwebrtc''} is better than ``Chromium''.}
-from which go-webrtc was derived
-is a massively complex software project,
-with a multi-stage and frequently changing build system.
-A large browser team can keep up with it,
-but it's too much for a small circumvention team.
-The reproducible build environment,
-with its requirements to
-cross-compile from source,
-without any pre-built binary or proprietary dependencies,
-was never a supported build configuration.
-The issue stalled us for a long time.
-We finally broke through the impasse
-by switching from the Chromium-derived go-webrtc
+% 2015-12-22 "native webrtc dependency build script" https://github.com/keroserene/go-webrtc/issues/23
+% 2016-02-02 "[WIP] Script to build-from-scratch from upstream webrtc" https://github.com/keroserene/go-webrtc/pull/32
+% 2017-01-04 "libwebrtc-magic.a equivalent file for windows machine" https://github.com/keroserene/go-webrtc/issues/57
+% 2017-10-02 "I put in all the work to get DLL linkage in" https://github.com/keroserene/go-webrtc/pull/69
+% 2018-04-06 "How to run latest commit with Windows? (branch-heads/64)" https://github.com/keroserene/go-webrtc/issues/83
+not working on Windows is surely a damper on usability.
+% (Chromium did not have even basic support for cross-compiling for Windows until late in 2017.)
+% https://groups.google.com/a/chromium.org/g/chromium-dev/c/cIA9fBb9vBE/m/73cOvZu9BQAJ
+% https://chromium.googlesource.com/chromium/src/+log/e9464b64f5f8cb3ff66965e16c16bec2648910fc/docs/win_cross.md
+What finally broke through the impasse was a switch
+% "Consider Native WebRTC Implementation" https://github.com/keroserene/go-webrtc/issues/26
 % "Evaluate pion WebRTC" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/28942
-to Pion WebRTC~\cite{pion-webrtc} in the middle of 2019.
-Pion is an independent implementation of WebRTC protocols, written in Go,
-that had not existing at the beginning of the Snowflake project.
-Pion presented no major difficulties to building reproducibly,
-and with it we were able to release Snowflake for Windows
+to Pion WebRTC~\cite{pion-webrtc} in~2019.
+Pion is an independent implementation WebRTC,
+written in Go like Snowflake itself,
+and easily cross-compilable.
+While Pion's not being based on browser code
+gives rise to more fingerprinting concerns
+of the kind discussed in \autoref{sec:fingerprinting},
+the time and attention it has freed up
+has been more than worth~it.
+% A few more libwebrtc problems:
+% "Memory and file descriptor leaks in programs that use go-webrtc" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/21312
+% "Bump snowflake/go-webrtc for trac 21312" https://bugs.torproject.org/tpo/applications/tor-browser/25449
+% "Bump snowflake/go-webrtc again for trac 21312" https://bugs.torproject.org/tpo/applications/tor-browser/25579
+% 2019-05-03 "Any go program that uses this library will have an executable stack..." https://github.com/keroserene/go-webrtc/pull/105
 
 History of changing domain fronts
 % "Standalone broker (independent of App Engine)" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/22874
