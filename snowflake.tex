@@ -1289,6 +1289,38 @@ and an analysis of how much of a threat they pose in practice.
 
 \todo{Add some intro here.}
 
+\begin{figure*}[t]
+\includegraphics{figures/users/users-global}
+\caption{
+Estimated average number of simultaneous Snowflake users per day.
+The value at the far left,
+in early January 2021, is about~60.
+% > filter(filtered, abs(date - as.Date("2021-01-01")) < 3)
+% # A tibble: 5 x 3
+%   date       transport users
+%   <date>     <chr>     <dbl>
+% 1 2020-12-30 snowflake  66.2
+% 2 2020-12-31 snowflake  54.0
+% 3 2021-01-01 snowflake  53.4
+% 4 2021-01-02 snowflake  65.5
+% 5 2021-01-03 snowflake  65.4
+At this point, Snowflake was available
+for desktop platforms and Android
+in Tor Browser's alpha release series,
+but not yet in the stable release series.
+The maximum value in the part of the graph not shown
+is~133, on \mbox{2020-12-09}.
+% > filtered[which.max(filter(filtered, date < "2021-01-01")$users), ]
+% # A tibble: 1 x 3
+%   date       transport users
+%   <date>     <chr>     <dbl>
+% 1 2020-12-09 snowflake  133.
+}
+\label{fig:user-counts}
+\todo[inline]{Bandwidth chart? Ideally with aligned horizontal axis.}
+\todo[inline]{Find a good way to represent the intermittent blocking of the domain front in Iran, January--March~2023.}
+\end{figure*}
+
 \subsection{Deployment history and user counts}
 \label{sec:deployment}
 
@@ -1332,38 +1364,6 @@ and an analysis of how much of a threat they pose in practice.
 % |2023-03-13 19:46:07|||snowflake|Restarted snowflake-02 bridge for a bugfix.|[comment](https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40262#note_2886032) [issue](https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40260)||
 % |2023-03-13 20:17:54|||snowflake|Restarted snowflake-01 bridge for a bugfix.|[comment](https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40262#note_2886041) [issue](https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40260)||
 % |2023-03-15|||snowflake|Release of Orbot for Android v17 BETA 2. First release of Orbot to include the snowflake-02 bridge along with the existing snowflake-01. Has a change to the Snowflake DTLS fingerprint (removes Hello Verify Request) to mitigate reported blocking in Russia.|[release](https://github.com/guardianproject/orbot/releases/tag/17.0.0-BETA-2-tor.0.4.7.11) [Orbot commit adding snowflake-02](https://github.com/guardianproject/orbot/commit/c3f6ee18f17770a5904ad19c3cd24b9c8dcb3885) [IPtProxy commit upgrading Snowflake](https://github.com/tladesignz/IPtProxy/commit/5d0654a6a1439c05d3ee52b2b351b5df1ff3f6dc)||
-
-\begin{figure*}[t]
-\includegraphics{figures/users/users-global}
-\caption{
-Estimated average number of simultaneous Snowflake users per day.
-The value at the far left,
-in early January 2021, is about~60.
-% > filter(filtered, abs(date - as.Date("2021-01-01")) < 3)
-% # A tibble: 5 x 3
-%   date       transport users
-%   <date>     <chr>     <dbl>
-% 1 2020-12-30 snowflake  66.2
-% 2 2020-12-31 snowflake  54.0
-% 3 2021-01-01 snowflake  53.4
-% 4 2021-01-02 snowflake  65.5
-% 5 2021-01-03 snowflake  65.4
-At this point, Snowflake was available
-for desktop platforms and Android
-in Tor Browser's alpha release series,
-but not yet in the stable release series.
-The maximum value in the part of the graph not shown
-is~133, on \mbox{2020-12-09}.
-% > filtered[which.max(filter(filtered, date < "2021-01-01")$users), ]
-% # A tibble: 1 x 3
-%   date       transport users
-%   <date>     <chr>     <dbl>
-% 1 2020-12-09 snowflake  133.
-}
-\label{fig:user-counts}
-\todo[inline]{Bandwidth chart? Ideally with aligned horizontal axis.}
-\todo[inline]{Find a good way to represent the intermittent blocking of the domain front in Iran, January--March~2023.}
-\end{figure*}
 
 The deployment of Snowflake to end users was gradual,
 reflecting a long development process.
