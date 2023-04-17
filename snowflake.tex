@@ -1379,13 +1379,15 @@ and their influence on the number of Snowflake users over time.
 
 Snowflake first shipped in the alpha release series of Tor Browser
 before graduating to the stable series.
-% "First working bundles with Snowflake, for linux only" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/19001
 It~first became available for GNU/Linux
 with Tor Browser~7.0a1 on \mbox{2017-01-24};
-% "mac reproducible build" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/19001
-% "[tbb-dev] Please check reproducibility of mac build with Snowflake (e084e83418)" https://lists.torproject.org/pipermail/tbb-dev/2017-July/000579.html
+% "First working bundles with Snowflake, for linux only" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/19001
+% "Add snowflake pt to alpha linux builds" https://bugs.torproject.org/tpo/applications/tor-browser/20735
 then for macOS
 with Tor Browser~7.5a4 on \mbox{2017-08-08}.
+% "mac reproducible build" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/19001
+% "[tbb-dev] Please check reproducibility of mac build with Snowflake (e084e83418)" https://lists.torproject.org/pipermail/tbb-dev/2017-July/000579.html
+% "Merge Snowflake for mac" https://bugs.torproject.org/tpo/applications/tor-browser/22831
 Here we hit a roadblock:
 the Chromium-derived WebRTC library we had used to that point
 proved difficult to make work in Tor Browser's
@@ -1395,6 +1397,7 @@ and after switching to it we were able to release
 Snowflake for Windows
 with Tor Browser~9.0a7 on \mbox{2019-10-01}.
 % "Android reproducible build of Snowflake" https://bugs.torproject.org/tpo/applications/tor-browser/28672
+% "Integrate snowflake into mobile Tor Browser alpha" https://bugs.torproject.org/tpo/applications/tor-browser/30318
 Snowflake for Android became available with
 Tor Browser~10.0a1 on \mbox{2020-06-02}.
 
@@ -1953,14 +1956,14 @@ managing development complexity,
 deploying on multiple platforms,
 and administering servers.
 While seemingly mundane, they can mean the difference between success and failure.
-% "Under this understanding of censorship as friction, the usability of circumvention tools becomes even more important." https://github.com/net4people/bbs/issues/122
+% "Under this understanding of censorship as friction, the usability of circumvention tools becomes even more important." https://github.com/net4people/bbs/issues/122#issuecomment-1232334948
 
 The primary make-or-break challenge was finding a way to make
 WebRTC, a suite of protocols of and for the web,
 usable outside the browser,
 in order to make a general-purpose proxy capable of transmitting
 not just web, but Tor and any other traffic.
-In~2017 there were not as many options for this as there are now.
+In~2016 there were not as many options as there are now.
 Our own \mbox{go-webrtc} package,
 which extracted the C++ WebRTC library
 from the Chromium web browser and added bindings
@@ -2024,11 +2027,12 @@ has been more than worth~it.
 % 2019-05-03 "Any go program that uses this library will have an executable stack..." https://github.com/keroserene/go-webrtc/pull/105
 
 History of changing domain fronts
-% "Standalone broker (independent of App Engine)" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/22874
+% 2017-06-10 "Standalone broker (independent of App Engine)" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/22874
 % 2018-04-13 "Domain fronting to App Engine stopped working" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/25804
 % 2018-05-03 "Additional domain fronts for Snowflake rendezvous" [switch to Azure] https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/22782#note_2591690
 % 2021-04-05 "Switch front domain and host to fastly" https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/merge_requests/33
-% "Is there a better moat/snowflake SNI than cdn.sstatic.net?" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40068
+% 2018-05-02 "Change Snowflake rendezvous to use Azure" https://bugs.torproject.org/tpo/applications/tor-browser/26010
+% 2021-08-13 "Is there a better moat/snowflake SNI than cdn.sstatic.net?" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40068
 
 scaling
 % david
@@ -2325,11 +2329,11 @@ by the cooperation and support of many people
 and organizations.
 We want to thank particularly:
 % https://keroserene.net/snowflake/technical/#history
-Chris Ball, % Earliest work on extracting a WebRTC library: https://bugs.torproject.org/legacy/trac/5578#note_2111217
+Chris Ball, % Earliest work on extracting a WebRTC library: https://blog.printf.net/articles/2013/05/17/webrtc-without-a-signaling-server/ https://bugs.torproject.org/legacy/trac/5578#note_2111217
 Griffin Boyce, % Cupcake
 Arthur Edelstein, % Helped set up crowdfunding in 2022 (even though we later decided not to go that route): https://forum.torproject.net/t/tor-project-more-resources-required-for-snowflake-bridge/2353/4
 Haz~Æ~41,\todo{Check how they want to be identified.} % Found an important bug affecting performance: https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40260
-Mia Gil Epner, % Coauthor of "Fingerprintability of WebRTC" https://censorbib.nymity.ch/#Fifield2016b
+Mia Gil Epner, % Coauthor of "Fingerprintability of WebRTC": https://censorbib.nymity.ch/#Fifield2016b
 Jordan Holland, % Coauthor of "Evaluating Snowflake as an Indistinguishable Censorship Circumvention Tool"
 Ximin Luo, % Early help trying to cross-compile libwebrtc: https://github.com/keroserene/go-webrtc/issues?q=commenter%3Ainfinity0
 Ivan Markin, % First AMP cache implementation: https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/25985 (username twim)
