@@ -1836,7 +1836,7 @@ comparative counts of the different types of proxy,
 counting unique IP addresses per 24~hours.
 The WebExtension proxies clearly predominate,
 representing about 90\% of daily IP addresses.
-% > tail(read_csv("figures/proxies/proxy-type.csv", col_types = cols()) %>% group_by(date) %>% mutate(percent = 100 * unique_ips / sum(unique_ips)), 8) %>% ungroup()
+% > tail(read_csv("figures/proxies/proxy-type.csv", col_types = cols()) %>% group_by(date) %>% mutate(percent = 100 * unique_ips / sum(unique_ips)) %>% ungroup(), 8)
 % # A tibble: 8 x 5
 %   date       type       unique_ips coverage percent
 %   <date>     <chr>           <dbl>    <dbl>   <dbl>
