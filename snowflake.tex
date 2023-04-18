@@ -2062,9 +2062,8 @@ to \emph{use} a proxy and to \emph{be} a proxy.
 
 The Snowflake system
 admittedly contains a lot of moving parts.
-Some complexity is inherent in the nature
-of what we are building:
-Snowflake is more complicated than a static encrypted proxy
+Some complexity is inherent in its nature:
+Snowflake is more complicated than a one-hop proxy
 and always will be.
 Complexity is the enemy of security and robustness, however,
 and in a system meant for real production use
@@ -2072,7 +2071,8 @@ could even be considered an existential risk,
 if the demands of maintenance exceed what the maintainers can provide.
 Managing complexity and designing for low maintenance
 are material concerns,
-and must sometimes take priority over speed of development.
+and must sometimes take priority over
+development of new features or performance optimization.
 
 % Safe Browsing / zip bomb problem (2019)
 % https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/31250
@@ -2088,6 +2088,8 @@ Actually tailored to the broker protocol, not a generic attack tool.
 
 \subsection{Rate of proxy IP address churn}
 \label{sec:proxy-churn}
+
+\todo{Move up into \autoref{sec:proxies}.}
 
 % shelikhoo
 
