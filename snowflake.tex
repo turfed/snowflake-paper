@@ -2036,6 +2036,30 @@ has been more than worth~it.
 % 2021-04-05 "Switch front domain and host to fastly" https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/merge_requests/33
 % 2021-08-13 "Is there a better moat/snowflake SNI than cdn.sstatic.net?" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40068
 
+The fact that snowflake proxies run in a web browser
+is the source of some confusion:
+do I install the browser extension if I am censored,
+or if I want to help someone else who is censored?
+The true situation is of course the latter,
+but it is natural for a user to assume
+that a circumvention-related browser extension is something
+they can use to unblock their own connection.
+This confusion is probably the cause of
+the relatively large number of proxies in Iran
+(about 5\% of total unique IP addresses in April~2023).
+% tail(read_csv("figures/proxies/proxy-country.csv", col_types = cols()) %>% group_by(date) %>% mutate(percent = 100 * unique_ips / sum(unique_ips)) %>% ungroup() %>% arrange(date, unique_ips) %>% filter(date == "2023-04-15"), 5)
+% # A tibble: 5 x 5
+%   date       country unique_ips coverage percent
+%   <date>     <chr>        <dbl>    <dbl>   <dbl>
+% 1 2023-04-15 gb           3042.        1    2.43
+% 2 2023-04-15 ca           3976.        1    3.18
+% 3 2023-04-15 ir           6312.        1    5.05
+% 4 2023-04-15 us          18903.        1   15.1
+% 5 2023-04-15 de          54553.        1   43.6
+There is similar confusion possible with Orbot,
+which has options both
+to \emph{use} a proxy and to \emph{be} a proxy.
+
 The Snowflake system
 admittedly contains a lot of moving parts.
 Some complexity is inherent in the nature
@@ -2049,11 +2073,6 @@ if the demands of maintenance exceed what the maintainers can provide.
 Managing complexity and designing for low maintenance
 are material concerns,
 and must sometimes take priority over speed of development.
-
-Confusion with browser extension---do I install it if I \emph{am} censored,
-or if I want to \emph{help} someone who is censored.
-Evident in the number of Snowflake proxies in Iran.
-Similar confusion with Orbot, which has options both to \emph{use} a proxy and to \emph{be} a proxy.
 
 % Safe Browsing / zip bomb problem (2019)
 % https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/31250
