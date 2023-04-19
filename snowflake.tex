@@ -2088,7 +2088,7 @@ Need a new experiment for this
 \url{https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/34075}
 
 
-Snowflake relies on the proxies' network address change over time to avoid censor block snowflake based on proxies' network address. For this reason, it is beneficial to evaluate how the proxy's network address change over time while preserving the privacy of proxy operators. A distinct count system known as HyperLogLog++ was used to count number of distinct proxy address while protecting the privacy of the proxy operators.
+Snowflake relies on the proxies' network address change over time to avoid censor block snowflake based on proxies' network address. For this reason, it is beneficial to evaluate how the proxy's network address change over time while preserving the privacy of proxy operators. A distinct count system known as HyperLogLog++~\cite{Heule2013a} was used to count number of distinct proxy address while protecting the privacy of the proxy operators.
 
 For any proxies that communicate with the broker during a given period of time, its network address will be converted to a blinded representation with a hash-based message authentication code and a secret. This blinded representation will then be added to the corresponding HyperLogLog++ structure.
 
