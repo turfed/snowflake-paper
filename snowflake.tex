@@ -2077,20 +2077,53 @@ development of new features or performance optimization.
 % Safe Browsing / zip bomb problem (2019)
 % https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/31250
 
-\subsection{Rate of proxy IP address churn}
+\subsection{Proxy IP address churn}
 \label{sec:proxy-churn}
 
 \todo{Move up into \autoref{sec:proxies}.}
 
-% shelikhoo
+% https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/34075
+% https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/merge_requests/95
 
-Need a new experiment for this
-\url{https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/34075}
+The number of available proxies is not
+the only important metric---also important
+is how frequently proxy IP addresses turn over.
+This indicates how hard a censor would have to work
+in order to maintain an effective proxy block list;
+or looked at another way,
+how quickly even a complete block list
+at a specific point in time would lose effectiveness.
+We designed an experiment
+to sample the composition of the proxy pool
+and enable comparisons at different points in time.
+Not wanting to store and risk exposing raw proxy IP addresses,
+we made hourly snapshots
+of a HyperLogLog++ structure~\cite{Heule2013a}
+that provides a probabilistic, approximate count
+of unique IP addresses seen over a time interval.
+HyperLogLog++ works by hashing its inputs;
+to remove the possibility of reversing the hashes
+by trial hashing of IP addresses,
+we additionally hashed each proxy IP address with a consistent secret key
+before adding it to the structure.
+A~HyperLogLog++ record \(A\)
+can report an approximate count \(|A|\)
+of its unique elements,
+but is more powerful than a simple count:
+two such records \(A\) and \(B\)
+can be merged to find the approximate count of their union
+\(|A \cup B|\).
+We can find approximately how many
+unique IP addresses two records have in common
+(the cardinality of their intersection) as
+\(|A| + |B| - |A \cup B|\),
+without needing to actually store lists of addresses.
+The HyperLogLog++ snapshots and derived data
+are included in the data set
+published with this paper.
 
-
-Snowflake relies on the proxies' network address change over time to avoid censor block snowflake based on proxies' network address. For this reason, it is beneficial to evaluate how the proxy's network address change over time while preserving the privacy of proxy operators. A distinct count system known as HyperLogLog++~\cite{Heule2013a} was used to count number of distinct proxy address while protecting the privacy of the proxy operators.
-
-For any proxies that communicate with the broker during a given period of time, its network address will be converted to a blinded representation with a hash-based message authentication code and a secret. This blinded representation will then be added to the corresponding HyperLogLog++ structure.
+windows of 24 hours are necessary to avoid
+conflation with diurnal patterns
 
 \subsection{Performance}
 \label{sec:performance}
