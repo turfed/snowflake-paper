@@ -266,20 +266,54 @@ func process(
 	// read-only at this point, so no synchronization of the input is
 	// needed.
 
+	// We end up wanting the same windows of size windowDuration over and
+	// over. Therefore we memoize the operations of calling
+	// contiguousWindowEnding and then mergeRecords.
+	var memoLock sync.Mutex
+	type memoKey struct {
+		i                   int
+		duration            time.Duration
+		contiguityTolerance time.Duration
+	}
+	memo := make(map[memoKey]record)
+	memoWindowEnding := func(i int, duration, contiguityTolerance time.Duration) record {
+		key := memoKey{i, duration, contiguityTolerance}
+		memoLock.Lock()
+		defer memoLock.Unlock()
+		rec, ok := memo[key]
+		if ok {
+			// Found in cache.
+			return rec
+		}
+		// Not found, compute and add to cache.
+		l, r := contiguousWindowEnding(records, i, windowDuration, contiguityTolerance)
+		rec = mergeRecords(records[l:r])
+		memo[key] = rec
+		if len(memo) > 1024 {
+			// When the cache gets too big, evict an old entry.
+			minKey := key
+			for k := range memo {
+				if k.i < minKey.i {
+					minKey = k
+				}
+			}
+			delete(memo, minKey)
+		}
+		return rec
+	}
+
 	// The processOne function does the processing for one reference window,
 	// the one that ends at index i, and all its nearby sample windows. It
 	// returns a list of formatting rows ready to be written to CSV.
 	processOne := func(i int) [][]string {
 		// Compute the reference window that ends at i.
-		wl, wr := contiguousWindowEnding(records, i, windowDuration, contiguityTolerance)
-		reference := mergeRecords(records[wl:wr])
+		reference := memoWindowEnding(i, windowDuration, contiguityTolerance)
 		// Compute the range of sample window endpoints.
 		sl, sr := contiguousWindowSurrounding(records, i, beforeDuration, afterDuration, contiguityTolerance)
 		rows := make([][]string, 0, sr-sl)
 		for j := sl; j < sr; j++ {
 			// Compute the sample window that ends at j.
-			wl, wr := contiguousWindowEnding(records, j, windowDuration, contiguityTolerance)
-			sample := mergeRecords(records[wl:wr])
+			sample := memoWindowEnding(j, windowDuration, contiguityTolerance)
 			// Append the CSV row for this reference—sample pair.
 			rows = append(rows, []string{
 				reference.End.Format(timestampFormat),                               // reference_timestamp_end
