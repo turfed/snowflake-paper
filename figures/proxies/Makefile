@@ -4,6 +4,7 @@
 all: \
 	proxy-type.pdf \
 	proxy-nat-type.pdf
+.PHONY: all
 
 proxy-type.pdf: .EXTRA_PREREQS = proxy-type.r ../common.r
 proxy-type.pdf: proxy-type.csv
