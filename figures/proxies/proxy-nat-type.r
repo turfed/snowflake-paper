@@ -1,5 +1,5 @@
-# Makes a graph showing number of unique Snowflake proxy IP addresses per day,
-# by NAT type.
+# Makes a graph showing the number of unique Snowflake proxy IP addresses per
+# day, by NAT type.
 #
 # Usage:
 #   Rscript proxy-nat-type.r proxy-nat-type.csv proxy-nat-type.pdf

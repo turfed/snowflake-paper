@@ -1,5 +1,5 @@
-# Makes a graph showing number of unique Snowflake proxy IP addresses per day,
-# by type.
+# Makes a graph showing the number of unique Snowflake proxy IP addresses per
+# day, by type.
 #
 # Usage:
 #   Rscript proxy-type.r proxy-type.csv proxy-type.pdf
