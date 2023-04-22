@@ -79,7 +79,7 @@ EVENTS <- tribble(
 
 # Return an abbreviation for the month, followed by a year for January only.
 date_labels <- function(breaks) {
-	strftime(breaks, ifelse(!is.na(breaks) & lubridate::month(breaks) == 1, "%b\n%Y", "%b"))
+	strftime(breaks, ifelse(!is.na(breaks) & lubridate::month(breaks) == 1, "%b\n%Y", "%b"), tz = "UTC")
 }
 
 # For each element of `at`, returns the minimum element of `values` whose
