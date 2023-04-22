@@ -2085,6 +2085,25 @@ development of new features or performance optimization.
 % https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/34075
 % https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/merge_requests/95
 
+\begin{figure}
+\includegraphics{figures/proxy-churn/proxy-count-decay}
+\caption{
+Proxy IP address churn in January 2023.
+The upper, darker line shows the number
+of unique proxy IP addresses in 24-hour windows,
+at intervals of 1~hour (the windows overlap).
+The lower, fainter lines show,
+relative to a reference window,
+how many IP addresses subsequent windows
+have in common with the reference,
+at 1-hour intervals up to 40 hours later.
+After 24 hours have elapsed,
+more than half the proxy pool has turned over
+with new addresses.
+}
+\label{fig:proxy-count-decay}
+\end{figure}
+
 The number of available proxies is not
 the only important metric---also important
 is how frequently proxy IP addresses turn over.

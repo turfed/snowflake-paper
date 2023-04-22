@@ -5,7 +5,8 @@ FIGURES = \
 	figures/rendezvous/rendezvous.pdf \
 	figures/users/users-global.pdf \
 	figures/proxies/proxy-type.pdf \
-	figures/proxies/proxy-nat-type.pdf
+	figures/proxies/proxy-nat-type.pdf \
+	figures/proxy-churn/proxy-count-decay.pdf
 
 snowflake.pdf: *.tex *.bib $(FIGURES)
 
