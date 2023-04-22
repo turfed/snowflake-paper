@@ -1,7 +1,7 @@
 // This program reads a metrics-ip-salted.jsonl and estimates how quickly the
 // composition of a proxy pool changes over time.
 //
-// The program works by comparing pairs of "windows", which are contiguous
+// The program works by comparing pairs of "windows", which are consecutive
 // groups of input records. The default duration of a window is 24h,
 // controllable with the -duration command-line option. For each "reference"
 // window, it looks at nearby "sample" windows that are within a certain
@@ -10,10 +10,7 @@
 // for each reference–sample pair, it outputs the size of the reference set, the
 // size of the sample set, and the size of their union (from which can be
 // derived the size of their intersection, which is what we are really
-// interested in). Consecutive input records are considered contiguous when the
-// end of one and the start of the next differ by no more than a certain
-// tolerance (5m by default, controllable with the -tolerance command-line
-// option). The output format is CSV, with the following columns:
+// interested in). The output format is CSV, with the following columns:
 //
 //	reference_timestamp_end,reference_duration,sample_timestamp_end_offset,sample_duration,reference_count,sample_count,union_count
 //
@@ -138,64 +135,28 @@ func mergeHLL(x, y *hyperloglog.HyperLogLogPlus) *hyperloglog.HyperLogLogPlus {
 	return hll
 }
 
-// Function contiguousWindowEnding returns the left and right endpoint indices
+// Function windowEnding returns the left and right endpoint indices
 // of a window of records such that the left record's Start is no more than
-// duration+contiguityTolerance from record i's End, and there are no gaps
-// larger than contiguityTolerance between adjacent records. The window will
-// not include record i itself if record i's Start is too far back.
-func contiguousWindowEnding(records []record, i int, duration, contiguityTolerance time.Duration) (l, r int) {
-	r = i + 1
-	for l = i; l >= 0; l-- {
-		if !(records[i].End.Sub(records[l].Start) <= duration+contiguityTolerance) {
-			// Too far back, stop.
-			break
-		}
-		if l != i {
-			gap := records[l+1].Start.Sub(records[l].End)
-			if !(-contiguityTolerance <= gap && gap < contiguityTolerance) {
-				// Too large a gap between records, stop.
-				break
-			}
-		}
+// duration from record i's End. The window will not include record i itself if
+// record i's Start is too far back.
+func windowEnding(records []record, i int, duration time.Duration) (l, r int) {
+	for l = i; l >= 0 && records[i].End.Sub(records[l].Start) <= duration; l-- {
 	}
 	l++
+	r = i + 1
 	return l, r
 }
 
-// Function contiguousWindowSurrounding returns the left and right endpoint
-// indices of a window of records such that the earliest Start is within
-// beforeDuration+contiguityTolerance of record i's End on the left, the lastest
-// End is within afterDuration+contiguityTolerance of record i's End on the
-// right, and there are no gaps larger than contiguityTolerance between adjacent
-// records. The window will not include record i itself if record i's Start is
-// too far back.
-func contiguousWindowSurrounding(records []record, i int, beforeDuration, afterDuration, contiguityTolerance time.Duration) (l, r int) {
-	for l = i; l >= 0; l-- {
-		if !(records[i].End.Sub(records[l].Start) <= beforeDuration+contiguityTolerance) {
-			// Too far back, stop.
-			break
-		}
-		if l != i {
-			gap := records[l+1].Start.Sub(records[l].End)
-			if !(-contiguityTolerance <= gap && gap < contiguityTolerance) {
-				// Too large a gap between records, stop.
-				break
-			}
-		}
+// Function windowSurrounding returns the left and right endpoint indices of a
+// window of records such that the earliest Start is within beforeDuration of
+// record i's End on the left, the lastest End is within afterDuration of record
+// i's End on the right. The window will not include record i itself if record
+// i's Start is too far back.
+func windowSurrounding(records []record, i int, beforeDuration, afterDuration time.Duration) (l, r int) {
+	for l = i; l >= 0 && records[i].End.Sub(records[l].Start) <= beforeDuration; l-- {
 	}
 	l++
-	for r = i + 1; r < len(records); r++ {
-		if !(records[r].End.Sub(records[i].End) <= afterDuration+contiguityTolerance) {
-			// Too far forward, stop.
-			break
-		}
-		if r != i {
-			gap := records[r].Start.Sub(records[r-1].End)
-			if !(-contiguityTolerance <= gap && gap < contiguityTolerance) {
-				// Too large a gap between records, stop.
-				break
-			}
-		}
+	for r = i + 1; r < len(records) && records[r].End.Sub(records[i].End) <= afterDuration; r++ {
 	}
 	return l, r
 }
@@ -230,7 +191,6 @@ func process(
 	windowDuration time.Duration,
 	beforeDuration time.Duration,
 	afterDuration time.Duration,
-	contiguityTolerance time.Duration,
 ) error {
 	// Read all input records into a slice.
 	records, err := readRecords(in)
@@ -267,17 +227,16 @@ func process(
 	// needed.
 
 	// We end up wanting the same windows of size windowDuration over and
-	// over. Therefore we memoize the operations of calling
-	// contiguousWindowEnding and then mergeRecords.
+	// over. Therefore we memoize the operations of calling windowEnding and
+	// then mergeRecords.
 	var memoLock sync.Mutex
 	type memoKey struct {
-		i                   int
-		duration            time.Duration
-		contiguityTolerance time.Duration
+		i        int
+		duration time.Duration
 	}
 	memo := make(map[memoKey]record)
-	memoWindowEnding := func(i int, duration, contiguityTolerance time.Duration) record {
-		key := memoKey{i, duration, contiguityTolerance}
+	memoWindowEnding := func(i int, duration time.Duration) record {
+		key := memoKey{i, duration}
 		memoLock.Lock()
 		defer memoLock.Unlock()
 		rec, ok := memo[key]
@@ -286,7 +245,7 @@ func process(
 			return rec
 		}
 		// Not found, compute and add to cache.
-		l, r := contiguousWindowEnding(records, i, windowDuration, contiguityTolerance)
+		l, r := windowEnding(records, i, windowDuration)
 		rec = mergeRecords(records[l:r])
 		memo[key] = rec
 		if len(memo) > 1024 {
@@ -307,13 +266,13 @@ func process(
 	// returns a list of formatting rows ready to be written to CSV.
 	processOne := func(i int) [][]string {
 		// Compute the reference window that ends at i.
-		reference := memoWindowEnding(i, windowDuration, contiguityTolerance)
+		reference := memoWindowEnding(i, windowDuration)
 		// Compute the range of sample window endpoints.
-		sl, sr := contiguousWindowSurrounding(records, i, beforeDuration, afterDuration, contiguityTolerance)
+		sl, sr := windowSurrounding(records, i, beforeDuration, afterDuration)
 		rows := make([][]string, 0, sr-sl)
 		for j := sl; j < sr; j++ {
 			// Compute the sample window that ends at j.
-			sample := memoWindowEnding(j, windowDuration, contiguityTolerance)
+			sample := memoWindowEnding(j, windowDuration)
 			// Append the CSV row for this reference—sample pair.
 			rows = append(rows, []string{
 				reference.End.Format(timestampFormat),                               // reference_timestamp_end
@@ -400,10 +359,10 @@ windows in a metrics-ip-salted.jsonl file.
 		flag.PrintDefaults()
 	}
 
-	windowDuration := flag.Duration("duration", 24*time.Hour, "window duration")
-	beforeDuration := flag.Duration("before", 10*time.Hour, "maximum sample time distance before reference")
-	afterDuration := flag.Duration("after", 40*time.Hour, "maximum sample time distance after reference")
-	contiguityTolerance := flag.Duration("tolerance", 5*time.Minute, "contiguity tolerance")
+	const tolerance = 5 * time.Minute
+	windowDuration := flag.Duration("duration", 24*time.Hour+tolerance, "window duration")
+	beforeDuration := flag.Duration("before", 10*time.Hour+tolerance, "maximum sample time distance before reference")
+	afterDuration := flag.Duration("after", 40*time.Hour+tolerance, "maximum sample time distance after reference")
 	concurrency := flag.Int("concurrency", runtime.NumCPU(), "number of concurrent processing threads")
 
 	flag.Parse()
@@ -417,7 +376,6 @@ windows in a metrics-ip-salted.jsonl file.
 		os.Stdin, os.Stdout,
 		*concurrency,
 		*windowDuration, *beforeDuration, *afterDuration,
-		*contiguityTolerance,
 	)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)
