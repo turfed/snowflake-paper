@@ -226,17 +226,15 @@ func process(
 	// read-only at this point, so no synchronization of the input is
 	// needed.
 
-	// We end up wanting the same windows of size windowDuration over and
-	// over. Therefore we memoize the operations of calling windowEnding and
-	// then mergeRecords.
+	// We end up wanting the same merged windows over and over. Therefore we
+	// memoize mergeRecords for pairs of left and right indexes.
 	var memoLock sync.Mutex
 	type memoKey struct {
-		i        int
-		duration time.Duration
+		l, r int
 	}
 	memo := make(map[memoKey]record)
-	memoWindowEnding := func(i int, duration time.Duration) record {
-		key := memoKey{i, duration}
+	memoMergeRecords := func(l, r int) record {
+		key := memoKey{l, r}
 		memoLock.Lock()
 		defer memoLock.Unlock()
 		rec, ok := memo[key]
@@ -245,14 +243,13 @@ func process(
 			return rec
 		}
 		// Not found, compute and add to cache.
-		l, r := windowEnding(records, i, windowDuration)
 		rec = mergeRecords(records[l:r])
 		memo[key] = rec
 		if len(memo) > 1024 {
 			// When the cache gets too big, evict an old entry.
 			minKey := key
 			for k := range memo {
-				if k.i < minKey.i {
+				if k.r < minKey.r {
 					minKey = k
 				}
 			}
@@ -266,13 +263,15 @@ func process(
 	// returns a list of formatting rows ready to be written to CSV.
 	processOne := func(i int) [][]string {
 		// Compute the reference window that ends at i.
-		reference := memoWindowEnding(i, windowDuration)
+		wl, wr := windowEnding(records, i, windowDuration)
+		reference := memoMergeRecords(wl, wr)
 		// Compute the range of sample window endpoints.
 		sl, sr := windowSurrounding(records, i, beforeDuration, afterDuration)
 		rows := make([][]string, 0, sr-sl)
 		for j := sl; j < sr; j++ {
 			// Compute the sample window that ends at j.
-			sample := memoWindowEnding(j, windowDuration)
+			wl, wr := windowEnding(records, j, windowDuration)
+			sample := memoMergeRecords(wl, wr)
 			// Append the CSV row for this reference—sample pair.
 			rows = append(rows, []string{
 				reference.End.Format(timestampFormat),                               // reference_timestamp_end
