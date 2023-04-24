@@ -1745,11 +1745,8 @@ At~that time, about 2.7\% of all Tor users
 \href{https://lists.torproject.org/pipermail/tor-dev/2022-April/014725.html}{\texttt{frac}}
 in other estimates/\allowbreak graphs, but here we effectively do.}
 % > library("tidyverse")
-% > DATE_RANGE <- as.Date(c(
-%     "2023-03-23",
-%     "2023-03-30"
-%   ))
-% > x <- bind_rows(
+% > DATE_RANGE <- as.Date(c("2023-03-23", "2023-03-30"))
+% > userstats <- bind_rows(
 %     read_csv("figures/users/userstats-relay-country-2023-01-04-all-2023-04-04-off.csv", comment = "#") %>%
 %       mutate(mode = "relay"),
 %     read_csv("figures/users/userstats-bridge-transport-2023-01-04-2023-04-04-! OR -snowflake- OR .csv", comment = "#") %>%
@@ -1758,14 +1755,14 @@ in other estimates/\allowbreak graphs, but here we effectively do.}
 % > filter(lubridate::`%within%`(date, do.call(lubridate::interval, as.list(DATE_RANGE)))) %>%
 % > mutate(transport = if_else(mode == "bridge" & transport != "snowflake", "non-snowflake", transport)) %>%
 % > group_by(mode, transport) %>% summarize(users = sum(users, na.rm = TRUE), .groups = "drop")
-% > x %>% mutate(percent = 100 * users / sum(users))
+% > userstats %>% mutate(percent = 100 * users / sum(users))
 % # A tibble: 3 x 4
 %   mode   transport        users percent
 % * <chr>  <chr>            <dbl>   <dbl>
 % 1 bridge non-snowflake  1374662    6.01
 % 2 bridge snowflake       607905    2.66
 % 3 relay  NA            20872771   91.3
-% > x %>% filter(mode == "bridge") %>% mutate(percent = 100 * users / sum(users))
+% > userstats %>% filter(mode == "bridge") %>% mutate(percent = 100 * users / sum(users))
 % # A tibble: 2 x 4
 %   mode   transport       users percent
 %   <chr>  <chr>           <dbl>   <dbl>
