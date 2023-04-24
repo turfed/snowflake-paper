@@ -2085,14 +2085,12 @@ development of new features or performance optimization.
 \begin{figure}
 \includegraphics{figures/proxy-churn/proxy-count-decay}
 \caption{
-Proxy IP address churn in January 2023.
-The upper, darker line shows the number
-of unique proxy IP addresses in 24-hour windows,
-at intervals of 1~hour (the windows overlap).
-The lower, fainter lines show,
-relative to a reference window,
-how many IP addresses subsequent windows
-have in common with the reference,
+Proxy pool churn in January 2023.
+The dark upper line shows the number
+of unique proxy IP addresses in overlapping 24-hour windows,
+sampled at intervals of 1~hour.
+The descending lines show
+how many of the same IP addresses remain the pool,
 at 1-hour intervals up to 40 hours later.
 After 24 hours have elapsed,
 more than half the proxy pool has turned over
@@ -2101,42 +2099,38 @@ with new addresses.
 \label{fig:proxy-count-decay}
 \end{figure}
 
-The number of available proxies is not
-the only important metric---also important
-is how frequently proxy IP addresses turn over.
-This indicates how hard a censor would have to work
-in order to maintain an effective proxy block list;
-or looked at another way,
-how quickly even a complete block list
-at a specific point in time would lose effectiveness.
-We designed an experiment
-to sample the composition of the proxy pool
-and enable comparisons at different points in time.
-Not wanting to store and risk exposing raw proxy IP addresses,
-we made hourly snapshots
-of a HyperLogLog++ structure~\cite{Heule2013a}
-that provides a probabilistic, approximate count
-of unique IP addresses seen over a time interval.
-HyperLogLog++ works by hashing its inputs;
-to remove the possibility of reversing the hashes
-by trial hashing of IP addresses,
-we additionally hashed each proxy IP address with a consistent secret key
-before adding it to the structure.
-A~HyperLogLog++ record \(X\)
-can report an approximate count \(|X|\)
-of its unique elements,
-but is more powerful than a simple count:
-two such records \(X\) and \(Y\)
-can be merged to find the approximate count of their union
-\(|X \cup Y|\).
-We can find approximately how many
-unique IP addresses two records have in common
-(the cardinality of their intersection) as
-\(|X| + |Y| - |X \cup Y|\),
-without needing to actually store lists of addresses.
-The HyperLogLog++ snapshots and derived data
-are included in the data set
-published with this paper.
+The size of the proxy pool is not the only measure of its quality.
+Also important is its ``churn,'' the rate at which
+one proxy in the pool is replaced by another.
+Churn indicates how hard a censor would have to work
+to keep a proxy block list up to date;
+or conversely,
+how quickly even a momentarily complete block list
+would lose effectiveness.
+
+We ran an experiment to measure churn.
+Every hour, the broker logged a record representing
+the proxy IP addresses it had seen in the past hour.
+To~avoid the need to store, and risk exposing, real proxy IP addresses,
+each record was not a plain list of addresses,
+but rather a HyperLogLog++ sketch~\cite{Heule2013a},
+a~probabilistic data structure for estimating
+the number of distinct elements in a multiset.
+We additionally hashed proxy IP addresses with a consistent secret string,
+to prevent the recovery of past proxy IP addresses from our published data.
+A~HyperLogLog++ sketch supports two basic operations: count and merge.
+Given a sketch \(X\),
+we may compute an approximate count \(|X|\)
+of its unique elements;
+given two sketches \(X\) and \(Y\),
+we may merge them to form a new sketch
+representing their union \(X \cup Y\).
+What we are really interested in is the intersection
+of two sketches, which may be computed using the formula
+\(|X| + |Y| - |X \cup Y|\).
+For us, the intersection represents
+how many IP addresses are the same
+in the proxy pool at two different points in time.
 
 windows of 24 hours are necessary to avoid
 conflation with diurnal patterns
