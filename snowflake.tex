@@ -1960,18 +1960,18 @@ Every hour, the broker logged a record representing
 the proxy IP addresses it had seen in the past hour.
 To~avoid the need to store, and risk exposing, real proxy IP addresses,
 each record was not a plain list of addresses,
-but rather a HyperLogLog++ sketch~\cite{Heule2013a},
+but a HyperLogLog++ sketch~\cite{Heule2013a},
 a~probabilistic data structure for estimating
 the number of distinct elements in a multiset.
 We additionally hashed proxy IP addresses with a consistent secret string,
 to prevent the recovery of past proxy IP addresses from our published data.
 A~HyperLogLog++ sketch supports two basic operations: count and merge.
-Given a sketch \(X\),
+Given a sketch~\(X\),
 we may compute an approximate count \(|X|\)
 of its unique elements;
-given two sketches \(X\) and \(Y\),
+given two sketches \(X\) and~\(Y\),
 we may merge them to form a new sketch
-representing their union \(X \cup Y\).
+that represents their union \(X \cup Y\).
 What we are really interested in is the intersection
 of two sketches, which may be computed using the formula
 \(|X| + |Y| - |X \cup Y|\).
@@ -2133,15 +2133,17 @@ has been more than worth~it.
 
 The fact that snowflake proxies run in a web browser
 is the source of some confusion:
-do I install the browser extension if I am censored,
-or if I want to help someone else who is censored?
+do I~install the browser extension if I~am censored,
+or if I~want to help someone else who is censored?
+% https://apps.apple.com/us/app/torproject-snowflake/id1597501940
+% "Snowflake bridges do work in Iran but only in official Tor bundle. It'll be great if the developers get this extension to work for Iranian users."
 The true situation is of course the latter,
 but it is natural for a user to assume
 that a circumvention-related browser extension is something
 they can use to unblock their own connection.
 This confusion is probably the cause of
-the relatively large number of proxies in Iran
-(about 5\% of total unique IP addresses in April~2023).
+the relatively large proportion of \emph{proxies} in Iran
+(about 5\% of unique IP addresses in April~2023).
 % tail(read_csv("figures/proxies/proxy-country.csv", col_types = cols()) %>% group_by(date) %>% mutate(percent = 100 * unique_ips / sum(unique_ips)) %>% ungroup() %>% arrange(date, unique_ips) %>% filter(date == "2023-04-15"), 5)
 % # A tibble: 5 x 5
 %   date       country unique_ips coverage percent
@@ -2157,6 +2159,10 @@ to \emph{use} a proxy and to \emph{be} a proxy.
 
 The Snowflake system
 admittedly contains a lot of moving parts.
+It~is, unfortunately,
+something that requires a team to manage---it
+cannot easily be deployed by an individual for their own use,
+as some other systems can.
 Some complexity is inherent in its nature:
 Snowflake is more complicated than a one-hop proxy
 and always will be.
@@ -2194,14 +2200,25 @@ distributing traffic over multiple bridges.
 % "Prepare all pieces of the snowflake pipeline for a second snowflake bridge" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/28651
 % "Distributed Snowflake Server Support" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40129
 
-% hooman
 Centralized bridge
+that's the whole point,
+the bridge can afford to be centralized because the proxies insulate it from direct blocking
 - (notionally centralized, though now realized as multiple instances for performance reasons)
 - load balancing at the client, not ideal, though hard to do otherwise given the restrictions of working with Tor
 - not a perfect solution because of double rendezvous
+for now, the best we can do
+limitations not in Snowflake itself,
+but in the way it interacts with the Tor client.
 
-Distributed bridge architecture
-\url{https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40129}
+loosely coupled
+frontend server interface, terminates WebSocket, manages Turbo Tunnel session state
+backend proxy interface (Tor)
+
+just as you cannot expect to resume an in-progress TCP connection
+with a different endpoint, unless the endpoints are
+coordinating behind the scenes
+
+% https://forum.torproject.net/t/anyone-experiencing-problems-with-snowflake-proxy/6938/15
 
 Snowflake have experienced a significant increase of active users since its initial release. However, the design of snowflake requires server to keep state for the clients across connections that prevents server side load balancing. To enable the use of more than one snowflake server, a new design amendment is necessary.
 
@@ -2230,7 +2247,7 @@ and persistent challenges.
 
 The examples are taken from
 Russia, Iran, and Turkmenistan,
-and are selected for being significant and edifying.
+and are selected for being significant and instructive.
 Common themes are that having a line of communication
 with affected users is invaluable in understanding and reacting to blocking;
 and that a circumvention system's blocking resistance
