@@ -1,6 +1,6 @@
 # metrics-ip-salted.jsonl is distributed separately.
 
-proxy-count-decay.pdf: .EXTRA_PREREQS = proxy-count-decay.r
+proxy-count-decay.pdf: .EXTRA_PREREQS = proxy-count-decay.r ../common.r
 proxy-count-decay.pdf: proxy-churn-windows.csv
 	Rscript proxy-count-decay.r "$<" "$@"
 
