@@ -2175,7 +2175,24 @@ development of new features or performance optimization.
 \subsection{Performance}
 \label{sec:performance}
 
-% cecylia
+\todo{Reconsider the section title:
+``Performance'' is unspecific given what the section now contains.}
+
+Snowflake is positioned in the class
+of low-latency, relatively high-bandwidth circumvention systems.
+Even coupled with Tor,
+as long as you get a fast enough proxy,
+the connection should be suitable for
+interactive web browsing and video streaming.
+We~have remarked, in \autoref{sec:deployment},
+on some of the growing pains
+experienced in having performance keep pace with demand.
+Here we comment on a further design
+intended to enable increased performance:
+distributing traffic over multiple bridges.
+
+% "Prepare all pieces of the snowflake pipeline for a second snowflake bridge" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/28651
+% "Distributed Snowflake Server Support" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40129
 
 % hooman
 Centralized bridge
