@@ -2206,10 +2206,25 @@ distributing traffic over multiple bridges.
 % "Prepare all pieces of the snowflake pipeline for a second snowflake bridge" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/28651
 % "Distributed Snowflake Server Support" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40129
 
-Centralized bridge
-that's the whole point,
-the bridge can afford to be centralized because the proxies insulate it from direct blocking
-- (notionally centralized, though now realized as multiple instances for performance reasons)
+The bridge in the Snowflake model (\autoref{sec:mechanics})
+is notionally a single, centralized entity.
+It~\emph{can} be centralized
+because it is insulated from direct blocking
+by the snowflake proxies.
+Unlike traditional proxy systems,
+Snowflake does not benefit, in terms of blocking resistance,
+by having multiple bridges,
+since the bridge is decoupled from the means of accessing it.
+For practical performance reasons, though,
+it makes sense for ``the'' bridge to be realized as
+multiple servers, simply because the load of Snowflake traffic
+is a lot for one server to handle.
+As~of this writing, there are two backend bridges.
+There are two reasons why distributing load
+over more than one bridges is less than trivial,
+one related to Snowflake itself
+and one having to do with its interface with Tor.
+
 - load balancing at the client, not ideal, though hard to do otherwise given the restrictions of working with Tor
 - not a perfect solution because of double rendezvous
 for now, the best we can do
