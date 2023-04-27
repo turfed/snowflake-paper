@@ -2220,11 +2220,74 @@ For practical performance reasons, though,
 it makes sense for ``the'' bridge to be realized as
 multiple servers, simply because the load of Snowflake traffic
 is a lot for one server to handle.
-As~of this writing, there are two backend bridges.
-There are two reasons why distributing load
-over more than one bridges is less than trivial,
-one related to Snowflake itself
-and one having to do with its interface with Tor.
+\todo{Note fraction of total Tor traffic.}
+For technical reasons, though,
+the use of multiple bridges cannot be made fully transparent to clients
+without making some compromises.
+One of the reasons is related to Snowflake itself,
+and the other has to do with its interaction with Tor.
+We will explain the tradeoffs involved
+and the design we settled on.
+
+What is called the bridge is actually a pipeline of several components.
+One component terminates incoming WebSocket connections arriving from proxies,
+one decodes the Turbo Tunnel packets contained therein and reassembles them into streams,
+and one forwards the streams to their eventual destinations
+(in~our deployment, this last component is Tor itself).
+These components are separable.
+For example, because the interface with Tor is ordinary TCP sockets,
+it is easy to run Tor on a different host with its own CPU and RAM,
+% A diagram of such separation: https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/28651#note_2783541
+or even round-robin over multiple instances of Tor
+(as we do\todo{Cite ``Running a high-performance pluggable transports Tor bridge''.}).
+
+What is not so easy to distribute
+is the Turbo Tunnel layer itself.
+Recall from \autoref{sec:data-transfer} that Snowflake
+has a notion of a long-term end-to-end session
+between the client and the bridge that is independent of
+the temporary proxies in between.
+This is made possible by extensive state stored at the bridge:
+a table of ongoing sessions, reassembly buffers,
+transmission queues, timers, and so on.
+% `type KCP` https://github.com/xtaci/kcp-go/blob/03b584b84eddd95cc03dbff65fc9cc5cbdf80c6b/kcp.go#L132
+% `type UDPSession` https://github.com/xtaci/kcp-go/blob/03b584b84eddd95cc03dbff65fc9cc5cbdf80c6b/sess.go#L61
+While it is certainly possible to instantiate more than one such state machine,
+a~session that is begun in one instance must remain in that instance---any
+other instance will not have the state necessary to make the packets
+of the session meaningful.
+
+The other difficulty is a Tor bridge is identified
+by a \firstterm{bridge fingerprint},
+a hash of its long-term Tor identity key.
+The bridge configuration interface in the Tor client
+expects a bridge fingerprint,
+and if the bridge it connects to cannot prove that
+its identity matches that fingerprint,
+the client will terminate the connection~\cite[\S 5.1.2]{tor-spec}\todo{Verify that this is the relevant section of the spec.}.
+% https://gitweb.torproject.org/torspec.git/tree/tor-spec.txt?id=33308845cec54bfc0096b8ea0339a8ff183aa1b1#n1153
+% "Extending ORs MUST check _all_ provided identity keys (if they recognize the format), and and MUST NOT extend the circuit if the target OR did not prove its ownership of any such identity key."
+There is no facility in Tor for a certificate,
+or anything like that,
+to authorize a whole set of equivalent bridge fingerprints:
+the fingerprint of every bridge a client may use
+must be configured separately at the client.
+While it is possible to copy identity keys between
+separate instances of Tor so they have the same fingerprint,
+and desirable to do so within one bridge installation for performance reasons,
+our vision for scaling the Snowflake backend
+involved bridge sites in different locations,
+managed by different teams,
+and we decided that we did not want the trust boundary
+of who had access to those important keys to be so expansive.
+
+In short, the client must know in advance which bridge
+its snowflake proxy will connect (or re-connect) it to.
+If~the first connection is to a bridge other than the one the client expects,
+the Tor client will abandon the connection because the bridge fingerprint is wrong.
+Subsequent re-connections in the same client session
+need to go to the same bridge,
+otherwise the Turbo Tunnel session state will be missing.
 
 - load balancing at the client, not ideal, though hard to do otherwise given the restrictions of working with Tor
 - not a perfect solution because of double rendezvous
@@ -2233,22 +2296,9 @@ limitations not in Snowflake itself,
 but in the way it interacts with the Tor client.
 a deployment not built on Tor would have more flexibility here
 
-loosely coupled
-frontend server interface, terminates WebSocket, manages Turbo Tunnel session state
-recall from \autoref{sec:data-transfer} that a Snowflake session has long-term end-to-end state maintained by the client and the bridge
-backend proxy interface (Tor)
-easily separable
-Turbo Tunnel state not so easily separable
-
-just as you cannot expect to resume an in-progress TCP connection
-with a different endpoint, unless the endpoints are
-coordinating behind the scenes
-
 client has some control over what the proxy connects to,
 safeguards against misuse
 % https://forum.torproject.net/t/anyone-experiencing-problems-with-snowflake-proxy/6938/15
-
-However, the design of snowflake requires server to keep state for the clients across connections that prevents server side load balancing. To enable the use of more than one snowflake server, a new design amendment is necessary.
 
 Among many alternative designs, a snowflake client initiated server identity indication system was chosen. The snowflake client would send the server fingerprint it intended to connect to the broker. The broker then translate this server identity fingerprint to a server WebSocket relay address that corresponding to this server identify fingerprint and send this relay WebSocket address to the snowflake proxy matched. Upon receiving the address together with snowflake client's Session Description Protocol, the proxy will connect the client and the relay before tunneling the connection between them.
 
