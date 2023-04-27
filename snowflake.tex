@@ -738,6 +738,7 @@ and the other's is symmetric or port-restricted.
 }
 \label{tab:nat-matching}
 \todo[inline]{Update this figure with one that shows how the ``restricted'' and ``unrestricted'' label is allotted differently for clients and proxies.}
+\todo[inline]{Check style guide to see if caption should be before or after a table.}
 \end{table}
 
 Table~\ref{tab:nat-matching}
@@ -2206,6 +2207,7 @@ distributing traffic over more than one bridge server.
 
 % "Prepare all pieces of the snowflake pipeline for a second snowflake bridge" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/28651
 % "Distributed Snowflake Server Support" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40129
+% Ancient history from flash proxy: "allow the client to pick a specific relay for its registration" https://bugs.torproject.org/legacy/trac/10196
 
 The bridge in the Snowflake model (\autoref{sec:mechanics})
 is notionally a single, centralized entity.
@@ -2295,10 +2297,15 @@ for now, the best we can do
 limitations not in Snowflake itself,
 but in the way it interacts with the Tor client.
 a deployment not built on Tor would have more flexibility here
+otherwise could get away with hashing some aspect of the client (client ID) and using that to consistently assign to a bridge
 
+A~client-chooses design
 client has some control over what the proxy connects to,
 safeguards against misuse
 % https://forum.torproject.net/t/anyone-experiencing-problems-with-snowflake-proxy/6938/15
+% A contrary view: "(More) Distributed servers" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40248
+
+As~of April 2023\todo{Update on publication.}, there are two backend bridges.
 
 Among many alternative designs, a snowflake client initiated server identity indication system was chosen. The snowflake client would send the server fingerprint it intended to connect to the broker. The broker then translate this server identity fingerprint to a server WebSocket relay address that corresponding to this server identify fingerprint and send this relay WebSocket address to the snowflake proxy matched. Upon receiving the address together with snowflake client's Session Description Protocol, the proxy will connect the client and the relay before tunneling the connection between them.
 
