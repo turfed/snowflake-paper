@@ -2226,8 +2226,8 @@ is a lot for one server to handle.
 For technical reasons, though,
 the use of multiple bridges cannot be made fully transparent to clients
 without making some compromises.
-One of the reasons is related to Snowflake itself,
-and the other has to do with its interaction with Tor.
+One of the reasons, relatively minor, is related to Snowflake itself;
+the other, more constraining one has to do with its interaction with Tor.
 We will explain the tradeoffs involved
 and the design we settled on.
 
@@ -2281,7 +2281,7 @@ our vision for scaling the Snowflake backend
 involved bridge sites in different locations,
 managed by different teams,
 and we decided that we did not want the trust boundary
-of who had access to those important keys to be so expansive.
+of who has access to those important keys to be quite so large.
 
 In short, the client must know in advance which bridge
 its snowflake proxy will connect (or re-connect) it to.
@@ -2326,9 +2326,9 @@ safeguards against misuse
 % https://forum.torproject.net/t/anyone-experiencing-problems-with-snowflake-proxy/6938/15
 % A contrary view: "(More) Distributed servers" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40248
 
-As~of April 2023\todo{Update on publication.}, there are two backend bridges.
 To protect the proxy against a compromised broker that lead to send unsolicited traffic to servers, the proxy can be configured to check the WebSocket address's hostname and reject those without predefined suffix. Combining with mandatory TLS the proxy with distributed snowflake support does not introduce network abuse risk. This hostname check system is also used to check the compatibility between the proxy and the broker, as the broker will reject any proxy with a host name rejection policy that is incompatible with the brokers', including the case when a legacy proxy connect to a broker with distributed snowflake support enabled.
 
+As~of April 2023\todo{Update on publication.}, there are two backend bridges.
 The Snowflake bridges stand among the largest relays in the Tor network.
 \todo{Do some analysis from the \href{https://metrics.torproject.org/rs.html\#toprelays}{toprelays}.}
 
