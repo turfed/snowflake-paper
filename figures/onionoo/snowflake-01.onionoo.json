@@ -1,0 +1,9 @@
+{"version":"8.0",
+"build_revision":"75b41be",
+"relays_published":"2023-04-29 12:00:00",
+"relays":[
+],
+"bridges_published":"2023-04-29 11:58:18",
+"bridges":[
+{"nickname":"flakey6","hashed_fingerprint":"5481936581E23D2D178105D44DB6915AB06BFB7F","or_addresses":["10.149.190.17:57483"],"last_seen":"2023-04-29 12:58:18","first_seen":"2017-01-21 02:41:04","running":false,"flags":["V2Dir","Valid"],"last_restarted":"2023-03-22 03:26:00","advertised_bandwidth":38930491,"platform":"Tor 0.4.5.16 on Linux","version":"0.4.5.16","version_status":"obsolete","recommended_version":false,"transports":["snowflake"]}
+]}

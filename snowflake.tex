@@ -488,7 +488,7 @@ We currently support two rendezvous methods in Snowflake:
 \item[Domain fronting]
 In this method, the client does one HTTPS exchange
 with the broker; however routing through an intermediary such as a CDN,
-and disguising the externally visible domain name
+and disguising the externally visible domain name\todo{Audit ``domain name'' vs.\ ``hostname''.}
 (the TLS Server Name Indication, or SNI) so that the exchange
 appears to be destined to a different site~\cite{Fifield2015a}.
 The well-known drawback of domain fronting
@@ -2305,7 +2305,7 @@ to equalize the load across bridges.
 A~consequence is that
 every bridge must meet some minimum performance standard:
 we cannot, say,
-assign 20\% of clients to one and 80\% to another,
+assign 20\% of clients to one and 80\% to another
 according to their relative capabilities.
 A~further drawback is that there is no way to try connecting
 to only one of the bridges it knows about,
@@ -2345,9 +2345,25 @@ Proxies check the hostname of the URL's
 to ensure that it is a subdomain of a known suffix reserved for Snowflake bridges.
 So~there are two independent safeguards against misuse.
 
-As~of April 2023\todo{Update on publication.}, there are two backend bridges.
-The Snowflake bridges stand among the largest relays in the Tor network.
-\todo{Do some analysis from the \href{https://metrics.torproject.org/rs.html\#toprelays}{toprelays}.}
+As~of May 2023\todo{Update on publication.},
+there are two Snowflake bridges,
+which are among the largest relays in the Tor network,
+in terms of bandwidth.\todo{Do some analysis from figures/\allowbreak onionoo.}
+% Actually head-and-shoulders the largest relays?
+% figures/onionoo$ jq -r '(.relays+.bridges)|sort_by(-.advertised_bandwidth)[]|[.nickname,.advertised_bandwidth]|@tsv' top-consensus_weight.onionoo.json | head -n 4
+% RandomRecipes	114341160
+% poiuty	109014582
+% xor	103805661
+% StayStrongRelay01	99326969
+% figures/onionoo$ jq -r '(.relays+.bridges)|sort_by(-.advertised_bandwidth)[]|[.nickname,.advertised_bandwidth*12]|@tsv' snowflake-??.onionoo.json
+% flakey6	467165892
+% crusty7	178083996
+
+% https://archive.is/aYyxR 2023-04-29 archive of https://metrics.torproject.org/rs.html#toprelays
+% https://archive.is/zOp4G 2023-04-29 archive of https://metrics.torproject.org/rs.html#aggregate/as
+% https://archive.is/GHBKE 2023-04-29 archive of https://metrics.torproject.org/rs.html#details/5481936581E23D2D178105D44DB6915AB06BFB7F (snowflake-01) (multiply by 12)
+% https://archive.is/LKFxo 2023-04-29 archive of https://metrics.torproject.org/rs.html#details/91DA221A149007D0FD9E5515F5786C3DD07E4BB0 (snowflake-02) (multiply by 12)
+% Relay bandwidth aggregated by AS: https://metrics.torproject.org/rs.html#aggregate/as; on 2023-04-29 Snowflake bridges provide about as much advertised bandwidth as Emerald Onion.
 
 % \subsection{SQL injection attempts at broker}
 % \url{https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40089}

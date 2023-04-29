@@ -1,0 +1,9 @@
+{"version":"8.0",
+"build_revision":"75b41be",
+"relays_published":"2023-04-29 13:00:00",
+"relays":[
+],
+"bridges_published":"2023-04-29 12:58:18",
+"bridges":[
+{"nickname":"crusty7","hashed_fingerprint":"91DA221A149007D0FD9E5515F5786C3DD07E4BB0","or_addresses":["10.153.169.14:52156"],"last_seen":"2023-04-29 12:58:18","first_seen":"2022-04-21 05:38:09","running":false,"flags":["V2Dir","Valid"],"last_restarted":"2023-03-22 22:45:57","advertised_bandwidth":14840333,"platform":"Tor 0.4.7.13 on Linux","version":"0.4.7.13","version_status":"recommended","recommended_version":true,"transports":["snowflake"]}
+]}

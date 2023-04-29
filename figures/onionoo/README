@@ -1,0 +1,27 @@
+This directory contains archives of Onionoo documents
+(https://metrics.torproject.org/onionoo.html),
+for comparing the bandwidth of Snowflake bridges
+against the bandwidth of other relays.
+
+```
+# Top 100 relays sorted by consensus weight (which somewhat corresponds to advertised bandwidth):
+curl 'https://onionoo.torproject.org/details?limit=100&order=-consensus_weight' > top-consensus_weight.onionoo.json
+# snowflake-01:
+curl 'https://onionoo.torproject.org/details?lookup=5481936581E23D2D178105D44DB6915AB06BFB7F' > snowflake-01.onionoo.json
+# snowflake-02:
+curl 'https://onionoo.torproject.org/details?lookup=91DA221A149007D0FD9E5515F5786C3DD07E4BB0' > snowflake-02.onionoo.json
+```
+
+You can check the dates of the JSON files with:
+
+```
+jq '[.relays_published,.bridges_published]' *.json
+```
+
+To get a look at the relays with the highest advertised bandwidth
+(not multiplication by 12 for Snowflake bridges):
+
+```
+jq -r '(.relays+.bridges)|sort_by(-.advertised_bandwidth)[]|[.nickname,.advertised_bandwidth]|@tsv' top-consensus_weight.onionoo.json
+jq -r '(.relays+.bridges)|sort_by(-.advertised_bandwidth)[]|[.nickname,.advertised_bandwidth*12]|@tsv' snowflake-??.onionoo.json
+```
