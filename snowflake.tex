@@ -2320,13 +2320,30 @@ The only consideration would be the Turbo Tunnel session state,
 which could be solved by hashing a client's session identifier string
 to consistently assign the same bridge during a session.
 
-A~client-chooses design
-client has some control over what the proxy connects to,
-safeguards against misuse
-% https://forum.torproject.net/t/anyone-experiencing-problems-with-snowflake-proxy/6938/15
-% A contrary view: "(More) Distributed servers" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40248
-
-To protect the proxy against a compromised broker that lead to send unsolicited traffic to servers, the proxy can be configured to check the WebSocket address's hostname and reject those without predefined suffix. Combining with mandatory TLS the proxy with distributed snowflake support does not introduce network abuse risk. This hostname check system is also used to check the compatibility between the proxy and the broker, as the broker will reject any proxy with a host name rejection policy that is incompatible with the brokers', including the case when a legacy proxy connect to a broker with distributed snowflake support enabled.
+A~client-chooses design risks the possibility
+of misuse by clients, if not handled carefully.
+The client should be able to select
+a proxy destination from the set of known bridges,
+but not cause a proxy to connect to arbitrary destinations,
+otherwise the many proxies of \autoref{sec:proxies}
+could be used to attack third parties.
+% "Clients cannot cause a proxy to attack or even connect to an arbitrary web site or relay..." https://forum.torproject.net/t/anyone-experiencing-problems-with-snowflake-proxy/6938/15
+% An alternative vision: "(More) Distributed servers" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40248
+When the client expresses its bridge selection
+in its rendezvous message, the selection is represented
+not as an IP address or domain name,
+but as a bridge fingeprint (a 40-digit hexadecimal string).
+The broker maps the fingerprint to a WebSocket URL
+by consulting a local database of known Snowflake bridges.
+The broker rejects client rendezvous messages requesting an unknown fingerprint.
+% https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/blob/8e5ea8261110e97a8df56cfc9c83028081d902fb/broker/ipc.go#L187
+The broker then tells an incoming proxy
+what WebSocket URL to connect this particular client to,
+% https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/blob/8e5ea8261110e97a8df56cfc9c83028081d902fb/broker/ipc.go#L144
+but here also there is a check.
+Proxies check the hostname of the URL's
+to ensure that it is a subdomain of a known suffix reserved for Snowflake bridges.
+So~there are two independent safeguards against misuse.
 
 As~of April 2023\todo{Update on publication.}, there are two backend bridges.
 The Snowflake bridges stand among the largest relays in the Tor network.
