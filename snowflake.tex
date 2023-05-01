@@ -2417,18 +2417,30 @@ Turkmenistan.
 \subsection{Blocking in Russia}
 \label{sec:block-ru}
 
-% mention the creeping block of VPNs? https://github.com/net4people/bbs/issues/76
+% "[Russia] Some ISPs are blocking Tor" https://bugs.torproject.org/tpo/community/support/40050
+% "OONI reports of Tor blocking in certain ISPs since 2021-12-01" https://ntc.party/t/ooni-reports-of-tor-blocking-in-certain-isps-since-2021-12-01/1477
+% "Responding to Tor censorship in Russia" https://blog.torproject.org/tor-censorship-in-russia/
 
-% david
+Snowflake, along with other common ways of accessing Tor,
+was blocked in a subset of ISPs in Russia on \mbox{2021-12-01}~\cite{ooni-2021-russia-blocks-tor}.
+The blocking action was clearly pre-planned and targeted,
+as it happened suddenly and affected multiple Tor-related protocols:
+besides Snowflake,
+some servers supporting
+the blocking-resistant transports meek and obfs4,
+as well as the IP addresses of a portion
+of unobfuscated Tor relays and bridges,
+were blocked.
+As~one might expect, the blocking of blocking-resilient transports
+was less than totally successful,
+and the ultimate effect was to increase the number of users in Russia
+using circumvention protocols to access Tor.
+What concerns us here is the mechanism of Snowflake's detection and blocking.
+
+% counts before and after
 
 \autoref{fig:user-counts-ru}
 
-\url{https://bugs.torproject.org/tpo/community/support/40050}
-\url{https://ntc.party/t/ooni-reports-of-tor-blocking-in-certain-isps-since-2021-12-01/1477}
-% \url{https://blog.torproject.org/tor-censorship-in-russia/}
-
-Snowflake blocked in Russia, along with all other Tor protocols,
-in December 2021 \cite{ooni-2021-russia-blocks-tor}
 In comparison to TM, easy to get testers
 Managed to unblock it within 2 weeks
 
@@ -2441,6 +2453,7 @@ Importance during the invasion of Ukraine
   \url{https://forum.torproject.net/t/tor-project-more-resources-required-for-snowflake-bridge/2353}
 
 Second round of DTLS fingerprinting, this time targeting DTLS Client Hello?
+Initially not noticed, lost in the shuffle with Iran?
 \url{https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40030#note_2803188}
 \url{https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40140}
 \url{https://ntc.party/t/a-new-snowflake-blocking-rule-offset-of-supported-groups-in-dtls-client-hello/2420}
@@ -2453,6 +2466,8 @@ and it plays the DTLS server role
 That pluggable transports could not compensate fully
 for the loss of relay users points to a usability gap.
 Tor already a fairly niche use.
+
+% mention the creeping block of VPNs? https://github.com/net4people/bbs/issues/76
 
 \subsection{Blocking in Iran}
 \label{sec:block-ir}
