@@ -2433,7 +2433,8 @@ the blocking-resistant transports meek and obfs4,
 as well as the IP addresses of a portion
 of unobfuscated Tor relays and bridges,
 were blocked.
-As~one might expect, the blocking of blocking-resilient transports
+As~might be expected, the attempt to block
+Tor's blocking-resilient transports
 was less than totally successful,
 and the ultimate effect was to increase the number of users in Russia
 using circumvention protocols to access Tor.
@@ -2459,6 +2460,11 @@ Initially not noticed, lost in the shuffle with Iran?
 \url{https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40030#note_2803188}
 \url{https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40140}
 \url{https://ntc.party/t/a-new-snowflake-blocking-rule-offset-of-supported-groups-in-dtls-client-hello/2420}
+\url{https://ntc.party/t/in-case-snowflake-rendezvous-gets-blocked/1857/9}
+\url{https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/merge_requests/131}
+\url{https://gitlab.torproject.org/tpo/applications/tor-browser-build/-/merge_requests/637}
+Snowflake 2.5.1, Tor Browser 12.0.3
+% "Since the release of Tor Browser 12.0.3 on 2023-02-15 there has been an increase in users from Russia on both bridges." https://gitlab.torproject.org/tpo/anti-censorship/censorship-analysis/-/issues/40030#note_2893870
 
 Snowflake client may be either the DTLS client or DTLS server
 Even a Snowflake client with a blocked fingerprint may work,
@@ -2477,6 +2483,8 @@ Tor already a fairly niche use.
 % "Unexplained drop in Snowflake client polls and bandwidth, testers wanted" https://github.com/net4people/bbs/issues/131
 % "Tor censorship in Iran" https://bugs.torproject.org/tpo/anti-censorship/team/96#note_2840481
 % "Sudden reduction in snowflake-01 bridge bandwidth, 2022-10-04 17:15" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40207#note_2844163
+% "Planning response to censorship in Iran with AC team" https://gitlab.torproject.org/tpo/team/-/wikis/Planning-response-to-censorship-in-Iran-with-AC-team
+% "Censorship analysis for UDP traffic between Iran and rest of Internet: 2022 Q4" https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40036
 
 Go standard library crypto/tls a convenient way to use TLS in a Go program
 
