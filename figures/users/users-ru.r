@@ -10,7 +10,9 @@ source("../common.r")
 
 DATE_LIMITS <- lubridate::ymd(c(
 	"2021-11-01",
-	"2023-02-15"
+	# 2021-12-01 first blocking https://bugs.torproject.org/tpo/community/support/40050
+	# 2022-02-15 release of Tor Browser 12.0.3 with altered fingerprint https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40030#note_2893870
+	"2023-03-15"
 ))
 
 WANTED_FINGERPRINTS <- c(
