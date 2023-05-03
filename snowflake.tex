@@ -1712,8 +1712,8 @@ rather than Tor Browser.
 % 15 2023-02-27 snowflake 68905. snowflake-01   95.2
 % 16 2023-02-27 snowflake  3477. snowflake-02    4.80
 
-As~of \mbox{2023-03-31},
-Snowflake had transferred 4.06~PB of user data.\todo{Estimate and subtract non-Snowflake (i.e.~$\langle\mathrm{OR}\rangle$) bytes, even though likely negligible.}
+As~of \mbox{2023-04-30},
+Snowflake had transferred 4.98~PB of user data.\todo{Estimate and subtract non-Snowflake (i.e.~$\langle\mathrm{OR}\rangle$) bytes, even though likely negligible.}
 % > library("tidyverse")
 % > options(width = 200)
 % > WANTED_FINGERPRINTS <- c(
@@ -1723,7 +1723,7 @@ Snowflake had transferred 4.06~PB of user data.\todo{Estimate and subtract non-S
 %   )
 % > read_csv("figures/bandwidth/bandwidth-multi.csv") %>%
 %     filter(fingerprint %in% names(WANTED_FINGERPRINTS)) %>%
-%     filter(date < "2023-04-01") %>%
+%     filter(date < "2023-05-01") %>%
 %     pivot_wider(names_from = c(type), values_from = c(bytes)) %>%
 %     mutate(instance = WANTED_FINGERPRINTS[fingerprint], fingerprint = NULL) %>% relocate(date, instance) %>%
 %     # group_by(instance) %>%
@@ -1738,23 +1738,23 @@ Snowflake had transferred 4.06~PB of user data.\todo{Estimate and subtract non-S
 % # A tibble: 1 x 8
 %   date       cumul_read cumul_write `cumul_dirreq-read` `cumul_dirreq-write` cumul_good_read cumul_good_write cumul_good_avg
 %   <date>     <chr>      <chr>       <chr>               <chr>                <chr>           <chr>            <chr>
-% 1 2023-03-31 4.09 PB    4.12 PB     4.97 TB             83.47 TB             4.09 PB         4.03 PB          4.06 PB
+% 1 2023-04-30 5.02 PB    5.05 PB     5.51 TB             94.13 TB             5.01 PB         4.95 PB          4.98 PB
 This is goodput; that is, the amount of Tor TLS traffic inside the tunnel.
 The bandwidth at the bridges' network interfaces is
 higher than the goodput bandwidth,
 because of the overhead of WebRTC, WebSocket, and
 the internal Turbo Tunnel layer.
 At~that time, about 2.7\% of all Tor users
-(31\% when looking at just bridge users) used Snowflake to connect to Tor.
+(32\% when looking at just bridge users) used Snowflake to connect to Tor.
 \todo{Think about this slight inconsistency: we don't use
 \href{https://lists.torproject.org/pipermail/tor-dev/2022-April/014725.html}{\texttt{frac}}
 in other estimates/\allowbreak graphs, but here we effectively do.}
 % > library("tidyverse")
-% > DATE_RANGE <- as.Date(c("2023-03-23", "2023-03-30"))
+% > DATE_RANGE <- as.Date(c("2023-04-23", "2023-04-30"))
 % > userstats <- bind_rows(
-%     read_csv("figures/users/userstats-relay-country-2023-01-04-all-2023-04-04-off.csv", comment = "#") %>%
+%     read_csv("figures/users/userstats-relay-country.csv", comment = "#") %>%
 %       mutate(mode = "relay"),
-%     read_csv("figures/users/userstats-bridge-transport-2023-01-04-2023-04-04-! OR -snowflake- OR .csv", comment = "#") %>%
+%     read_csv("figures/users/userstats-bridge-transport.csv", comment = "#") %>%
 %       mutate(mode = "bridge")
 %   ) %>%
 % > filter(lubridate::`%within%`(date, do.call(lubridate::interval, as.list(DATE_RANGE)))) %>%
@@ -1764,15 +1764,15 @@ in other estimates/\allowbreak graphs, but here we effectively do.}
 % # A tibble: 3 x 4
 %   mode   transport        users percent
 % * <chr>  <chr>            <dbl>   <dbl>
-% 1 bridge non-snowflake  1374662    6.01
-% 2 bridge snowflake       607905    2.66
-% 3 relay  NA            20872771   91.3
+% 1 bridge non-snowflake  1464001    5.73
+% 2 bridge snowflake       677110    2.65
+% 3 relay  NA            23427552   91.6
 % > userstats %>% filter(mode == "bridge") %>% mutate(percent = 100 * users / sum(users))
 % # A tibble: 2 x 4
 %   mode   transport       users percent
 %   <chr>  <chr>           <dbl>   <dbl>
-% 1 bridge non-snowflake 1374662    69.3
-% 2 bridge snowflake      607905    30.7
+% 1 bridge non-snowflake 1464001    68.4
+% 2 bridge snowflake      677110    31.6
 
 \subsection{Proxy recruitment and growth}
 \label{sec:proxies}

@@ -10,7 +10,7 @@ source("../common.r")
 
 DATE_LIMITS <- lubridate::ymd(c(
 	"2020-12-31",
-	"2023-03-31"
+	"2023-04-30"
 ))
 
 WANTED_FINGERPRINTS <- c(
