@@ -11,8 +11,8 @@ users-global.pdf: .EXTRA_PREREQS = users-global.r ../common.r
 users-global.pdf: userstats-bridge-transport-multi.csv
 	Rscript users-global.r "$<" "$@"
 
-users-ru.pdf: .EXTRA_PREREQS = users-ru.r ../common.r
+users-ru.pdf: .EXTRA_PREREQS = users-country.r ../common.r
 users-ru.pdf: userstats-bridge-combined-multi.csv
-	Rscript users-ru.r "$<" "$@"
+	Rscript users-country.r "$<" "$@"
 
 .DELETE_ON_ERROR:
