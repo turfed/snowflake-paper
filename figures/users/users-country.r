@@ -2,7 +2,7 @@
 # in Russia, around the time of blocking events.
 #
 # Usage:
-#   Rscript users-ru.r userstats-bridge-combined-multi.csv users-ru.pdf
+#   Rscript users-country.r userstats-bridge-combined-multi.csv users-ru.pdf
 
 library("tidyverse")
 
@@ -29,7 +29,7 @@ date_labels <- function(breaks) {
 (function() {
 	args <- commandArgs(trailingOnly = TRUE)
 	if (length(args) != 2) {
-		stop("usage: Rscript users-ru.r userstats-bridge-combined-multi.csv users-ru.pdf")
+		stop("usage: Rscript users-country.r userstats-bridge-combined-multi.csv users-ru.pdf")
 	}
 	bridge_combined_multi_csv_path <<- args[[1]]
 	output_path <<- args[[2]]
