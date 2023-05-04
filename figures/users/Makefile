@@ -4,15 +4,23 @@
 
 all: \
 	users-global.pdf \
-	users-ru.pdf
+	users-ru.pdf \
+	users-ir.pdf \
+	users-tm.pdf
 .PHONY: all
 
 users-global.pdf: .EXTRA_PREREQS = users-global.r ../common.r
 users-global.pdf: userstats-bridge-transport-multi.csv
 	Rscript users-global.r "$<" "$@"
 
-users-ru.pdf: .EXTRA_PREREQS = users-country.r ../common.r
-users-ru.pdf: userstats-bridge-combined-multi.csv
-	Rscript users-country.r "$<" "$@"
+users-ru.pdf \
+users-ir.pdf \
+users-tm.pdf \
+: .EXTRA_PREREQS = users-country.r ../common.r
+users-ru.pdf \
+users-ir.pdf \
+users-tm.pdf \
+&: userstats-bridge-combined-multi.csv
+	Rscript users-country.r "$<"
 
 .DELETE_ON_ERROR:
