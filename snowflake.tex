@@ -1318,6 +1318,7 @@ is~133, on \mbox{2020-12-09}.
 \label{fig:user-counts}
 \todo[inline]{Bandwidth chart? Ideally with aligned horizontal axis.}
 \todo[inline]{Find a good way to represent the intermittent blocking of the domain front in Iran, January--March~2023.}
+\todo[inline]{Pro-rate days with partial coverage (e.g.\ the dip on Feb.~16--17 2023, which was a server restart.}
 \todo[inline]{Embed fonts.}
 \end{figure*}
 
@@ -2374,7 +2375,7 @@ Though seemingly paradoxical, this effect is easy to explain:
 as the intensity of censorship increases,
 users are displaced from less resilient systems
 to more resilient systems.
-Snowflake's blocking resistance has not always been an unqualified success,
+Snowflake's blocking resistance has not in every case been an unqualified success,
 though, and here we also reflect on missteps
 and persistent challenges.
 
@@ -2407,8 +2408,13 @@ farther out of reach of would-be controllers of information.
 \includegraphics{figures/users/users-ru}
 \caption{
 Snowflake users in Russia.
-The initial blocking event in December 2021
-led to Snowflake's first surge in users.
+The blocking of Tor-related transports in December~2021
+led to Snowflake's first surge in usage.
+The decrease in September~2022
+was contemporaneous with an even larger influx of users from Iran,
+which may have masked another blocking rule
+that was partially % "partially" because only in Tor Browser, not Orbot at that time
+mitigated only in February~2023.
 }
 \label{fig:user-counts-ru}
 \bigskip
@@ -2423,6 +2429,7 @@ Iran.
 Turkmenistan.
 }
 \label{fig:user-counts-tm}
+\todo[inline]{Add annotations for specific events, like \autoref{fig:user-counts}.}
 \todo[inline]{Embed fonts.}
 \end{figure}
 
