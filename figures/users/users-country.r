@@ -46,10 +46,13 @@ bridge_combined_multi <- read_csv(bridge_combined_multi_csv_path, comment = "#")
 	# everywhere.
 	mutate(across(c(low, high), ~ .x * frac / 100), frac = NULL) %>%
 
-	# Derive a single user count from each day's low–high range. Take the
-	# minimum, not the mean, because "low" is too noisy, especially in
-	# Turkmenistan.
-	mutate(users = pmin(low, high))
+	# Derive a single user count from each day's low–high range. The
+	# formulas from https://metrics.torproject.org/reproducible-metrics.html#bridge-users
+	# can result in a "low" bound that is higher than the "high" bound, so
+	# take the minimum of "low" and "high" as the true low, then take the
+	# average. The raw "low" is noisy, especially when there is less data,
+	# as in Turkmenistan.
+	mutate(users = (pmin(low, high) + high) / 2)
 
 bridge_combined <- bridge_combined_multi %>%
 	# Sum the contributions of all bridge fingerprints by day.

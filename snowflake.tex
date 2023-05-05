@@ -1576,13 +1576,13 @@ about 70\% of Snowflake users were in Russia.
 %   )
 % > userstats <- read_csv("figures/users/userstats-bridge-combined-multi.csv") %>%
 %     filter(transport == "snowflake" & fingerprint %in% names(WANTED_FINGERPRINTS)) %>%
-%     mutate(across(c(low, high), ~ .x * frac / 100), frac = NULL, mean = (low + high) / 2) %>%
+%     mutate(across(c(low, high), ~ .x * frac / 100), frac = NULL, users = (pmin(low, high) + high) / 2) %>%
 %     # Combine the contributions of all bridges.
-%     group_by(date, transport, country) %>% summarize(across(c(low, high, mean), sum), .groups = "drop")
-% > head(userstats %>% filter(date == "2022-05-20") %>% arrange(desc(mean)) %>%
-%     mutate(percent = mean / sum(mean) * 100))
+%     group_by(date, transport, country) %>% summarize(across(c(low, high, users), sum), .groups = "drop")
+% > head(userstats %>% filter(date == "2022-05-20") %>% arrange(desc(users)) %>%
+%     mutate(percent = users / sum(users) * 100))
 % # A tibble: 6 x 7
-%   date       transport country   low  high  mean percent
+%   date       transport country   low  high users percent
 %   <date>     <chr>     <chr>   <dbl> <dbl> <dbl>   <dbl>
 % 1 2022-05-20 snowflake ru      9123. 9125. 9124.   68.9
 % 2 2022-05-20 snowflake us      1085. 1087. 1086.    8.21
