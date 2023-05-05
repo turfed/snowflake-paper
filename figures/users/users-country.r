@@ -41,13 +41,15 @@ bridge_combined_multi <- read_csv(bridge_combined_multi_csv_path, comment = "#")
 	# Keep only the transports and bridges we care about.
 	filter(transport == "snowflake" & fingerprint %in% names(WANTED_FINGERPRINTS)) %>%
 
-	# Adjust users by frac, and forget frac. This is just for completeness,
-	# as we expect the input files to have frac == 100 everywhere.
-	mutate(
-		across(c(low, high), ~ .x * frac / 100),
-		frac = NULL,
-		users = pmin(low, high) # Take the minimum, not the mean, because "low" is too noisy, especially in Turkmenistan.
-	)
+	# Adjust low and high by frac, and forget frac. This is just for
+	# completeness, as we expect the input files to have frac == 100
+	# everywhere.
+	mutate(across(c(low, high), ~ .x * frac / 100), frac = NULL) %>%
+
+	# Derive a single user count from each day's low–high range. Take the
+	# minimum, not the mean, because "low" is too noisy, especially in
+	# Turkmenistan.
+	mutate(users = pmin(low, high))
 
 bridge_combined <- bridge_combined_multi %>%
 	# Sum the contributions of all bridge fingerprints by day.
