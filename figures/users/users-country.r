@@ -52,7 +52,31 @@ bridge_combined_multi <- read_csv(bridge_combined_multi_csv_path, comment = "#")
 	# take the minimum of "low" and "high" as the true low, then take the
 	# average. The raw "low" is noisy, especially when there is less data,
 	# as in Turkmenistan.
-	mutate(users = (pmin(low, high) + high) / 2)
+	mutate(users = (pmin(low, high) + high) / 2) %>%
+
+	# Reassign users from the country "??" proportionally to other
+	# countries. Versions of snowflake-webext between 0.6.0 (2022-06-27)
+	# and 0.7.2 (2023-04-10) had a bug where they did not report client IP
+	# addresses, so all their users (which varied as a fraction between 5%
+	# and 25% of all users) got assigned to "??". (Otherwise the fraction
+	# of "??" users is usually below 1%.) This adjustment is to avoid the
+	# loss of 5–25% of all country-specific counts between 2022-06-27 and
+	# 2023-04-10, as well as to avoid illusory steps at the endpoints. The
+	# assumption we're making is that the country distribution of users
+	# that connect through snowflake-webext is the same as connect through
+	# other proxy types.
+	#
+	# "WS.makeWebsocket ignores params (i.e. `client_ip`), losing country statistics" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake-webext/82
+	# "2023 April update" https://opencollective.com/censorship-circumvention/projects/snowflake-daily-operations/updates/2023-april-update
+	group_by(date, transport) %>%
+	# Count the total users, including those from "??".
+	mutate(total_users = sum(users)) %>%
+	# Delete the "??" rows, unless "??" is the only represented country for a day.
+	filter(country != "??" | n() <= 1) %>%
+	# Take each per-country fraction of users out of the total not including "??",
+	# and scale it up to the total including "??".
+	mutate(users = users/sum(users) * total_users) %>%
+	ungroup()
 
 bridge_combined <- bridge_combined_multi %>%
 	# Sum the contributions of all bridge fingerprints by day.
@@ -63,9 +87,6 @@ bridge_combined <- bridge_combined_multi %>%
 	group_by(country, transport) %>%
 	complete(date = seq.Date(min(date), max(date), "days")) %>%
 	ungroup()
-
-# TODO: assign country "??" proportionally to other countries.
-# "WS.makeWebsocket ignores params (i.e. `client_ip`), losing country statistics" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake-webext/82
 
 for (g in list(
 	list(
