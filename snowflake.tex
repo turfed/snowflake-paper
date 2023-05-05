@@ -1578,18 +1578,20 @@ about 70\% of Snowflake users were in Russia.
 %     filter(transport == "snowflake" & fingerprint %in% names(WANTED_FINGERPRINTS)) %>%
 %     mutate(across(c(low, high), ~ .x * frac / 100), frac = NULL, users = (pmin(low, high) + high) / 2) %>%
 %     # Combine the contributions of all bridges.
-%     group_by(date, transport, country) %>% summarize(across(c(low, high, users), sum), .groups = "drop")
-% > head(userstats %>% filter(date == "2022-05-20") %>% arrange(desc(users)) %>%
-%     mutate(percent = users / sum(users) * 100))
+%     group_by(date, transport, country) %>% summarize(across(c(low, high, users), sum), .groups = "drop") %>%
+%     # Apportion "??" to other countries (see figures/users/users-country.r).
+%     group_by(date, transport) %>% mutate(across(c(low, high, users), ~ .x * sum(.x) / sum(ifelse(country == "??", 0, .x)))) %>% ungroup() %>% filter(country != "??")
+% > userstats %>% filter(date == "2022-05-20") %>% arrange(desc(users)) %>%
+%     mutate(percent = users / sum(users) * 100) %>% head()
 % # A tibble: 6 x 7
 %   date       transport country   low  high users percent
 %   <date>     <chr>     <chr>   <dbl> <dbl> <dbl>   <dbl>
-% 1 2022-05-20 snowflake ru      9123. 9125. 9124.   68.9
-% 2 2022-05-20 snowflake us      1085. 1087. 1086.    8.21
-% 3 2022-05-20 snowflake cn       523.  524.  523.    3.96
-% 4 2022-05-20 snowflake ??       265.  267.  266.    2.01
-% 5 2022-05-20 snowflake de       251.  253.  252.    1.90
-% 6 2022-05-20 snowflake by       196.  198.  197.    1.49
+% 1 2022-05-20 snowflake ru      9311. 9311. 9311.   70.4
+% 2 2022-05-20 snowflake us      1108. 1109. 1109.    8.38
+% 3 2022-05-20 snowflake cn       533.  535.  534.    4.04
+% 4 2022-05-20 snowflake de       256.  258.  257.    1.94
+% 5 2022-05-20 snowflake by       200.  202.  201.    1.52
+% 6 2022-05-20 snowflake gb       184.  186.  185.    1.40
 The count of users in Russia get an additional small boost,
 visible in the graph,
 starting on \mbox{2022-07-14},
@@ -1616,7 +1618,7 @@ Internet users in Iran turned to circumvention systems
 that continued working despite the new restrictions,
 Snowflake among them.
 On~\mbox{2022-09-20}, Iran accounted for only~1\% of Snowflake users;
-on~\mbox{2022-09-24} it was 59\%.
+on~\mbox{2022-09-24} it was 67\%.
 % > library("tidyverse")
 % > WANTED_FINGERPRINTS <- c(
 %     "7659DA0F96B156C322FBFF3ACCC9B9DC01C27C73" = "snowman",
@@ -1627,19 +1629,21 @@ on~\mbox{2022-09-24} it was 59\%.
 %     filter(transport == "snowflake" & fingerprint %in% names(WANTED_FINGERPRINTS)) %>%
 %     mutate(across(c(low, high), ~ .x * frac / 100), frac = NULL, users = (pmin(low, high) + high) / 2) %>%
 %     # Combine the contributions of all bridges.
-%     group_by(date, transport, country) %>% summarize(across(c(low, high, users), sum), .groups = "drop")
+%     group_by(date, transport, country) %>% summarize(across(c(low, high, users), sum), .groups = "drop") %>%
+%     # Apportion "??" to other countries (see figures/users/users-country.r).
+%     group_by(date, transport) %>% mutate(across(c(low, high, users), ~ .x * sum(.x) / sum(ifelse(country == "??", 0, .x)))) %>% ungroup() %>% filter(country != "??")
 % > userstats %>% filter("2022-09-19" <= date & date <= "2022-09-25") %>%
 %     group_by(date, transport) %>% mutate(percent = users / sum(users) * 100) %>% filter(country == "ir") %>% ungroup()
 % # A tibble: 7 x 7
 %   date       transport country    low   high  users percent
 %   <date>     <chr>     <chr>    <dbl>  <dbl>  <dbl>   <dbl>
-% 1 2022-09-19 snowflake ir        186.   188.   187.    1.09
-% 2 2022-09-20 snowflake ir        207.   209.   208.    1.20
-% 3 2022-09-21 snowflake ir        933.   935.   934.    5.00
-% 4 2022-09-22 snowflake ir      15947. 16507. 16227.   47.5
-% 5 2022-09-23 snowflake ir      17230. 17888. 17559.   57.9
-% 6 2022-09-24 snowflake ir      42268. 43395. 42831.   59.4
-% 7 2022-09-25 snowflake ir      40158. 40149. 40149.   59.3
+% 1 2022-09-19 snowflake ir        205.   207.   206.    1.20
+% 2 2022-09-20 snowflake ir        228.   229.   228.    1.32
+% 3 2022-09-21 snowflake ir       1023.  1025.  1024.    5.48
+% 4 2022-09-22 snowflake ir      17313. 18064. 17691.   51.8
+% 5 2022-09-23 snowflake ir      19180. 20037. 19610.   64.7
+% 6 2022-09-24 snowflake ir      47469. 49083. 48279.   67.0
+% 7 2022-09-25 snowflake ir      45359. 45445. 45445.   67.1
 The massive influx of users had us scrambling to test and deploy
 performance improvements over the next few days;
 the apparent oscillations in this part of the graph
