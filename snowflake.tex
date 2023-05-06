@@ -2411,7 +2411,7 @@ Snowflake users in Russia.
 The blocking of Tor-related transports in December~2021
 led to Snowflake's first surge in usage.
 The decrease in September~2022
-was contemporaneous with an even larger influx of users from Iran,
+coincided with an even larger influx of users from Iran,
 which may have masked another blocking rule
 that was partially % "partially" because only in Tor Browser, not Orbot at that time
 mitigated only in February~2023.
@@ -2441,25 +2441,34 @@ Turkmenistan.
 % "Responding to Tor censorship in Russia" https://blog.torproject.org/tor-censorship-in-russia/
 
 Snowflake, along with other common ways of accessing Tor,
-was blocked in a subset of ISPs in Russia on \mbox{2021-12-01}~\cite{ooni-2021-russia-blocks-tor}.
+was blocked in a subset of ISPs in Russia
+% https://ntc.party/t/ooni-reports-of-tor-blocking-in-certain-isps-since-2021-12-01/1477/95
+% "Tor filtering is done using government black box called TSPU.
+% Not all providers have them. Tor is not blocked if TSPU is not present.
+% According to tor metrics graph directly connecting users decreased only by 1/3.
+% This indicates TSPU is not everywhere."
+\todo{Consider introducing TSPU? Or not?}
+on \mbox{2021-12-01}~\cite{ooni-2021-russia-blocks-tor}.
 The blocking action was clearly pre-planned and targeted,
-as it happened suddenly and affected multiple Tor-related protocols:
-besides Snowflake,
-some servers supporting
-the blocking-resistant transports meek and obfs4,
-as well as the IP addresses of a portion
+as it happened suddenly and affected multiple Tor-related protocols.
+Besides Snowflake,
+the IP addresses of a portion
 of unobfuscated Tor relays and bridges,
-were blocked.
-As~might be expected, the attempt to block
-Tor's blocking-resilient transports
+as well as some servers of
+the blocking-resistant transports meek and obfs4,
+were blocked, at least temporarily.
+As~you might expect, the attempted blocking
+of various blocking-resilient transports
 was less than totally successful,
-and the ultimate effect was to increase the number of users in Russia
-using circumvention protocols to access Tor.
-What concerns us here is the mechanism of Snowflake's detection and blocking.
+and the ultimate effect was a substantial increase in the number
+of users accessing Tor via circumvention transports,
+Snowflake among them---see the left side of \autoref{fig:user-counts-ru}.
+% "A zoom on just the bridge transports" https://bugs.torproject.org/tpo/community/support/40050#note_2796770
+For an overview of how Tor-related transports were affected at this time,
+see an article by Ramesh, Sundara Raman, et~al.~\cite[\S 6.2]{Ramesh2023a}.
+Here, our focus is on Snowflake.
 
 % counts before and after
-
-\autoref{fig:user-counts-ru}
 
 In comparison to TM, easy to get testers
 Managed to unblock it within 2 weeks
@@ -2488,6 +2497,9 @@ Even a Snowflake client with a blocked fingerprint may work,
 if it happens to be paired with a browser proxy (which may be presumed to have an unblocked fingerprint)
 and it plays the DTLS server role
 
+(The increase in circumventing users was,
+however, more than counterbalanced by a loss of users
+accessing Tor directly.)
 That pluggable transports could not compensate fully
 for the loss of relay users points to a usability gap.
 Tor already a fairly niche use.
