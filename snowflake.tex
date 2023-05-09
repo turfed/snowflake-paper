@@ -2470,16 +2470,36 @@ Here, our focus is on Snowflake.
 
 % counts before and after
 
-In comparison to TM, easy to get testers
-Managed to unblock it within 2 weeks
+Through manual tests,
+a~collaborator of our in Russia
+isolated the traffic feature that was being used to detect Snowflake connections.
+It~was DTLS fingerprinting
+of the type cautioned about in \autoref{sec:fingerprinting}.
+% "Russian DPI check supported_groups extension in ServerHello payload (byte 0x5a in udp packet)." https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40014#note_2765074
+Specifically, it was the presence of a
+\mbox{supported\_groups} extension in Pion's DTLS Server Hello message.
+This extension being included in Server Hello was a bug---it
+% "Server Hello should not contain supported_groups extension (extension.SupportedEllipticCurves)" https://github.com/pion/dtls/issues/409
+was supposed to have been only in Client Hello---but
+at any rate, it made DTLS connections with a Pion implementation
+in the server role detectable as such.
 
-supported\_groups in Specific DTLS Server Hello Extension
-Release to change fingerprint evaded blocking, has worked in Russia since
-Had been anticipated by MacMillan et al.\cite[\S 3]{arxiv.2008.03254}
-Though not necessarily the wrong call not to have prioritized a fix earlier
+The \mbox{supported\_groups} distinguisher is one
+that had already been discovered by MacMillan et al.~\cite[\S 3]{arxiv.2008.03254}.
+We~might have avoided this blocking event by proactively removing
+the known distinguisher,
+but as a practical matter,
+it was not necessarily the wrong call not to have done so.
+
+Managed to unblock it within 2 weeks
+Release to change fingerprint evaded blocking
 Importance during the invasion of Ukraine
-- increased usage caused scaling difficulties
-  \url{https://forum.torproject.net/t/tor-project-more-resources-required-for-snowflake-bridge/2353}
+
+Snowflake client may be either the DTLS client or DTLS server
+Even a Snowflake client with a blocked fingerprint may work,
+if it happens to be paired with a browser proxy (which may be presumed to have an unblocked fingerprint)
+and it plays the DTLS server role
+% "Creating a version of Tor Browser with patched Snowflake client that includes supported_groups censorship countermeasure" https://bugs.torproject.org/tpo/anti-censorship/team/83
 
 Second round of DTLS fingerprinting, this time targeting DTLS Client Hello?
 Initially not noticed, lost in the shuffle with Iran?
@@ -2492,10 +2512,7 @@ Initially not noticed, lost in the shuffle with Iran?
 Snowflake 2.5.1, Tor Browser 12.0.3
 % "Since the release of Tor Browser 12.0.3 on 2023-02-15 there has been an increase in users from Russia on both bridges." https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40030#note_2893870
 
-Snowflake client may be either the DTLS client or DTLS server
-Even a Snowflake client with a blocked fingerprint may work,
-if it happens to be paired with a browser proxy (which may be presumed to have an unblocked fingerprint)
-and it plays the DTLS server role
+In comparison to TM, easy to get testers
 
 (The increase in circumventing users was,
 however, more than counterbalanced by a loss of users
