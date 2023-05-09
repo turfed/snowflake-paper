@@ -122,7 +122,6 @@ text_annotation <- function(data) {
 			label.size = 0,
 			label.r = unit(0, "lines"),
 			label.padding = unit(0.05, "lines"),
-			family = FONT_FAMILY,
 			size = 2.0,
 			vjust = ifelse(data$ymin <= data$ymax, 1, 0),
 			lineheight = 0.8
@@ -200,7 +199,7 @@ p <- ggplot() +
 	)) +
 
 	# Data series.
-	geom_line(data = bridge_transport, aes(x = date, y = users), size = LINE_SIZE) +
+	geom_line(data = bridge_transport, aes(x = date, y = users)) +
 
 	scale_y_continuous(
 		breaks = 20000*0:ceiling(144000 / 20000),
@@ -213,7 +212,6 @@ p <- ggplot() +
 		labels = date_labels
 	) +
 	coord_cartesian(xlim = DATE_LIMITS, ylim = c(0, 100000), expand = FALSE, clip = "off") +
-	COMMON_THEME +
 	theme(plot.margin = unit(c(13, 0, 0, 0), "mm")) +
 	labs(x = NULL, y = "Average simultaneous users")
 ggsave(output_path, p, width = DOCUMENT_TEXTWIDTH, height = 2)

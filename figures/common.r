@@ -8,12 +8,17 @@ DOCUMENT_TEXTWIDTH <- 505.89 / 72.27
 DOCUMENT_LINEWIDTH <- 247.94499 / 72.27
 
 FONT_FAMILY <- "Times"
-
-LINE_SIZE <- 0.2
-
-COMMON_THEME <- theme_minimal() +
-	theme(text = element_text(size = 9, family = FONT_FAMILY)) +
+theme_set(
+	theme_minimal(
+		base_family = FONT_FAMILY,
+		base_size = 9
+	) +
 	theme(plot.margin = margin(0, 0, 0, 0, "mm"))
+)
+# https://stackoverflow.com/a/48978417
+update_geom_defaults("text", aes(family = FONT_FAMILY))
+update_geom_defaults("label", aes(family = FONT_FAMILY))
+update_geom_defaults("line", aes(size = 0.2))
 
 # Returns a vector z that minimizes sum((z - y)^2), subject to the conditions
 # that all elements of z are at least M, and the difference between any two

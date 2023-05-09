@@ -88,8 +88,7 @@ p <- ggplot() +
 			# remove illusory dips caused by partial days' data.
 			y = unique_ips / coverage,
 			color = type
-		),
-		size = LINE_SIZE
+		)
 	) +
 
 	# Draw the type labels in the right margin. theme(plot.margin) below
@@ -109,7 +108,6 @@ p <- ggplot() +
 			label = type
 		),
 		position = position_nudge(x = 5),
-		family = FONT_FAMILY,
 		size = 2,
 		hjust = 0, vjust = 0.5
 	) +
@@ -125,7 +123,6 @@ p <- ggplot() +
 	) +
 	scale_color_brewer(palette = "Set1") +
 	coord_cartesian(xlim = DATE_LIMITS, expand = FALSE, clip = "off") +
-	COMMON_THEME +
 	labs(x = NULL, y = "Unique proxy IP addresses") +
 
 	# Make room for the margin labels added by geom_text above.

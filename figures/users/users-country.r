@@ -120,7 +120,6 @@ for (g in list(
 		geom_line(
 			data = bridge_combined %>% filter(country == g$country),
 			aes(x = date, y = users),
-			size = LINE_SIZE
 		) +
 		scale_x_date(
 			date_breaks = "1 month",
@@ -128,7 +127,6 @@ for (g in list(
 			labels = g$date_labels
 		) +
 		coord_cartesian(xlim = g$date_limits, expand = FALSE) +
-		COMMON_THEME +
 		labs(x = NULL, y = NULL)
 	ggsave(sprintf("users-%s.pdf", g$country), p, width = DOCUMENT_LINEWIDTH, height = HEIGHT)
 }
