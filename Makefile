@@ -11,12 +11,19 @@ FIGURES = \
 
 snowflake.pdf: *.tex *.bib $(FIGURES)
 
-%.pdf: %.tex
+# Compile the TeX files to produce a PDF that does not have embedded fonts.
+%.tmp.pdf: %.tex
 	rm -f "$*.aux" "$*.bbl"
 	$(PDFLATEX) -draftmode "$*"
 	$(BIBTEX) "$*"
 	$(PDFLATEX) -draftmode "$*"
 	$(PDFLATEX) "$*"
+	mv -v "$*.pdf" "$@"
+
+# Embed fonts (PDF graphics produced by R do not have embedded fonts by default)
+# https://www.usenix.org/legacy/events/samples/latex_tips.html
+%.pdf: %.tmp.pdf
+	gs -q -dSAFER -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile="$@" -dEmbedAllFonts=true "$<"
 
 .PHONY: clean
 clean:
