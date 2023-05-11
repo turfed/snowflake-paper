@@ -2322,7 +2322,7 @@ could be used to attack third parties.
 When the client expresses its bridge selection
 in its rendezvous message, the selection is represented
 not as an IP address or domain name,
-but as a bridge fingeprint (a~\mbox{40-digit} hexadecimal string).
+but as a bridge fingerprint (a~\mbox{40-digit} hexadecimal string).
 The broker maps the fingerprint to a WebSocket URL
 by consulting a local database of known Snowflake bridges.
 The broker rejects client rendezvous messages requesting an unknown fingerprint.
@@ -2331,7 +2331,7 @@ The broker then tells an incoming proxy
 what WebSocket URL to connect this particular client to,
 % https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/blob/8e5ea8261110e97a8df56cfc9c83028081d902fb/broker/ipc.go#L144
 but here also there is a check.
-Proxies check the hostname of the URL's
+Proxies check the hostname of the URLs
 to ensure that it is a subdomain of a known suffix reserved for Snowflake bridges.
 So~there are two independent safeguards against misuse.
 
