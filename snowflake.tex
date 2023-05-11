@@ -2534,6 +2534,8 @@ would be absent.
 % "IRC Tip about Signature used to block Snowflake in Russia, 2022-May-16" https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40030
 % ValdikSS confirmed the blocked byte pattern, though also said that Snowflake worked despite it:
 % https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40030#note_2804998
+% The fact that it worked may have to do with the fact that the DTLS client role is not always played
+% by a Pion implementation.
 % We made a test release with a modified supported_groups in Client Hello:
 % "Creating a version of Tor Browser with patched Snowflake client that includes supported_groups censorship countermeasure" https://bugs.torproject.org/tpo/anti-censorship/team/83
 % https://ntc.party/t/testing-invitation-for-tor-browser-with-supported-groups-patch-countermeasure-in-snowflake-to-evade-censorship-observed-in-russia/2837
@@ -2546,7 +2548,7 @@ would be absent.
 % a large effect on user counts, and may have gone away without our having to do anything.
 % But who knows, maybe it was the cause of the sharp decline in early April 2022?
 
-Second round of DTLS fingerprinting, this time targeting DTLS Client Hello?
+Second round of DTLS fingerprinting, this time targeting DTLS Hello Verify Request?
 Initially not noticed, lost in the shuffle with Iran?
 \url{https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40030#note_2803188}
 \url{https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40140}
@@ -2557,14 +2559,11 @@ Initially not noticed, lost in the shuffle with Iran?
 Snowflake 2.5.1, Tor Browser 12.0.3
 % "Since the release of Tor Browser 12.0.3 on 2023-02-15 there has been an increase in users from Russia on both bridges." https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40030#note_2893870
 
-The Snowflake client does not necessarily play the
-DTLS client role in a WebRTC data channel:
-depending on NAT, it may actually be the DTLS server,
-the temporary proxy being the DTLS client.
-Even a Snowflake client with a blocked fingerprint may work,
-if it happens to be paired with a browser proxy (which may be presumed to have an unblocked fingerprint)
-and it plays the DTLS server role
-% "Creating a version of Tor Browser with patched Snowflake client that includes supported_groups censorship countermeasure" https://bugs.torproject.org/tpo/anti-censorship/team/83
+As~with the supported\_groups distinguisher,
+the Hello Verify Request distinguisher
+would not have been effective when the DTLS server
+was a web browser proxy.
+% "Snowflake will only work if you have a browser version of the proxy and the snowflake client is a DTLS Client." https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40030#note_2823140
 
 (The increase in circumventing users was,
 however, more than counterbalanced by a loss of users
