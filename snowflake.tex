@@ -905,7 +905,7 @@ Stream Control Transmission Protocol (SCTP), which
 does reordering and retransmission of dropped packets---similar
 to what an OS kernel does for a TCP connection,
 but in userspace.
-SCTP packets are then encapsulated in Datagram TLS (DTLS)
+SCTP packets are then encapsulated in Datagram TLS (DTLS)~\cite{rfc9147}
 for confidentiality and integrity between the WebRTC peers.
 The peers mutually authenticate one another
 at the DTLS layer using certificate fingerprints
@@ -1150,7 +1150,7 @@ to strengthen its guess and possibly effect a blocking decision.
 The outermost protocol
 of a WebRTC data connection, exposed to the censor,
 is Datagram TLS (DTLS) over UDP.
-DTLS is an adaptation of TLS,
+DTLS is an adaptation of TLS~\cite[\S 1]{rfc9147},
 and inherits the fingerprinting concerns of the latter~\cite{Frolov2019a}.
 TLS/DTLS fingerprinting may involve, for example,
 inspecting the ClientHello message to see what
