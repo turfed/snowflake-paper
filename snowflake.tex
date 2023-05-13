@@ -2414,7 +2414,14 @@ which may have masked another blocking rule.
 \bigskip
 \includegraphics{figures/users/users-ir}
 \caption{
-Iran.
+Snowflake users in Iran.
+The censorship that followed
+protests that started in September 2022
+caused Iran to suddenly become the largest contingent of Snowflake users.
+The drop in early October 2022
+was the result of blocking based on TLS fingerprint,
+which interfered with Snowflake's rendezvous
+and took some time to mitigate.
 }
 \label{fig:user-counts-ir}
 \bigskip
@@ -2610,29 +2617,51 @@ and even such factors as which endpoint plays the DTLS server role.
 
 % "Unexplained drop in Snowflake client polls and bandwidth, testers wanted" https://github.com/net4people/bbs/issues/131
 % "Tor censorship in Iran" https://bugs.torproject.org/tpo/anti-censorship/team/96#note_2840481
-% "Sudden reduction in snowflake-01 bridge bandwidth, 2022-10-04 17:15" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40207#note_2844163
+% "Sudden reduction in snowflake-01 bridge bandwidth, 2022-10-04 17:15" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40207
 % "Planning response to censorship in Iran with AC team" https://gitlab.torproject.org/tpo/team/-/wikis/Planning-response-to-censorship-in-Iran-with-AC-team
-% "Censorship analysis for UDP traffic between Iran and rest of Internet: 2022 Q4" https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40036
 
-Go standard library crypto/tls a convenient way to use TLS in a Go program
+We have remarked in \autoref{sec:deployment} how,
+in late September 2022,
+almost overnight Iran became the source of the majority of Snowflake users,
+and had an even more sudden drop two weeks later.
+The cause of the drop was blocking based on TLS fingerprint,
+though it took some time to diagnose this fact.
+Specifically, it was a block of one of the TLS fingerprints
+produced by the crypto/tls package in the standard library of
+the Go programming language.
 
+We~say ``one of'' the crypto/tls fingerprints
+because there are several the package may output.
+The fingerprint changed between Go~1.17 and Go~1.18
+as the latter dropped default support for TLS~1.0 and~1.1
+in the Client Hello message.
+% https://go.dev/doc/go1.18#tls10
+% supported_versions: https://www.rfc-editor.org/rfc/rfc8446#section-4.2.1
+Furthermore, the TLS client reorders its offered ciphersuites
+according to hardware capabilities:
+if the platform has hardware-accelerated AES,
+it prioritizes AES ciphersuites;
+otherwise it prioritizes ChaCha ones.
+The combination of these two variables
+(Go~1.17 or~1.18; AES acceleration or not)
+result in four distinct TLS fingerprints;
+of these, only one was blocked, namely the one from
+the older version of Go, without AES acceleration.
 % "This all gives us a good hypothesis... It includes the fingerprints of go1.17+ crypto/tls without AES acceleration" https://github.com/net4people/bbs/issues/139#issuecomment-1280243079
 % "...in native Go crypto/tls fingerprints since go1.17 is that the order of ciphersuites depends on whether the platform has support for accelerated AES-GCM" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40207#note_2844163
 % "When I tested the desktop version, I did it in a VM that did not emulate support for accelerated AES-GCM..." https://github.com/net4people/bbs/issues/131#issuecomment-1280284051
 % "There is strong evidence of an attempt to block the native Go crypto/tls fingerprint, but not all native fingerprints produced by Go programs are blocked." https://github.com/net4people/bbs/issues/125#issuecomment-1284602875
-Default TLS fingerprint changed between Go~1.17 and~1.18~\cite{go1.18-tls10}:
-earlier versions, in their supported\_\allowbreak versions field,
-% supported_versions: https://www.rfc-editor.org/rfc/rfc8446#section-4.2.1
-declared support for TLS~1.0, 1.1, 1.2, and~1.3;
-after Go~1.18 they declare support only for TLS~1.2 and~1.3.
-Order of ciphersuites depends on whether the platform has hardware-accelerated AES.
-If~so, the order prioritizes AES ciphersuites; if not, it prioritizes ChaCha20 ciphersuites.
-% https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/issues/40207#note_2844163
-Roughly corresponds to desktop platforms (which usually do) versus mobile platforms (which usually do not).
-OONI was misleading in this case, because it used Go~1.18, whose fingerprint was not blocked.
-
-Go is a popular language for implementing circumvention clients and servers.
-Not certain that it was Snowflake that was specifically targeted
+As~it happens, only Orbot was affected
+(which is more used than Tor Browser, in Iran).
+At the time, Orbot was compiling the Snowflake client with Go~1.17
+and Tor Browser was using Go~1.18;
+the mobile platforms on which Orbot runs are also less likely to
+have hardware-accelerated AES
+than the desktop platforms that run Tor Browser.
+We~were briefly hampered in our investigation by the fact that
+OONI Probe used Go~1.18 to compile Snowflake,
+so its measurements showed everything as normal,
+even as we saw the bandwidth at the bridge.
 
 This was our mistake---we had implemented TLS camouflage using uTLS
 in the Snowflake client, but had neglected to turn it on by default.
@@ -2644,10 +2673,15 @@ In~the meantime, we posted instructions on how users could activate uTLS manuall
 % "Snowflake with uTLS support in Tor Browser 11.5.4" https://forum.torproject.net/t/iran-circumventing-censorship-with-tor/4590/24
 but the effectiveness of manual workarounds is far inferior to automatically provided defaults.
 
+Go is a popular language for implementing circumvention clients and servers.
+Not certain that it was Snowflake that was specifically targeted
+
 % "Blocking of cdn.sstatic.net by SNI in Iran, 2023-01-16 to 2023-01-24 and sporadically thereafter" https://bugs.torproject.org/tpo/anti-censorship/team/115#note_2873040
 Blocking of default domain front for domain fronting rendezvous
 Again, not clear it was targeted at Snowflake specifically,
 as many circumvention systems use the same front domain.
+
+% "Censorship analysis for UDP traffic between Iran and rest of Internet: 2022 Q4" https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40036
 
 \subsection{Blocking in Turkmenistan}
 \label{sec:block-tm}
