@@ -2658,30 +2658,43 @@ and Tor Browser was using Go~1.18;
 the mobile platforms on which Orbot runs are also less likely to
 have hardware-accelerated AES
 than the desktop platforms that run Tor Browser.
-We~were briefly hampered in our investigation by the fact that
-OONI Probe used Go~1.18 to compile Snowflake,
+We~were hampered in our investigation by the fact that
+OONI Probe\todo{Say what OONI is.} used Go~1.18 to compile Snowflake,
 so its measurements showed everything as normal,
-even as we saw the bandwidth at the bridge.
+even as we saw the bandwidth drop at the bridge.
 
-This was our mistake---we had implemented TLS camouflage using uTLS
-in the Snowflake client, but had neglected to turn it on by default.
-Once activated, Snowflake began working again,
-but it was at the cost of waiting for a release cycle of Tor Browser and Orbot.
-(See the interval September--November~2022 in \autoref{fig:user-counts}.)
-In~the meantime, we posted instructions on how users could activate uTLS manually,
-% "Snowflake with uTLS support in Tor Browser 11.5.4 for Android" https://github.com/net4people/bbs/issues/131#issuecomment-1280391051
-% "Snowflake with uTLS support in Tor Browser 11.5.4" https://forum.torproject.net/t/iran-circumventing-censorship-with-tor/4590/24
-but the effectiveness of manual workarounds is far inferior to automatically provided defaults.
+That TLS fingerprinting worked to block Snowflake
+was an oversight on our part.
+We had in fact already implemented TLS camouflage using uTLS,
+but had failed to turn it on by default.
+% "uTLS for broker negotiation" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40054
+Activating it took only a small configuration change,
+% "Enable uTLS and use the full bridge line for snowflake" https://gitlab.torproject.org/tpo/applications/tor-browser-build/-/merge_requests/540
+but we had to wait out the release cycles of Tor Browser and Orbot
+to get it in the hands of users:
+see the September--November~2022 interval in \autoref{fig:user-counts-ir}.
 
-Go is a popular language for implementing circumvention clients and servers.
-Not certain that it was Snowflake that was specifically targeted
+The fact that only one of Snowflake's possible TLS fingerprints was blocked
+(albeit the most common one)
+could show carelessness on the part of the censor.
+On~the other hand, it is not certain that the TLS fingerprint blocking of October 2022
+was targeted specifically at Snowflake.
+Go~is a popular language for implementing circumvention systems.
+Snowflake may have been caught up in blocking that was intended for another system.
 
 % "Blocking of cdn.sstatic.net by SNI in Iran, 2023-01-16 to 2023-01-24 and sporadically thereafter" https://bugs.torproject.org/tpo/anti-censorship/team/115#note_2873040
-Blocking of default domain front for domain fronting rendezvous
-Again, not clear it was targeted at Snowflake specifically,
-as many circumvention systems use the same front domain.
 
-% "Censorship analysis for UDP traffic between Iran and rest of Internet: 2022 Q4" https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40036
+The default domain name used for domain fronting rendezvous
+was blocked in some ISPs, matching on the TLS SNI field,
+between \mbox{2023-01-16} and \mbox{2023-01-24}.
+We~confirmed this by examining OONI measurements;
+there was also a reduction in users at this time (\autoref{fig:user-counts-ir}).
+AMP cache rendezvous was a successful workaround while the block was in effect.
+After the block was lifted,
+OONI measurements in the following weeks showed isolated cases
+of failure to connect to the front domain,
+which may have been more blocking,
+though with less intensity and not for more than a few days at a time.
 
 \subsection{Blocking in Turkmenistan}
 \label{sec:block-tm}
