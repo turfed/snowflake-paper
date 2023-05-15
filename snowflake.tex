@@ -2699,12 +2699,28 @@ though with less intensity and not for more than a few days at a time.
 \subsection{Blocking in Turkmenistan}
 \label{sec:block-tm}
 
-% |2021-10-24||tm|snowflake|Snowflake users in Turkmenistan drop to zero, possibly as a result of blocking of the broker's domain-fronting channel.|[issue](https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40024) [comment](https://bugs.torproject.org/tpo/community/support/40030#note_2759213) [discussion](http://meetbot.debian.net/tor-meeting/2021/tor-meeting.2021-11-04-15.59.log.html#l-55)|X|
+% "Blocking of Snowflake in Turkmenistan, 2021-10-24" https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40024
+% "On 2021-10-24, Snowflake users dropped drastically and thereafter went to zero." https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40029#note_2787789
 
-% \url{https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40024}
-
-In late October, 2021 we noticed a sharp decline in our usage metrics of Snowflake users from 
-Turkmenistan, as shown in \autoref{fig:user-counts-tm}.
+Compared to Russia and Iran,
+there had not been many Snowflake users in Turkmenistan,
+likely a consequence of the lesser development
+of the country's Internet infrastructure
+and its even more extreme network censorship.
+Nevertheless, there were some,
+but on \mbox{2021-10-24} the number dropped suddenly to zero,
+as~you can see in \autoref{fig:user-counts-tm}.
+Our investigation found the blocking to consist of two layers:
+the default domain fronting rendezvous domain was blocked
+by DNS injection;
+and certain UDP port numbers commonly used by STUN were blocked.
+We~were able to mitigate the blocking
+by providing alternative domain fronts for rendezvous
+and finding public STUN servers running on non-standard ports,
+but not for all users in all ISPs.
+Turkmenistan remains a difficult environment for circumvention.
+% had been about 750 relay users at the time
+% relays dropped as well on 2021-10-29 https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40029#note_2787789
 
 While usage metrics can detect whether blocking has occurred and \emph{when} the block occurs, 
 it unfortunately supplies too few details to determine \emph{how} the blocking occurs. 
