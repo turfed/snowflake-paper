@@ -2403,7 +2403,7 @@ farther out of reach of would-be controllers of information.
 \begin{figure}[t!]
 \includegraphics{figures/users/users-ru}
 \caption{
-Snowflake users in Russia.
+Snowflake users in Russia (average concurrent).
 The blocking of Tor-related transports in December~2021
 led to Snowflake's first surge in usage.
 The decrease in September~2022
@@ -2427,10 +2427,13 @@ and took some time to mitigate.
 \bigskip
 \includegraphics{figures/users/users-tm}
 \caption{
-Turkmenistan.
+Snowflake users in Turkmenistan.
+Though there has never been many Snowflake users in Turkemenistan,
+blocking actions are evident on
+\mbox{2021-10-24} and \mbox{2022-07-28}.
 }
 \label{fig:user-counts-tm}
-\todo[inline]{Add annotations for specific events, like \autoref{fig:user-counts}.}
+\todo[inline]{Add annotations for specific events, like in \autoref{fig:user-counts}.}
 \end{figure}
 
 \subsection{Blocking in Russia}
@@ -2556,8 +2559,8 @@ testers reported that Snowflake continued to work---which
 % https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40030#note_2804998
 % https://ntc.party/t/a-new-snowflake-blocking-rule-offset-of-supported-groups-in-dtls-client-hello/2420/2
 may have something to do with the fact that the Snowflake client
-does not always play the client role in DTLS;
-if the Snowflake client is the DTLS server,
+does not always play the client role in DTLS:
+if~the Snowflake client is the DTLS server,
 and the DTLS client is a browser proxy,
 then the specific byte pattern of the blocking rule never appears.
 % Hard to say at this point, but perhaps it was the cause of the sharp drop in April 2022, only reported in May?
@@ -2659,7 +2662,7 @@ the mobile platforms on which Orbot runs are also less likely to
 have hardware-accelerated AES
 than the desktop platforms that run Tor Browser.
 We~were hampered in our investigation by the fact that
-OONI Probe\todo{Say what OONI is.} used Go~1.18 to compile Snowflake,
+OONI Probe\todo{Say what OONI is. Or, cut this detail.} used Go~1.18 to compile Snowflake,
 so its measurements showed everything as normal,
 even as we saw the bandwidth drop at the bridge.
 
@@ -2762,11 +2765,22 @@ the resulting log messages, we were able to track the cause to port-based blocki
 % https://gitlab.torproject.org/tpo/anti-censorship/censorship-analysis/-/issues/40024#note_2829127
 % https://gitlab.torproject.org/tpo/anti-censorship/censorship-analysis/-/issues/40024#note_2829157
 Our use of NAT behavior capable STUN servers came in handy here because the alternate STUN port 3479 remained
+\todo{
+See if there is documentation/\allowbreak specification about 3479 being an alternative.
+% It's the default value for --altport in stunserver: https://github.com/jselbie/stunserver/blob/d2d06a6d002d1e2fba312cf4993b08bb57a0346b/resources/stunserver.md
+}
 unblocked in AGTS, one of the two major affected ISPs, and users were able to establish a connection
 with Snowflake again. TurkmenTelecom, the other major ISP, blocked both ports.
 % https://gitlab.torproject.org/tpo/anti-censorship/censorship-analysis/-/issues/40024#note_2829394
 
 \todo{check if we can determine through our metrics for how long the port 3479 bridge line worked in AGTS}
+
+\todo{Investigate and discuss further blocking on \mbox{2022-07-28}.}
+
+\todo{
+Read \href{https://dl.acm.org/doi/fullHtml/10.1145/3543507.3583189}{``Measuring and Evading Turkmenistan's Internet Censorship''}
+to see if it can inform this section.
+}
 
 censor relativity
 Highlight this to make the point that blocking resistance cannot be defined absolutely,
@@ -2790,7 +2804,11 @@ that a richer, more capable censor cannot.
 
 \todo{Add a section for China if
 \href{https://github.com/net4people/bbs/issues/249}{\#249}
-turns out to be significant.}
+turns out to be significant.
+% "Snowflake bridge does not work in China since days ago" https://forum.torproject.net/t/snowflake-bridge-does-not-work-in-china-since-days-ago/7635
+% Also note contemporaneous
+% "GFW at the Edge: Latest Development of China's Distributed Censorship System" https://github.com/net4people/bbs/issues/248
+}
 
 \section{Future work}
 \label{sec:future}
@@ -2822,7 +2840,7 @@ Must also include the churn logs of \autoref{sec:proxy-churn}.}
 The Snowflake project has been made possible
 by the cooperation and support of many people
 and organizations.
-We want to thank particularly:
+We~want to thank particularly:
 % https://keroserene.net/snowflake/technical/#history
 Chris Ball, % Earliest work on extracting a WebRTC library: https://blog.printf.net/articles/2013/05/17/webrtc-without-a-signaling-server/ https://bugs.torproject.org/legacy/trac/5578#note_2111217
 Griffin Boyce, % Cupcake
