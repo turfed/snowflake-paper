@@ -495,8 +495,9 @@ The well-known drawback of domain fronting
 is the high financial cost of CDN bandwidth,
 but because we use it only for rendezvous and not bulk data transfer,
 the cost is vastly lower than it would be in a system like~meek.
+
+% "AMP cache rendezvous" https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/merge_requests/50
 \item[AMP cache]
-% https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/merge_requests/50
 AMP is a framework for web pages written in a restricted dialect of HTML.
 Part of this framework is a free-to-use
 cache server~\cite{amp-cache}.
@@ -508,7 +509,7 @@ one that is not easily blocked without blocking the cache server as a whole.
 This rendezvous method still requires domain fronting,
 because the AMP cache protocol would otherwise expose the
 upstream server's domain name in the TLS SNI,
-but it increases the number of usable intermediary nodes.
+but it increases the number of usable front domains.
 \end{description}
 
 The rendezvous component is, however, modular,
