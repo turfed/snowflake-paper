@@ -490,7 +490,7 @@ In this method, the client does one HTTPS exchange
 with the broker; however routing through an intermediary such as a CDN,
 and disguising the externally visible domain name\todo{Audit ``domain name'' vs.\ ``hostname''.}
 (the TLS Server Name Indication, or SNI) so that the exchange
-appears to be destined to a different site~\cite{Fifield2015a}.
+appears to be destined to a different ``front domain''~\cite{Fifield2015a}.
 The well-known drawback of domain fronting
 is the high financial cost of CDN bandwidth,
 but because we use it only for rendezvous and not bulk data transfer,
@@ -2705,6 +2705,11 @@ though with less intensity and not for more than a few days at a time.
 % "Blocking of Snowflake in Turkmenistan, 2021-10-24" https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40024
 % "On 2021-10-24, Snowflake users dropped drastically and thereafter went to zero." https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40029#note_2787789
 
+\todo{
+Read \href{https://dl.acm.org/doi/fullHtml/10.1145/3543507.3583189}{``Measuring and Evading Turkmenistan's Internet Censorship''}
+to see if it can inform this section.
+}
+
 Compared to Russia and Iran,
 there had not been many Snowflake users in Turkmenistan,
 likely a consequence of the lesser development
@@ -2725,62 +2730,55 @@ Turkmenistan remains a difficult environment for circumvention.
 % had been about 750 relay users at the time
 % relays dropped as well on 2021-10-29 https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40029#note_2787789
 
-While usage metrics can detect whether blocking has occurred and \emph{when} the block occurs, 
-it unfortunately supplies too few details to determine \emph{how} the blocking occurs. 
-Snowflake in particular makes many different connections, any of which may be the subject of endpoint blocks, 
-protocol-based blocking, or fingerprinting as discussed in \autoref{sec:fingerprinting}.
+Among the mechanisms used for censorship in Turkmenistan
+are DNS injection and TCP RST injection.
+DNS queries for blocked domain names receive an injected response
+containing the localhost IP address 127.0.0.1;
+TLS handshakes with a blocked SNI receive an injected TCP RST packet
+that terminates the connection.
+% "I did some tests to see if it would be possible to measure blocking of SNI and DNS from outside Turkmenistan" https://gitlab.torproject.org/tpo/community/support/40030#note_2748011
+% "Bidirectional DNS, HTTPS, HTTP injection in Turkmenistan" https://github.com/net4people/bbs/issues/80
+Conveniently for analysis,
+both forms of injection are bidirectional:
+packets that \emph{enter} the country are subject to injection,
+just as those that exit it are.
+We~took advantage of this fact,
+sending probes into the country,
+to find that the default front domain used to access the broker
+was blocked by both DNS injection and RST injection,
+% "...the block on Snowflake is effected by (at least) DNS and SNI blocking of the broker's front domain, cdn.sstatic.net." https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40024#note_2767094
+but that some alternative domains were not blocked.
+Testers in Turkmenistan confirmed that using a different front domain
+worked to get around the block of the broker.
+(We~did not get confirmation whether AMP cache rendezvous also worked.)
+% "...there's some progress in the sense that the broker connection is working now, but it looks like the client is having trouble connecting to the proxies." https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40024#note_2829140
+But Snowflake still did not work,
+because even after contacting the broker,
+clients were not able to make a connection with a proxy.
+% "connection failed timeout waiting for DataChannel.OnOpen" https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40024#note_2829121
 
-Because Turkmenistan performs blocking bidirectionally
-%https://github.com/net4people/bbs/issues/80
-we were able to confirm from outside of Turkmenistan 
-that the front domain `cdn.sstatic.net` was being blocked by a DNS injection attack.
-\todo{David, do you want to go into more detail here?}
-A similar test determined that `www.google.com` was not being blocked, along with several other front domains.
-As a result, users were able to bypass the DNS injection attack 
-by using a different domain front. It was unclear whether the AMP cache rendezvous also worked.
-Despite unblocking the connection to the broker, we continued to receive reports from users that they were still unable to 
-connect to the Snowflake bridge.
-
-Contact with
-testers and volunteers in the affected region is an immensely valuable
-way to pinpoint the cause of the block and develop a work around. However, this type of back-and-forth 
-development is not always easy to achieve, especially in the presence of tight Internet controls.
-To help debug the source of the blocking, we introduced log messages at key points during Snowflake's
-connection establishment with the bridge and passed these messages through to the tor process using
-the new LOG feature of Tor's pluggable transport specification.
-This allowed users to copy and paste the Tor log from their Tor Browser settings and send these logs
-to the community support team.
-% https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/issues/40062
-% https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/issues/40076
-
-From the Tor logs, were able to determine that users were successfully contacting the broker but failing to 
-establish a connection with any Snowflake peers.
-% https://gitlab.torproject.org/tpo/anti-censorship/censorship-analysis/-/issues/40024#note_2829121
-While the enumeration and blocking of Snowflake proxies is 
-possible in theory, we determined it was unlikely given the large number of proxies at the time.
-\todo{Look up how many we had}
-The more plausible cause for a failed peer connection would be the inability of the client to correctly determine 
-its ICE candidates before they are sent to the peer. Through a few rounds of sending new bridge lines and receiving 
-the resulting log messages, we were able to track the cause to port-based blocking of STUN servers.
-% https://gitlab.torproject.org/tpo/anti-censorship/censorship-analysis/-/issues/40024#note_2829127
-% https://gitlab.torproject.org/tpo/anti-censorship/censorship-analysis/-/issues/40024#note_2829157
-Our use of NAT behavior capable STUN servers came in handy here because the alternate STUN port 3479 remained
-\todo{
-See if there is documentation/\allowbreak specification about 3479 being an alternative.
-% It's the default value for --altport in stunserver: https://github.com/jselbie/stunserver/blob/d2d06a6d002d1e2fba312cf4993b08bb57a0346b/resources/stunserver.md
-}
-unblocked in AGTS, one of the two major affected ISPs, and users were able to establish a connection
-with Snowflake again. TurkmenTelecom, the other major ISP, blocked both ports.
-% https://gitlab.torproject.org/tpo/anti-censorship/censorship-analysis/-/issues/40024#note_2829394
-
-\todo{check if we can determine through our metrics for how long the port 3479 bridge line worked in AGTS}
+More rounds of testing revealed a block of the default port number
+used by STUN, UDP port~3478.
+% "And port 3478 is blocked in TM" https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40024#note_2829127
+Not being able to reach a STUN server,
+a~client cannot find its own ICE candidate addresses
+(refer to \autoref{sec:ice}),
+and therefore the peer-to-peer connection with the proxy fails.
+As~luck would have it, the NAT discovery feature we rely on
+for testing the NAT type of clients also requires
+STUN servers to listen on a second port other than the default~\cite[\S 6]{rfc5780}
+(commonly 3479),
+and changing the STUN server addresses to those other port numbers
+let some users connect to Snowflake again.
+% "this line... :3479... Works!" https://gitlab.torproject.org/tpo/anti-censorship/censorship-analysis/-/issues/40024#note_2829157
+Specifically, it worked in AGTS,
+one of two major affected ISPs.
+\todo{Check if we can determine through our metrics how long the port 3479 bridge line worked in AGTS.}
+Port~3479 was blocked in TurkmenTelecom, the other major ISP,
+and the workaround did not work there.
+% "So the line where we switch to port 3479 only works for some people but not others?" https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40024#note_2829235
 
 \todo{Investigate and discuss further blocking on \mbox{2022-07-28}.}
-
-\todo{
-Read \href{https://dl.acm.org/doi/fullHtml/10.1145/3543507.3583189}{``Measuring and Evading Turkmenistan's Internet Censorship''}
-to see if it can inform this section.
-}
 
 censor relativity
 Highlight this to make the point that blocking resistance cannot be defined absolutely,
