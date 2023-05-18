@@ -2819,17 +2819,43 @@ turns out to be significant.
 \section{Future work}
 \label{sec:future}
 
+A~natural extension would be to use Snowflake
+to access systems other than Tor,
+for example ordinary VPN services.
+Tor has a number of nice qualities:
+an~existing user base,
+a~standard (pluggable transports) for integrating
+circumvention modules,
+and the fact that entry nodes are separate from exit nodes,
+which means circumvention developers can focus on providing access
+and leave the worries of actually exiting that traffic
+to the destination to someone else.
+But Tor has its drawbacks,
+notably its lower speed,
+lack of support for UDP,
+and lower level of awareness among censored users.
+There is nothing that conceptually ties Snowflake to Tor,
+and it could be adapted to other systems.
+One question is whether there should be one proxy pool
+for all projects that use Snowflake,
+or if every project should deploy its own pool.
+Cultivating a healthy population of proxies
+has been a vital yet non-trivial part of Snowflake's success,
+and clearly it would be more efficient for one pool
+to be shared among many projects.
+But while some proxy operators may be happy to donate
+bandwidth to a project like Tor,
+they may need more incentive to help a commercial VPN.
+Having multiple cooperating projects
+working together also makes it harder
+to change the proxy protocol, for example,
+if that should become necessary.
+A~next-generation proxy pool could be built
+from the ground up with multiple cooperating projects in mind,
+and if it proved successful,
+the Tor deployment could migrate to it.
+
 Multiplexing?
-
-Use by non-Tor systems
-- shared proxy pool
-
-Being integrated with Tor has advantages and disadvantages.
-- separate exit nodes
-- pluggable circumvention support
-but
-- limitations of Tor: slow speed, TCP only
-- lack of flexibility with bridge fingerprints
 
 \section*{Availability}
 
