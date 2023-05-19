@@ -946,6 +946,7 @@ Turbo Tunnel design pattern~\cite{Fifield2020a};
 that is, we interpose an additional, userspace,
 session/reliability layer between the raw transport layer
 and client application streams.
+% "[anti-censorship-team] Turbo Tunnel in Snowflake" https://lists.torproject.org/pipermail/anti-censorship-team/2020-February/000059.html
 This additional layer gives the proxy and the bridge
 shared end-to-end state that persists throughout
 the sequence of temporary proxies that are the carriers of a Snowflake session.
@@ -2020,7 +2021,7 @@ After 1~hour, the shifted window still has, on average,
 97.3\% of addresses in common with the reference;
 after 12~hours the fraction has fallen to 68.8\%;
 by the time 24~hours have elapsed,
-38.2\% of proxy IP addresses
+only 38.2\% of proxy IP addresses
 are ones that had been seen in the previous day.
 % > library("tidyverse")
 % > options(width = 200)
@@ -2843,6 +2844,10 @@ Cultivating a healthy population of proxies
 has been a vital yet non-trivial part of Snowflake's success,
 and clearly it would be more efficient for one pool
 to be shared among many projects.
+In~fact, there is no reason why one proxy could not
+serve multiple projects at the same time,
+directing each client's traffic to an appropriate bridge
+according to the client's preference.
 But while some proxy operators may be happy to donate
 bandwidth to a project like Tor,
 they may need more incentive to help a commercial VPN.
