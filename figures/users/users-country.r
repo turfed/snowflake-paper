@@ -35,11 +35,6 @@ bridge_combined_multi <- read_csv(bridge_combined_multi_csv_path, comment = "#")
 	# Keep only the transports and bridges we care about.
 	filter(transport == "snowflake" & fingerprint %in% names(WANTED_FINGERPRINTS)) %>%
 
-	# Adjust low and high by frac, and forget frac. This is just for
-	# completeness, as we expect the input files to have frac == 100
-	# everywhere.
-	mutate(across(c(low, high), ~ .x * frac / 100), frac = NULL) %>%
-
 	# Derive a single user count from each day's low–high range. The
 	# formulas from https://metrics.torproject.org/reproducible-metrics.html#bridge-users
 	# can result in a "low" bound that is higher than the "high" bound, so

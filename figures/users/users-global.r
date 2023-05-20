@@ -134,11 +134,7 @@ text_annotation <- function(data) {
 
 bridge_transport_multi <- read_csv(bridge_transport_multi_csv_path, comment = "#") %>%
 	# Keep only the transports and bridges we care about.
-	filter(transport == "snowflake" & fingerprint %in% names(WANTED_FINGERPRINTS)) %>%
-
-	# Adjust users by frac, and forget frac. This is just for completeness,
-	# as we expect the input files to have frac == 100 everywhere.
-	mutate(users = users * frac / 100, frac = NULL)
+	filter(transport == "snowflake" & fingerprint %in% names(WANTED_FINGERPRINTS))
 
 bridge_transport <- bridge_transport_multi %>%
 	# Sum the contributions of all bridge fingerprints by day.

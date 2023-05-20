@@ -1300,7 +1300,7 @@ in early January 2021, is about~60.
 %   date       transport users
 %   <date>     <chr>     <dbl>
 % 1 2020-12-30 snowflake  66.2
-% 2 2020-12-31 snowflake  54.0
+% 2 2020-12-31 snowflake  54
 % 3 2021-01-01 snowflake  53.4
 % 4 2021-01-02 snowflake  65.5
 % 5 2021-01-03 snowflake  65.4
@@ -1431,7 +1431,6 @@ had not risen above~40.
 %   )
 % > userstats <- read_csv("figures/users/userstats-bridge-transport-multi.csv") %>%
 %     filter(transport == "snowflake" & fingerprint %in% names(WANTED_FINGERPRINTS)) %>%
-%     mutate(users = users * frac / 100, frac = NULL) %>%
 %     group_by(date, transport) %>% summarize(users = sum(users, na.rm = TRUE), .groups = "drop")
 %
 % Ignoring two apparently anomalous spikes before 2021.
@@ -1441,8 +1440,8 @@ had not risen above~40.
 %   date       transport  users
 %   <date>     <chr>      <dbl>
 % 1 2020-05-19 snowflake   9.16
-% 2 2020-05-20 snowflake  13.6
-% 3 2020-05-21 snowflake 134.
+% 2 2020-05-20 snowflake  14.7
+% 3 2020-05-21 snowflake 133.
 % 4 2020-05-22 snowflake 388.
 % 5 2020-05-23 snowflake   7.9
 % 6 2020-05-24 snowflake  13.9
@@ -1577,7 +1576,7 @@ about 70\% of Snowflake users were in Russia.
 %   )
 % > userstats <- read_csv("figures/users/userstats-bridge-combined-multi.csv") %>%
 %     filter(transport == "snowflake" & fingerprint %in% names(WANTED_FINGERPRINTS)) %>%
-%     mutate(across(c(low, high), ~ .x * frac / 100), frac = NULL, users = (pmin(low, high) + high) / 2) %>%
+%     mutate(users = (pmin(low, high) + high) / 2) %>%
 %     # Combine the contributions of all bridges.
 %     group_by(date, transport, country) %>% summarize(across(c(low, high, users), sum), .groups = "drop") %>%
 %     # Apportion "??" to other countries (see figures/users/users-country.r).
@@ -1628,7 +1627,7 @@ on~\mbox{2022-09-24} it was 67\%.
 %   )
 % > userstats <- read_csv("figures/users/userstats-bridge-combined-multi.csv") %>%
 %     filter(transport == "snowflake" & fingerprint %in% names(WANTED_FINGERPRINTS)) %>%
-%     mutate(across(c(low, high), ~ .x * frac / 100), frac = NULL, users = (pmin(low, high) + high) / 2) %>%
+%     mutate(users = (pmin(low, high) + high) / 2) %>%
 %     # Combine the contributions of all bridges.
 %     group_by(date, transport, country) %>% summarize(across(c(low, high, users), sum), .groups = "drop") %>%
 %     # Apportion "??" to other countries (see figures/users/users-country.r).
@@ -1640,11 +1639,11 @@ on~\mbox{2022-09-24} it was 67\%.
 %   <date>     <chr>     <chr>    <dbl>  <dbl>  <dbl>   <dbl>
 % 1 2022-09-19 snowflake ir        205.   207.   206.    1.20
 % 2 2022-09-20 snowflake ir        228.   229.   228.    1.32
-% 3 2022-09-21 snowflake ir       1023.  1025.  1024.    5.48
-% 4 2022-09-22 snowflake ir      17313. 18064. 17691.   51.8
-% 5 2022-09-23 snowflake ir      19180. 20037. 19610.   64.7
-% 6 2022-09-24 snowflake ir      47469. 49083. 48279.   67.0
-% 7 2022-09-25 snowflake ir      45359. 45445. 45445.   67.1
+% 3 2022-09-21 snowflake ir       1024.  1025.  1024.    5.48
+% 4 2022-09-22 snowflake ir      18074. 18064. 18069.   50.3
+% 5 2022-09-23 snowflake ir      20053. 20037. 20045.   62.8
+% 6 2022-09-24 snowflake ir      49130. 49083. 49107.   66.0
+% 7 2022-09-25 snowflake ir      45481. 45445. 45463.   67.4
 The massive influx of users had us scrambling to test and deploy
 performance improvements over the next few days;
 the apparent oscillations in this part of the graph
@@ -1695,29 +1694,28 @@ rather than Tor Browser.
 %   )
 % > userstats <- read_csv("figures/users/userstats-bridge-transport-multi.csv") %>%
 %     filter(transport == "snowflake" & fingerprint %in% names(WANTED_FINGERPRINTS)) %>%
-%     mutate(users = users * frac / 100, frac = NULL) %>%
 %     mutate(instance = WANTED_FINGERPRINTS[fingerprint], fingerprint = NULL) %>%
 %     group_by(date, transport) %>% mutate (percent = 100 * users / sum(users, na.rm = TRUE)) %>% ungroup()
 % > print(userstats %>% filter("2023-02-20" <= date & date < "2023-02-28"), n = 100)
-% # A tibble: 16 x 5
-%    date       transport  users instance     percent
-%    <date>     <chr>      <dbl> <chr>          <dbl>
-%  1 2023-02-20 snowflake 78307. snowflake-01   95.8
-%  2 2023-02-20 snowflake  3407. snowflake-02    4.17
-%  3 2023-02-21 snowflake 75323. snowflake-01   95.7
-%  4 2023-02-21 snowflake  3354. snowflake-02    4.26
-%  5 2023-02-22 snowflake 72017. snowflake-01   95.5
-%  6 2023-02-22 snowflake  3356. snowflake-02    4.45
-%  7 2023-02-23 snowflake 66461. snowflake-01   95.1
-%  8 2023-02-23 snowflake  3408. snowflake-02    4.88
-%  9 2023-02-24 snowflake 70175. snowflake-01   95.3
-% 10 2023-02-24 snowflake  3444. snowflake-02    4.68
-% 11 2023-02-25 snowflake 70087. snowflake-01   95.2
-% 12 2023-02-25 snowflake  3508. snowflake-02    4.77
-% 13 2023-02-26 snowflake 70174. snowflake-01   95.2
-% 14 2023-02-26 snowflake  3531. snowflake-02    4.79
-% 15 2023-02-27 snowflake 68905. snowflake-01   95.2
-% 16 2023-02-27 snowflake  3477. snowflake-02    4.80
+% # A tibble: 16 x 7
+%    date       transport  users num_instances coverage instance     percent
+%    <date>     <chr>      <dbl>         <dbl>    <dbl> <chr>          <dbl>
+%  1 2023-02-20 snowflake 79040.            12     12   snowflake-01   95.9
+%  2 2023-02-20 snowflake  3407.            12     12   snowflake-02    4.13
+%  3 2023-02-21 snowflake 76365.            12     12   snowflake-01   95.8
+%  4 2023-02-21 snowflake  3354.            12     12   snowflake-02    4.21
+%  5 2023-02-22 snowflake 72064.            12     12   snowflake-01   95.6
+%  6 2023-02-22 snowflake  3356.            12     12   snowflake-02    4.45
+%  7 2023-02-23 snowflake 66324.            12     11.1 snowflake-01   95.1
+%  8 2023-02-23 snowflake  3408.            12     12   snowflake-02    4.89
+%  9 2023-02-24 snowflake 70774.            12     11.9 snowflake-01   95.4
+% 10 2023-02-24 snowflake  3444.            12     12   snowflake-02    4.64
+% 11 2023-02-25 snowflake 70069.            12     12   snowflake-01   95.2
+% 12 2023-02-25 snowflake  3506.            12     12   snowflake-02    4.77
+% 13 2023-02-26 snowflake 70590.            12     12   snowflake-01   95.3
+% 14 2023-02-26 snowflake  3506.            12     12   snowflake-02    4.73
+% 15 2023-02-27 snowflake 69135.            12     12   snowflake-01   95.2
+% 16 2023-02-27 snowflake  3454.            12     12   snowflake-02    4.76
 
 As~of \mbox{2023-04-30},
 Snowflake had transferred 4.98~PB of user data.\todo{Estimate and subtract non-Snowflake (i.e.~$\langle\mathrm{OR}\rangle$) bytes, even though likely negligible.}
@@ -1745,7 +1743,7 @@ Snowflake had transferred 4.98~PB of user data.\todo{Estimate and subtract non-S
 % # A tibble: 1 x 8
 %   date       cumul_read cumul_write `cumul_dirreq-read` `cumul_dirreq-write` cumul_good_read cumul_good_write cumul_good_avg
 %   <date>     <chr>      <chr>       <chr>               <chr>                <chr>           <chr>            <chr>
-% 1 2023-04-30 5.02 PB    5.05 PB     5.51 TB             94.13 TB             5.01 PB         4.95 PB          4.98 PB
+% 1 2023-04-30 5.02 PB    5.05 PB     5.51 TB             94.14 TB             5.01 PB         4.96 PB          4.98 PB
 This is goodput; that is, the amount of Tor TLS traffic inside the tunnel.
 The bandwidth at the bridges' network interfaces is
 higher than the goodput bandwidth,
@@ -1771,15 +1769,15 @@ in other estimates/\allowbreak graphs, but here we effectively do.}
 % # A tibble: 3 x 4
 %   mode   transport        users percent
 % * <chr>  <chr>            <dbl>   <dbl>
-% 1 bridge non-snowflake  1464001    5.73
-% 2 bridge snowflake       677110    2.65
-% 3 relay  NA            23427552   91.6
+% 1 bridge non-snowflake  1462005    5.75
+% 2 bridge snowflake       676189    2.66
+% 3 relay  NA            23306954   91.6
 % > userstats %>% filter(mode == "bridge") %>% mutate(percent = 100 * users / sum(users))
 % # A tibble: 2 x 4
 %   mode   transport       users percent
 %   <chr>  <chr>           <dbl>   <dbl>
-% 1 bridge non-snowflake 1464001    68.4
-% 2 bridge snowflake      677110    31.6
+% 1 bridge non-snowflake 1462005    68.4
+% 2 bridge snowflake      676189    31.6
 
 \subsection{Proxy recruitment and growth}
 \label{sec:proxies}
@@ -2503,7 +2501,7 @@ the number of users in Russia grew from about 400 to about 4,000.
 %   )
 % > userstats <- read_csv("figures/users/userstats-bridge-combined-multi.csv") %>%
 %     filter(transport == "snowflake" & fingerprint %in% names(WANTED_FINGERPRINTS)) %>%
-%     mutate(across(c(low, high), ~ .x * frac / 100), frac = NULL, users = (pmin(low, high) + high) / 2) %>%
+%     mutate(users = (pmin(low, high) + high) / 2) %>%
 %     # Combine the contributions of all bridges.
 %     group_by(date, transport, country) %>% summarize(across(c(low, high, users), sum), .groups = "drop") %>%
 %     # Apportion "??" to other countries (see figures/users/users-country.r).
