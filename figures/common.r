@@ -1,3 +1,5 @@
+library("tidyverse")
+
 # Without this, things like month names in axis labels are locale-dependent.
 Sys.setlocale("LC_ALL", "C")
 
