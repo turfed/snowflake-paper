@@ -13,12 +13,6 @@ DATE_LIMITS <- lubridate::ymd(c(
 	"2023-04-30"
 ))
 
-WANTED_FINGERPRINTS <- c(
-	"7659DA0F96B156C322FBFF3ACCC9B9DC01C27C73" = "snowman",
-	"5481936581E23D2D178105D44DB6915AB06BFB7F" = "snowflake-01",
-	"91DA221A149007D0FD9E5515F5786C3DD07E4BB0" = "snowflake-02"
-)
-
 GAPS <- tribble(
 	~begin, ~end, ~y, ~left_side,
 	# https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40033#note_2735468

@@ -22,6 +22,14 @@ update_geom_defaults("text", aes(family = FONT_FAMILY))
 update_geom_defaults("label", aes(family = FONT_FAMILY))
 update_geom_defaults("line", aes(size = 0.2))
 
+# Ignore all bridges that have the snowflake transport, except these. These are
+# the ones that we, the developers, ran, and were at some point deployed.
+WANTED_FINGERPRINTS <- c(
+	"7659DA0F96B156C322FBFF3ACCC9B9DC01C27C73" = "snowman",
+	"5481936581E23D2D178105D44DB6915AB06BFB7F" = "snowflake-01",
+	"91DA221A149007D0FD9E5515F5786C3DD07E4BB0" = "snowflake-02"
+)
+
 # Returns a vector z that minimizes sum((z - y)^2), subject to the conditions
 # that all elements of z are at least M, and the difference between any two
 # elements of z is at least S.

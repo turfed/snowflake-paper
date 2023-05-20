@@ -10,12 +10,6 @@ source("../common.r")
 
 HEIGHT <- 1.5
 
-WANTED_FINGERPRINTS <- c(
-	"7659DA0F96B156C322FBFF3ACCC9B9DC01C27C73" = "snowman",
-	"5481936581E23D2D178105D44DB6915AB06BFB7F" = "snowflake-01",
-	"91DA221A149007D0FD9E5515F5786C3DD07E4BB0" = "snowflake-02"
-)
-
 # Return an abbreviation for the month, followed by a year for January only.
 date_labels <- function(breaks) {
 	strftime(breaks, ifelse(!is.na(breaks) & lubridate::month(breaks) == 1, "%b\n%Y", "%b"), tz = "UTC")
