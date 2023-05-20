@@ -1576,7 +1576,7 @@ about 70\% of Snowflake users were in Russia.
 %   )
 % > userstats <- read_csv("figures/users/userstats-bridge-combined-multi.csv") %>%
 %     filter(transport == "snowflake" & fingerprint %in% names(WANTED_FINGERPRINTS)) %>%
-%     mutate(users = (pmin(low, high) + high) / 2) %>%
+%     mutate(users = (low + high) / 2) %>%
 %     # Combine the contributions of all bridges.
 %     group_by(date, transport, country) %>% summarize(across(c(low, high, users), sum), .groups = "drop") %>%
 %     # Apportion "??" to other countries (see figures/users/users-country.r).
@@ -1627,7 +1627,7 @@ on~\mbox{2022-09-24} it was 67\%.
 %   )
 % > userstats <- read_csv("figures/users/userstats-bridge-combined-multi.csv") %>%
 %     filter(transport == "snowflake" & fingerprint %in% names(WANTED_FINGERPRINTS)) %>%
-%     mutate(users = (pmin(low, high) + high) / 2) %>%
+%     mutate(users = (low + high) / 2) %>%
 %     # Combine the contributions of all bridges.
 %     group_by(date, transport, country) %>% summarize(across(c(low, high, users), sum), .groups = "drop") %>%
 %     # Apportion "??" to other countries (see figures/users/users-country.r).
@@ -2501,7 +2501,7 @@ the number of users in Russia grew from about 400 to about 4,000.
 %   )
 % > userstats <- read_csv("figures/users/userstats-bridge-combined-multi.csv") %>%
 %     filter(transport == "snowflake" & fingerprint %in% names(WANTED_FINGERPRINTS)) %>%
-%     mutate(users = (pmin(low, high) + high) / 2) %>%
+%     mutate(users = (low + high) / 2) %>%
 %     # Combine the contributions of all bridges.
 %     group_by(date, transport, country) %>% summarize(across(c(low, high, users), sum), .groups = "drop") %>%
 %     # Apportion "??" to other countries (see figures/users/users-country.r).

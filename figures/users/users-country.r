@@ -35,13 +35,8 @@ bridge_combined_multi <- read_csv(bridge_combined_multi_csv_path, comment = "#")
 	# Keep only the transports and bridges we care about.
 	filter(transport == "snowflake" & fingerprint %in% names(WANTED_FINGERPRINTS)) %>%
 
-	# Derive a single user count from each day's low–high range. The
-	# formulas from https://metrics.torproject.org/reproducible-metrics.html#bridge-users
-	# can result in a "low" bound that is higher than the "high" bound, so
-	# take the minimum of "low" and "high" as the true low, then take the
-	# average. The raw "low" is noisy, especially when there is less data,
-	# as in Turkmenistan.
-	mutate(users = (pmin(low, high) + high) / 2) %>%
+	# Derive a single user count from each day's low–high range.
+	mutate(users = (low + high) / 2) %>%
 
 	# Reassign users from the country "??" proportionally to other
 	# countries. Versions of snowflake-webext between 0.6.0 (2022-06-27)
