@@ -35,6 +35,9 @@ bridge_combined_multi <- read_csv(bridge_combined_multi_csv_path, comment = "#")
 	# Keep only the transports and bridges we care about.
 	filter(transport == "snowflake" & fingerprint %in% names(WANTED_FINGERPRINTS)) %>%
 
+	# Compensate for days when not all descriptors were published.
+	mutate(across(c(low, high), ~ .x / (coverage / pmax(num_instances, coverage)))) %>%
+
 	# Derive a single user count from each day's low–high range.
 	mutate(users = (low + high) / 2) %>%
 

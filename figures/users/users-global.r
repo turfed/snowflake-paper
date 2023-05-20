@@ -45,9 +45,9 @@ EVENTS <- tribble(
 	# "2022-04-11 15:49:30", 22000, T, "Bridge server migration",                     # https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40111#note_2794860
 	"2022-07-14 00:00:00", 40000, T, "Tor Browser 11.5\nautomatic configuration",     # https://blog.torproject.org/new-release-tor-browser-115/
 	"2022-09-20 00:00:00",100000, T, "Protests in Iran",                              # https://lists.torproject.org/pipermail/anti-censorship-team/2022-September/000247.html
-	"2022-10-04 17:15:00",112000, T, "TLS fingerprint blocking in Iran",              # https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40207#note_2849437
-	"2022-10-27 00:00:00",114000, T, "",                                              # https://blog.torproject.org/new-release-tor-browser-1156/
-	"2022-11-01 00:00:00",128000, T, "Tor Browser 11.5.6 and Orbot 16.6.3\nfix TLS fingerprint", # https://github.com/guardianproject/orbot/releases/tag/16.6.3-RC-1-tor.0.4.7.10
+	"2022-10-04 17:15:00",115000, T, "TLS fingerprint blocking in Iran",              # https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40207#note_2849437
+	"2022-10-27 00:00:00",115000, T, "",                                              # https://blog.torproject.org/new-release-tor-browser-1156/
+	"2022-11-01 00:00:00",129000, T, "Tor Browser 11.5.6 and Orbot 16.6.3\nfix TLS fingerprint", # https://github.com/guardianproject/orbot/releases/tag/16.6.3-RC-1-tor.0.4.7.10
 	"2022-12-07 00:00:00",138000, T, "Tor Browser 12.0 adds a second bridge",         # https://blog.torproject.org/new-release-tor-browser-120/
 	"2023-01-16 00:00:00", 33000, T, "",                                              # https://bugs.torproject.org/tpo/anti-censorship/team/115
 	"2023-01-24 00:00:00",  8000, T, "Domain fronting\nrendezvous\ntemporarily\nblocked in Iran", # https://bugs.torproject.org/tpo/anti-censorship/team/115
@@ -134,7 +134,10 @@ text_annotation <- function(data) {
 
 bridge_transport_multi <- read_csv(bridge_transport_multi_csv_path, comment = "#") %>%
 	# Keep only the transports and bridges we care about.
-	filter(transport == "snowflake" & fingerprint %in% names(WANTED_FINGERPRINTS))
+	filter(transport == "snowflake" & fingerprint %in% names(WANTED_FINGERPRINTS)) %>%
+
+	# Compensate for days when not all descriptors were published.
+	mutate(users = users / (coverage / pmax(num_instances, coverage)))
 
 bridge_transport <- bridge_transport_multi %>%
 	# Sum the contributions of all bridge fingerprints by day.

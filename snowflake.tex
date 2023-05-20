@@ -1319,7 +1319,6 @@ is~133, on \mbox{2020-12-09}.
 \label{fig:user-counts}
 \todo[inline]{Bandwidth chart? Ideally with aligned horizontal axis.}
 \todo[inline]{Find a good way to represent the intermittent blocking of the domain front in Iran, January--March~2023.}
-\todo[inline]{Pro-rate days with partial coverage (e.g.\ the dip on Feb.~16--17 2023, which was a server restart.}
 \end{figure*}
 
 \section{Experience}
@@ -1431,6 +1430,7 @@ had not risen above~40.
 %   )
 % > userstats <- read_csv("figures/users/userstats-bridge-transport-multi.csv") %>%
 %     filter(transport == "snowflake" & fingerprint %in% names(WANTED_FINGERPRINTS)) %>%
+%     mutate(users = users / (coverage / pmax(num_instances, coverage))) %>%
 %     group_by(date, transport) %>% summarize(users = sum(users, na.rm = TRUE), .groups = "drop")
 %
 % Ignoring two apparently anomalous spikes before 2021.
@@ -1576,6 +1576,7 @@ about 70\% of Snowflake users were in Russia.
 %   )
 % > userstats <- read_csv("figures/users/userstats-bridge-combined-multi.csv") %>%
 %     filter(transport == "snowflake" & fingerprint %in% names(WANTED_FINGERPRINTS)) %>%
+%     mutate(across(c(low, high), ~ .x / (coverage / pmax(num_instances, coverage)))) %>%
 %     mutate(users = (low + high) / 2) %>%
 %     # Combine the contributions of all bridges.
 %     group_by(date, transport, country) %>% summarize(across(c(low, high, users), sum), .groups = "drop") %>%
@@ -1602,8 +1603,6 @@ which attempts to automatically enable circumvention options when needed.
 A~separate DTLS blocking signature had been reported on \mbox{2022-06-20};
 we did not get to fixing it until Tor Browser~12.0.3 on \mbox{2023-02-15}.\todo{And Orbot 17 on\ldots}
 % "The 'skip Hello Verify Request' change was merged into Tor Browser..." https://gitlab.torproject.org/tpo/anti-censorship/censorship-analysis/-/issues/40030#note_2893870
-(The apparent one-day dip in the graph on that date is unrelated;
-it was a restart of the bridges for a security update.)\todo{Reevaluate this after user counts get pro-rated by coverage per day.}
 
 % "Shutdowns, intensified blocking in Iran since 2022-09-21" https://github.com/net4people/bbs/issues/125
 % "Need to increase number of tor instances on snowflake-01 bridge, increased usage since yesterday [2022-09-21]" https://lists.torproject.org/pipermail/anti-censorship-team/2022-September/000247.html
@@ -1627,6 +1626,7 @@ on~\mbox{2022-09-24} it was 67\%.
 %   )
 % > userstats <- read_csv("figures/users/userstats-bridge-combined-multi.csv") %>%
 %     filter(transport == "snowflake" & fingerprint %in% names(WANTED_FINGERPRINTS)) %>%
+%     mutate(across(c(low, high), ~ .x / (coverage / pmax(num_instances, coverage)))) %>%
 %     mutate(users = (low + high) / 2) %>%
 %     # Combine the contributions of all bridges.
 %     group_by(date, transport, country) %>% summarize(across(c(low, high, users), sum), .groups = "drop") %>%
@@ -1640,15 +1640,12 @@ on~\mbox{2022-09-24} it was 67\%.
 % 1 2022-09-19 snowflake ir        205.   207.   206.    1.20
 % 2 2022-09-20 snowflake ir        228.   229.   228.    1.32
 % 3 2022-09-21 snowflake ir       1024.  1025.  1024.    5.48
-% 4 2022-09-22 snowflake ir      18074. 18064. 18069.   50.3
-% 5 2022-09-23 snowflake ir      20053. 20037. 20045.   62.8
+% 4 2022-09-22 snowflake ir      20920. 20909. 20914.   50.3
+% 5 2022-09-23 snowflake ir      48467. 48427. 48447.   62.8
 % 6 2022-09-24 snowflake ir      49130. 49083. 49107.   66.0
-% 7 2022-09-25 snowflake ir      45481. 45445. 45463.   67.4
+% 7 2022-09-25 snowflake ir      59517. 59470. 59493.   67.4
 The massive influx of users had us scrambling to test and deploy
-performance improvements over the next few days;
-the apparent oscillations in this part of the graph
-are artifacts caused by our frequently restarting the bridge at this time,
-which causes Tor to lose part of a day's metrics.\todo{Reevaluate this after user counts get pro-rated by coverage per day.}
+performance improvements over the next few days.
 About two weeks later, on \mbox{2022-10-04},
 usage dropped as quickly as had risen,
 due to the censors in Iran blocking a TLS fingerprint
@@ -1694,6 +1691,7 @@ rather than Tor Browser.
 %   )
 % > userstats <- read_csv("figures/users/userstats-bridge-transport-multi.csv") %>%
 %     filter(transport == "snowflake" & fingerprint %in% names(WANTED_FINGERPRINTS)) %>%
+%     mutate(users = users / (coverage / pmax(num_instances, coverage))) %>%
 %     mutate(instance = WANTED_FINGERPRINTS[fingerprint], fingerprint = NULL) %>%
 %     group_by(date, transport) %>% mutate (percent = 100 * users / sum(users, na.rm = TRUE)) %>% ungroup()
 % > print(userstats %>% filter("2023-02-20" <= date & date < "2023-02-28"), n = 100)
@@ -1706,10 +1704,10 @@ rather than Tor Browser.
 %  4 2023-02-21 snowflake  3354.            12     12   snowflake-02    4.21
 %  5 2023-02-22 snowflake 72064.            12     12   snowflake-01   95.6
 %  6 2023-02-22 snowflake  3356.            12     12   snowflake-02    4.45
-%  7 2023-02-23 snowflake 66324.            12     11.1 snowflake-01   95.1
-%  8 2023-02-23 snowflake  3408.            12     12   snowflake-02    4.89
-%  9 2023-02-24 snowflake 70774.            12     11.9 snowflake-01   95.4
-% 10 2023-02-24 snowflake  3444.            12     12   snowflake-02    4.64
+%  7 2023-02-23 snowflake 71508.            12     11.1 snowflake-01   95.5
+%  8 2023-02-23 snowflake  3408.            12     12   snowflake-02    4.55
+%  9 2023-02-24 snowflake 71549.            12     11.9 snowflake-01   95.4
+% 10 2023-02-24 snowflake  3444.            12     12   snowflake-02    4.59
 % 11 2023-02-25 snowflake 70069.            12     12   snowflake-01   95.2
 % 12 2023-02-25 snowflake  3506.            12     12   snowflake-02    4.77
 % 13 2023-02-26 snowflake 70590.            12     12   snowflake-01   95.3
@@ -1729,7 +1727,9 @@ Snowflake had transferred 4.98~PB of user data.\todo{Estimate and subtract non-S
 % > read_csv("figures/bandwidth/bandwidth-multi.csv") %>%
 %     filter(fingerprint %in% names(WANTED_FINGERPRINTS)) %>%
 %     filter(date < "2023-05-01") %>%
-%     pivot_wider(names_from = c(type), values_from = c(bytes)) %>%
+%     filter(coverage > 0) %>%
+%     mutate(bytes = bytes / (coverage / pmax(num_instances, coverage))) %>%
+%     pivot_wider(id_cols = c(date, fingerprint), names_from = c(type), values_from = c(bytes)) %>%
 %     mutate(instance = WANTED_FINGERPRINTS[fingerprint], fingerprint = NULL) %>% relocate(date, instance) %>%
 %     # group_by(instance) %>%
 %     summarize(date = last(date), across(c(read, write, `dirreq-read`, `dirreq-write`), sum, na.rm = TRUE, .names = "cumul_{.col}")) %>%
@@ -2501,6 +2501,7 @@ the number of users in Russia grew from about 400 to about 4,000.
 %   )
 % > userstats <- read_csv("figures/users/userstats-bridge-combined-multi.csv") %>%
 %     filter(transport == "snowflake" & fingerprint %in% names(WANTED_FINGERPRINTS)) %>%
+%     mutate(across(c(low, high), ~ .x / (coverage / pmax(num_instances, coverage)))) %>%
 %     mutate(users = (low + high) / 2) %>%
 %     # Combine the contributions of all bridges.
 %     group_by(date, transport, country) %>% summarize(across(c(low, high, users), sum), .groups = "drop") %>%
