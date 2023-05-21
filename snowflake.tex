@@ -1763,8 +1763,8 @@ in other estimates/\allowbreak graphs, but here we effectively do.}
 %       mutate(mode = "bridge")
 %   ) %>%
 % > filter(lubridate::`%within%`(date, do.call(lubridate::interval, as.list(DATE_RANGE)))) %>%
-% > mutate(transport = if_else(mode == "bridge" & transport != "snowflake", "non-snowflake", transport)) %>%
-% > group_by(mode, transport) %>% summarize(users = sum(users, na.rm = TRUE), .groups = "drop")
+%     mutate(transport = if_else(mode == "bridge" & transport != "snowflake", "non-snowflake", transport)) %>%
+%     group_by(mode, transport) %>% summarize(users = sum(users, na.rm = TRUE), .groups = "drop")
 % > userstats %>% mutate(percent = 100 * users / sum(users))
 % # A tibble: 3 x 4
 %   mode   transport        users percent
@@ -2154,7 +2154,7 @@ they can use to unblock their own connection.
 This confusion is probably the cause of
 the relatively large proportion of \emph{proxies} in Iran
 (about 5\% of unique IP addresses in April~2023).
-% tail(read_csv("figures/proxies/proxy-country.csv", col_types = cols()) %>% group_by(date) %>% mutate(percent = 100 * unique_ips / sum(unique_ips)) %>% ungroup() %>% arrange(date, unique_ips) %>% filter(date == "2023-04-15"), 5)
+% > tail(read_csv("figures/proxies/proxy-country.csv", col_types = cols()) %>% group_by(date) %>% mutate(percent = 100 * unique_ips / sum(unique_ips)) %>% ungroup() %>% arrange(date, unique_ips) %>% filter(date == "2023-04-15"), 5)
 % # A tibble: 5 x 5
 %   date       country unique_ips coverage percent
 %   <date>     <chr>        <dbl>    <dbl>   <dbl>
