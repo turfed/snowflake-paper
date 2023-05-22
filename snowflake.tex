@@ -365,11 +365,13 @@ keeping track of associations between clients and proxies.
 
 A~client begins a Snowflake session by
 sending a rendezvous message to the broker.
+\todo{We could have referenced WebRTC term for this "Signaling Server" \url{https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Signaling_and_video_calling\#the_signaling_server}}
 The rendezvous message must be sent over a blocking-resistant channel,
 which may however be slow or expensive; see \autoref{sec:rendezvous} for some examples.
 When a client rendezvous message arrives,
 the broker chooses one of the immediately available proxies,
-subject to NAT compatibility and other matching criteria,\todo{Are there other matching criteria?}
+subject to NAT compatibility and other matching criteria,
+\todo{Are there other matching criteria? \#Comment: Currently no: \url{https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/blob/main/broker/ipc.go\#L235} }
 forwards the client's rendezvous message to that proxy,
 and conveys the client's downstream answer to the rendezvous back to the client.
 The client and proxy then initiate a WebRTC connection
@@ -431,6 +433,21 @@ often require contacting some kind of API server
 before initiating a connection, which can also be considered rendezvous.
 A~key property of rendezvous-using systems
 is that they do not rely on any preshared secret information.
+\todo{This may not be fully accurate, see comments in source
+%
+% as it is possible to require non-user-specific secret to get access to the channel,
+% and/or use user-specific credenital to authenticate to the channel.
+% Let's say in the case of https://shadowsocks.org/doc/sip008.html
+% A general purpose client don't ship with subscrition links in the form of HTTPS links
+% like https://s3.aws/secretbucket/usernameandpassword
+% A client would require user to input this link and client will in turn fetch configuration from such link
+% An attacker is prevented from getting the path part of url,
+% even with privilaged network position
+% and won't be able to probe if s3.aws hosts such an rendezvous channel without secret(path)
+% this is needed as not all websites have high collateral damages,
+% and the one providing the configuration hope that censor have no idea which server name is used
+% to provide configuration
+}
 The client user needs only to acquire the necessary software;
 whatever additional information is required to establish a circumvention session
 is exchanged dynamically, at runtime.
