@@ -830,8 +830,8 @@ environment.
 We have a number of
 mechanisms in place to avoid too much reliance on single points of failure.
 When a proxy cannot determine its NAT type,
-it is conservatively assumed to be ``restricted'' and the broker distributes it
-along with proxies with known restricted NATs.
+it is conservatively assumed to be ``restricted'' \todo{maybe here should be "unknown"?} 
+and the broker distributes it along with proxies with known restricted NATs. 
 If a proxy was previously able to determine its NAT type,
 a~failure of a periodic retest will not cause it to revert to ``unknown'' status.
 A~proxy that self-tests as unrestricted,
