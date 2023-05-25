@@ -2780,7 +2780,7 @@ used by STUN, UDP port~3478.
 Not being able to reach a STUN server,
 a~client cannot find its own ICE candidate addresses
 (refer to \autoref{sec:ice}),
-and therefore the peer-to-peer connection with the proxy fails.
+causing the overwhelming majority of peer-to-peer connections with proxies to fail.
 As~luck would have it, the NAT discovery feature we rely on
 for testing the NAT type of clients also requires
 STUN servers to listen on a second port other than the default~\cite[\S 6]{rfc5780}
