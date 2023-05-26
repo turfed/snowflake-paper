@@ -1545,7 +1545,7 @@ becoming a third built-in circumvention option,
 alongside meek and obfs4.
 % https://gitlab.torproject.org/tpo/applications/tor-browser-build/-/blob/tbb-10.5-build1/projects/tor-browser/Bundle-Data/PTConfigs/bridge_prefs.js
 Being part of the stable series meant that it was
-easily to all Tor users,
+easily available to all Tor users,
 not only those who had taken the trouble to install a special alpha release.
 The number of concurrent users steadily increased
 over the next five months,
@@ -1555,7 +1555,7 @@ Network blocking events result in sometimes fewer and
 sometimes more users of a circumvention system:
 fewer if the system has not enough resistance to avoid
 itself being caught up in the blocking;
-more if remains unblocked and becomes one
+more if it remains unblocked and becomes one
 among a diminished array of network access options.
 Two such censorship events,
 one in Russia and one in Iran,
@@ -1671,7 +1671,7 @@ used for rendezvous.
 We will have more to say about that in \autoref{sec:block-ir}.
 After deploying fixes for the TLS fingerprint issue,
 users in Iran began to recover going into~2023.
-One of the the emergency performance optimizations we had deployed in late September
+One of the emergency performance optimizations we had deployed in late September
 turned out to be mistaken and actually be harmful for performance,
 % "Weird KCP packets received by the client" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40260
 though the problem was masked, for a time, by the great demand for the service.
@@ -1985,7 +1985,7 @@ would lose effectiveness.
 We ran an experiment to measure churn.
 Every hour, the broker logged a record representing
 the proxy IP addresses it had seen in the past hour.
-To~avoid the need to store, and risk exposing, real proxy IP addresses,
+To~avoid the need to store, and risk exposing real proxy IP addresses,
 each record was not a plain list of addresses,
 but a HyperLogLog++ sketch~\cite{Heule2013a},
 a~probabilistic data structure for estimating
