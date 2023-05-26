@@ -880,7 +880,7 @@ or the proxy itself stop operating
 \label{sec:data-transfer}
 
 No complicated processing takes place at the proxy.
-The main value if a snowflake proxy is its IP address---it
+The main value of a snowflake proxy is its IP address---it
 gives the client somewhere to connect to that the censor does not know about yet.
 Having provided that, the proxy assumes a role
 of pure data transfer until it, or one of the endpoints, goes away.
@@ -937,7 +937,7 @@ because transmission of reliable,
 connection-oriented streams data is closely matched
 to the use case of a circumvention proxy.
 But data channels are not the only available option:
-WebRTC also provides media stream,
+WebRTC also provides media streams,
 for unreliable transmission of real-time audio and video.
 Data channels and media streams have distinguishable wire representations
 that give rise to fingerprinting concerns we take up in \autoref{sec:fingerprinting}.
@@ -1033,7 +1033,7 @@ in addition to the blocking resistance supplied by Snowflake.
 does not get to see the contents of clients' connection,
 nor their eventual destinations.)
 But there is nothing about Tor that Snowflake depends on essentially;
-the tasks of providing a blocking-resistant to the bridge
+the tasks of providing blocking resistance to the bridge
 and then telling the bridge what to do are easily separable.
 We~discuss alternatives to Tor
 and other extensions of Snowflake in \autoref{sec:future}.
@@ -1071,7 +1071,7 @@ conversely, small, corrigible fingerprinting flaws may be excused
 as long as the foundation is solid.
 
 As~WebRTC is designed for the web,
-most implementation of WebRTC are embedded in web browsers,
+most implementations of WebRTC are embedded in web browsers,
 and are not trivially usable outside that context.
 Snowflake originally used a WebRTC library extracted from Chromium,
 but that eventually proved unworkable from a practical standpoint---more
@@ -1134,7 +1134,7 @@ which leaves its messages open to inspection
 and potentially fingerprintable.
 What attributes appear,
 and their relative order,
-is a property of the the implementation
+is a property of the implementation
 and the way the application uses STUN.
 Among the attributes are some used
 for the NAT behavior discovery feature~\cite[\S 7]{rfc5780}
