@@ -62,7 +62,7 @@ making them vastly cheaper to set up than
 a traditional proxy or VPN server.
 The proxies are not assumed to have stable network addresses
 or be online all the time,
-and even the blocking of currently in-use proxy
+and even the blocking of the currently in-use proxy
 is not fatal to a circumvention session,
 as the system permits clients to switch proxies on the fly.
 
@@ -94,7 +94,7 @@ in order not to look like any other protocol in particular.
 Some concentrate their traffic into one, or a few,
 well-known proxies, somehow entangled with other traffic
 such that a censor cannot easily block them;
-and others that spread their traffic out over
+and others spread their traffic out over
 hundreds or thousands of proxies,
 none of which is individually difficult to block,
 but which are difficult for a censor to discover and block in their entirety.
@@ -123,7 +123,7 @@ in web browsers~\cite{rfc8825}.
 Video and voice chat are familiar and typical examples
 of WebRTC applications.
 Snowflake exchanges WebRTC data formats
-in the course of establishing a connections,
+in the course of establishing a connection,
 and uses WebRTC protocols for NAT traversal
 and for data transfer between the client and a temporary proxy.
 Critically for Snowflake, WebRTC protocols
@@ -188,7 +188,7 @@ from 2013 to~2016,
 but it never saw much use,
 probably because the reliance on WebSocket,
 which are TCP-based and do not have built-in NAT traversal like WebRTC does,
-and required uses to perform a
+and required users to perform a
 % https://gitlab.torproject.org/legacy/trac/-/wikis/doc/PluggableTransports/FlashProxy/Howto
 cumbersome port forwarding procedure.
 WebRTC was at the time an emerging technology, and while
@@ -216,7 +216,7 @@ because the browser proxies fetched destination content directly,
 without any further intermediary like the bridge in Snowflake.
 A~uProxy proxy was expected to be
 persistent and always online;
-clients did not changes proxies on the fly.
+clients did not change proxies on the fly.
 % https://github.com/uProxy/uproxy-obfuscators
 uProxy supported protocol obfuscation:
 though the communication protocol was fundamentally WebRTC,
