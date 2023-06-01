@@ -9,7 +9,7 @@ FIGURES = \
 	figures/proxies/proxy-nat-type.pdf \
 	figures/proxy-churn/proxy-count-decay.pdf
 
-snowflake.pdf: *.tex *.bib $(FIGURES)
+snowflake.pdf: snowflake.tex snowflake.bib $(FIGURES)
 
 # Compile the TeX files to produce a PDF that does not have embedded fonts.
 %.tmp.pdf: %.tex
