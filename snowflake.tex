@@ -1576,7 +1576,7 @@ The added demand temporarily overwhelmed the bridge hardware;
 for a few weeks Snowflake was almost unusably slow.
 % "I really want to use snowflake, but it's extremely slow, almost unusable." https://old.reddit.com/r/TOR/comments/t49i14/hello_i_have_a_problem_with_snowflake_can_you/
 We~had to invent a new way of deploying a Tor bridge,
-using load balancing over multiple processes to permit better scaling;\todo{Cite ``Running a high-performance pluggable transports Tor bridge'' if and when it comes out.}
+using load balancing over multiple processes to permit better scaling~\cite{Fifield2023a};
 % https://forum.torproject.net/t/tor-relays-how-to-reduce-tor-cpu-load-on-a-single-bridge/1483
 % "The DNS records were changed to point to the staging bridge at..." https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40095#note_2772325
 as well as migrate the bridge to more substantial server hardware
@@ -2249,7 +2249,7 @@ For example, because the interface with Tor is ordinary TCP sockets,
 it is easy to run Tor on a different host with its own CPU and RAM,
 % A diagram of such separation: https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/28651#note_2783541
 or even round-robin over multiple instances of Tor
-(as we do\todo{Cite ``Running a high-performance pluggable transports Tor bridge''.}).
+(as we in fact do~\cite{Fifield2023a}).
 
 What is not so easy to distribute
 is the Turbo Tunnel layer itself.
