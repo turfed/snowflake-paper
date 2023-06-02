@@ -360,8 +360,9 @@ installed the Snowflake proxy WebExtension,
 or a functionally equivalent headless command-line version.
 The proxies periodically poll a centralized server, the broker,
 to inquire whether there are any clients that need service.
-The broker is responsible for matching and
-keeping track of associations between clients and proxies.
+The broker is responsible for matching clients with proxies and facilitating the
+exchange of information necessary for both peers to establish a WebRTC connection
+(this step is sometimes referred to as signaling).
 
 A~client begins a Snowflake session by
 sending a rendezvous message to the broker.
