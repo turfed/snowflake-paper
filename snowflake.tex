@@ -86,38 +86,36 @@ and reflect on implications for circumvention generally.
 \label{sec:intro}
 
 Censorship circumvention systems
-may be characterized on multiple axes.
-There are those that seek to avoid blocking
-by imitating some common, high-value protocol;
-and those that randomize their protocols
-in order not to look like any other protocol in particular.
-Some concentrate their traffic into one, or a few,
-well-known proxies, somehow entangled with other traffic
-such that a censor cannot easily block them;
-and others spread their traffic out over
-hundreds or thousands of proxies,
-none of which is individually difficult to block,
-but which are difficult for a censor to discover and block in their entirety.
+seek to enable network communication
+despite interference by a censor.
+They may be characterized on multiple axes.
+Some systems imitate a common network protocol;
+others transform their traffic randomly, in order
+not to look like any protocol in particular.
+Some distribute connections over numerous proxy servers;
+others concentrate on just one proxy
+that is, for one reason or another, difficult for a censor to block.
 What all circumvention systems have in common
 is that they strive to increase the \emph{cost}
-to the censor of blocking them---whether that be
-in the form of research and development,
-human resources, and hardware,
+to the censor of blocking them---whether that cost be in
+research and development, human resources, and hardware,
 or in the inevitable overblocking that results
-when a censor tries to block circumvention traffic
-that is difficult to distinguish from other traffic
-the censor values highly.
-On the spectrum of mimicry to randomization,
-Snowflake falls more on the mimicry side;
-on the scale of concentrated to diffuse,
-it is diffuse.
-If~Snowflake has a single distinguishing characteristic,
-it is that it pushes this idea of distributed, disposable
-proxies to an extreme,
-by making proxies extremely cheap to run,
-in web browsers, using WebRTC to communicate.
+when a censor tries to selectively block
+some connections but not others.
+The subject of this paper, Snowflake,
+is a circumvention system that
+uses thousands of temporary proxies
+and makes switching between them easy and fast.
+On~the spectrum of imitation to randomization,
+Snowflake falls on the side of imitation;
+on the scale from diffuse to concentrated, it is diffuse.
+Snowflake's specialty
+is pushing the idea of distributed, disposable
+proxies to an extreme:
+its~proxies can run in a web browser
+and censored clients communicate with them using WebRTC.
 
-WebRTC is a suite of interacting protocols
+WebRTC is a suite of related protocols
 intended to enable real-time communication applications
 in web browsers~\cite{rfc8825}.
 Video and voice chat are familiar and typical examples
@@ -134,7 +132,7 @@ WebRTC is also usable outside a browser,
 which is how we implement the Snowflake client program
 and alternative, command line--based proxies.
 
-As is typical in circumvention research,
+As~is typical in circumvention research,
 we assume a threat model where
 censored \firstterm{clients} reside in a censor-controlled network.
 The \firstterm{censor} has the power to inspect and interfere with
@@ -157,7 +155,7 @@ can reliably reach any proxy,
 because the proxy then provides access to any desired destination.
 (In Snowflake, we separate the roles of temporary \firstterm{proxies}
 and a stable long-term \firstterm{bridge}, but the idea is the same.)
-Mitigating in the client's favor
+Working in the client's favor
 is the fact that the censor is presumed to derive some benefit
 from permitting some forms of network access:
 the censor cannot trivially ``win''
