@@ -359,12 +359,10 @@ or a functionally equivalent headless command-line version.
 The proxies periodically poll a centralized server, the broker,
 to inquire whether there are any clients that need service.
 The broker is responsible for matching clients with proxies and facilitating the
-exchange of information necessary for both peers to establish a WebRTC connection
-(this step is sometimes referred to as signaling).
+exchange of information necessary for both peers to establish a WebRTC connection.
 
 A~client begins a Snowflake session by
 sending a rendezvous message to the broker.
-\todo{We could have referenced WebRTC term for this "Signaling Server" \url{https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Signaling_and_video_calling\#the_signaling_server}}
 The rendezvous message must be sent over a blocking-resistant channel,
 which may however be slow or expensive; see \autoref{sec:rendezvous} for some examples.
 When a client rendezvous message arrives,
