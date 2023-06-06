@@ -209,9 +209,9 @@ for a personal acquaintance, outside the censor's network,
 to run a proxy in their web browser.
 % uProxy v1.2.5 Design Doc: https://docs.google.com/document/d/1t_30vX7RcrEGuWwcg0Jub-HiNI0Ko3kBOyqXgrQN3Kw
 % "uProxy depends on leveraging existing trust relationships to to find and use a proxy."
-The~trust relationship was necessary, to prevent misuse,
+The~trust relationship was necessary to prevent misuse,
 because the browser proxies fetched destination content directly,
-without any additional intermediary like the bridge in Snowflake.
+which means activity by the client would be attributed to the proxy operator.
 A~uProxy proxy was expected to be
 persistent and always online;
 clients did not change proxies on the fly.
@@ -229,58 +229,58 @@ Like flash proxy, uProxy was active in the years
 2013--2016.
 % 2013: Serene's 30C3 lightning talk on uProxy https://events.ccc.de/congress/2013/wiki/Static:Lightning_Talks#Day_3
 
-The closest existing system to Snowflake is MassBrowser~\cite{Nasr2020a}.
-% https://github.com/net4people/bbs/issues/32
-It incorporates many circumvention techniques, one of which is
+Among existing circumvention systems,
+the one that is most similar to Snowflake is MassBrowser~\cite{Nasr2020a}.
+% reading group summary of MassBrowser https://github.com/net4people/bbs/issues/32
+It~features multiple circumvention techniques, one of which is
 proxying though volunteer proxies, called buddies.
-The architecture is similar to Snowflake's:
-there is a centralized component responsible for coordinating
-connections between clients and proxies called the operator,
-like Snowflake's broker;
-MassBrowser buddies correspond to our snowflake proxies.
-The trust model is intermediate between those of Snowflake and uProxy:
-buddies may provide proxy service to strangers and not only their social acquaintances,
-but buddies specify categories of content they are willing to directly proxy,
-in order to mitigate misuse.
-Buddies preferentially operate as one-hop proxies,
-but also support proxying into a Tor bridge, as in Snowflake;
-this option, however, is treated as a last resort rather than a default mode,
-in keeping with MassBrowser's guiding principle of
+MassBrowser's architecture is similar to Snowflake's:
+there is a centralized component that coordinates
+connections between clients and buddies,
+corresponding to a piece in Snowflake called the broker;
+buddies play the same role as our snowflake proxies.
+The~trust model is intermediate between Snowflake's and uProxy's.
+Buddies preferentially operate as one-hop proxies, as in uProxy,
+but are not limited to proxying only for trusted friends.
+To~deter misuse, buddies specify a policy of
+what categories of content they are willing to proxy.
+Buddies also support forwarding to a Tor bridge, as in Snowflake,
+but this option is used only as a last resort,
+in keeping with MassBrowser's principle
 of prioritizing blocking resistance and performance
-over anonymity and privacy.
+over privacy and anonymity.
 An~innovation in MassBrowser not present in Snowflake is client-to-client proxying:
 clients may act as buddies for other clients,
-with the reasoning that what is censored for one client may not be censored for another.
-The buddy software is standalone application software,
-which means that it, like uProxy, can use protocol obfuscation
+the logic being that what is censored for one client may not be censored for another.
+The buddy software is a standalone application,
+not constrained by a web browser environment,
+and can, like uProxy, use protocol obfuscation
+on the client--buddy link.
 % V-D: "We also implement traffic obfuscation to protect MassBrowser's traffic
 % against traffic analysis attacks. Particularly, we have built a custom
 % implementation of the obfsproxy Tor pluggable transport tailored to work with
 % our MassBrowser implementation."
 % VI-A: "MassBrowser uses a custom protocol over TCP/UDP for the communications
 % between Clients and Buddies."
-on the client--buddy link.
-Like Snowflake, MassBrowser has been deployed to real users
-and tested in practice against censors.
 Protozoa~\cite{Barradas2020a}
-% https://github.com/net4people/bbs/issues/55
+% reading group summary of Protozoa https://github.com/net4people/bbs/issues/55
 is superficially similar
 to Snowflake in its use of WebRTC,
 but the two systems are essentially different.
 More like uProxy, Protozoa has a one-to-one proxy model:
-client and proxy discover one another and arrange a connection out of band,
-and the proxy persists as long as the client is using it.
-If Snowflake's specialty is diversity of proxy addresses,
-Protozoa's is traffic analysis:
+client and proxy arrange a connection out of band,
+and the proxy persists for the full duration of a circumvention session.
+Protozoa's specialty is resistance to traffic analysis:
 using an authentic WebRTC audio or video stream as a carrier,
-it replaces the content of encrypted, encoded media frames
-with covert ciphertexts of the same length,
-such that the replacement is undetectable to an observer.
+it replaces the encrypted content of encoded media frames
+with its own covert ciphertexts of identical size,
+such that the circumvention tunnel retains the traffic features
+of the original carrier stream.
 One technical subtlety is that where Snowflake uses
 WebRTC data channels,
 Protozoa uses WebRTC media streams,
-which may be an advantage;
-we will return to this point in \autoref{sec:fingerprinting}.
+which may be an advantage in blocking resistance.
+We will say more on this point in \autoref{sec:fingerprinting}.
 \todo{Check if \href{https://censorbib.nymity.ch/\#Figueira2022a}{Stegozoa}
 and \href{https://censorbib.nymity.ch/\#Barradas2020b}{CRON} are relevant,
 and discuss if so.}
