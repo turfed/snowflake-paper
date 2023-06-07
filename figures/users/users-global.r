@@ -10,7 +10,7 @@ source("../common.r")
 
 DATE_LIMITS <- lubridate::ymd(c(
 	"2020-12-31",
-	"2023-04-30"
+	"2023-05-31"
 ))
 
 GAPS <- tribble(
@@ -32,9 +32,9 @@ EVENTS <- tribble(
 	# "2019-10-01 00:00:00",  1000, T, "Tor Browser 9.0a7\nSnowflake for Windows",    # https://blog.torproject.org/new-release-tor-browser-90a7
 	# "2020-05-22 19:51:29",  1000, T, "Tor Browser 9.5a13\nadds Turbo Tunnel",       # https://blog.torproject.org/new-release-tor-browser-95a13
 	# "2020-06-02 18:09:48",  1000, T, "Tor Browser 10.0a1\nSnowflake for Android",   # https://blog.torproject.org/new-release-tor-browser-100a1
-	"2021-01-12 00:00:00", 20000, F, "Orbot 16.4.0\nincludes Snowflake",              # https://github.com/guardianproject/orbot/releases/tag/16.4.0-RC-1-tor-0.4.4.6
-	"2021-07-06 16:56:37", 28000, T, "Tor Browser 10.5\nincludes Snowflake",          # https://blog.torproject.org/new-release-tor-browser-105
-	"2021-12-01 00:00:00", 25000, T, "Onset of Tor blocking in Russia",               # https://bugs.torproject.org/tpo/community/support/40050
+	"2021-01-12 00:00:00", 23000, F, "Orbot 16.4.0\nincludes Snowflake",              # https://github.com/guardianproject/orbot/releases/tag/16.4.0-RC-1-tor-0.4.4.6
+	"2021-07-06 16:56:37", 30000, T, "Tor Browser 10.5\nincludes Snowflake",          # https://blog.torproject.org/new-release-tor-browser-105
+	"2021-12-01 00:00:00", 25000, T, "Onset of Tor blocking\nin Russia",               # https://bugs.torproject.org/tpo/community/support/40050
 	"2021-12-14 00:00:00", 28000, T, "",                                              # https://blog.torproject.org/new-release-tor-browser-115a1/
 	"2021-12-20 00:00:00", 42000, T, "Tor Browser 11.5a1 and 11.0.3\nalter DTLS fingerprint", # https://blog.torproject.org/new-release-tor-browser-1103/
 	"2022-01-25 17:41:00", 54000, T, "Load balancing of bridge",                      # https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40095#note_2772325

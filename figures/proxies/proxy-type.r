@@ -11,7 +11,7 @@ source("../common.r")
 DATE_LIMITS <- lubridate::ymd(c(
 	# "2019-07-01",
 	"2021-01-01",
-	"2023-04-30"
+	"2023-05-30"
 ))
 
 # TODO: date thresholds where labeling changed, notably "unknown"→"iptproxy" on 2022-06-21.
