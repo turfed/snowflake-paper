@@ -98,7 +98,7 @@ that is, for one reason or another, difficult for a censor to block.
 What all circumvention systems have in common
 is that they strive to increase the \emph{cost}
 to the censor of blocking them---whether that cost be in
-research and development, human resources, and hardware,
+research and development, human resources, and hardware;
 or in the inevitable overblocking that results
 when a censor tries to selectively block
 some connections but not others.
@@ -160,15 +160,15 @@ and a stable long-term \firstterm{bridge}, but the idea is the same.)
 Working in the client's favor
 is the fact that the censor is presumed to derive benefit
 from permitting some forms of network access:
-the censor cannot trivially ``win''
-simply by blocking all communication,
+the censor does not trivially ``win''
+simply by shutting down all communication,
 but must be selective in its blocking decisions
 in order to optimize some objective of its own.
 The art of censorship circumvention is
 forcing the censor into a dilemma
 of overblocking or underblocking,
 by making circumvention traffic difficult to distinguish
-from traffic that the censor wants to allow.
+from traffic that the censor prefers not to block.
 
 Snowflake originates in two earlier projects:
 flash proxy and uProxy.
@@ -272,7 +272,7 @@ client and proxy arrange a connection out of band,
 and the proxy persists for the full duration of a circumvention session.
 Protozoa's specialty is resistance to traffic analysis:
 using an authentic WebRTC audio or video stream as a carrier,
-it replaces the encrypted content of encoded media frames
+it replaces the encrypted portions of encoded media frames
 with its own covert ciphertexts of identical size,
 such that the circumvention tunnel retains the traffic features
 of the original carrier stream.
@@ -400,7 +400,7 @@ The client only communicates with the broker over an indirect rendezvous channel
 that is assumed to be difficult and expensive for a censor to block.
 The client only communicates with the bridge via a temporary proxy.
 No single temporary proxy is critical to the operation of the system.
-A~proxy may be blocked---even while it is in active use by a client---and
+A~proxy may be blocked, even while it is in active use by a client, and
 clients can adapt by using a different proxy.
 
 \subsection{Rendezvous}
