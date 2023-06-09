@@ -34,6 +34,7 @@
 \hyphenation{Web-Exten-sion}
 \hyphenation{Java-Script}
 \hyphenation{uProxy}
+\hyphenation{off-line}
 
 % Highlight the first usage or definition of a technical term.
 % Like the firstterm element in DocBook: https://tdg.docbook.org/tdg/5.2/firstterm.html.
@@ -373,82 +374,48 @@ and transfers over 35~TB of circumvention traffic per day.
 \framebox[\textwidth]{\vbox to 2in{\vfil\centering TODO\vfil}}
 \caption{
 Architecture of Snowflake.
+The client contacts the broker through a special channel with high blocking resistance.
+The broker assigns the client a compatible proxy from among those currently polling.
+The client and proxy connect to one another using WebRTC.
+The proxy connects to the bridge,
+then begins copying traffic between the client and the bridge.
+Session state is established at the client and the bridge,
+so that it may be resumed on a different proxy if interrupted.
 }
 \label{fig:architecture}
 \end{figure*}
 
 A~Snowflake proxy connection proceeds in three phases.
-First, there is the rendezvous, where a client
-signals its need for circumvention service
+First, there is rendezvous, in which a client
+indicates its need for circumvention service
 and is matched with a temporary proxy.
+Rendezvous is facilitated by a central server called the broker.
 Then, there is connection establishment,
-where the client and its temporary proxy connect to one another
+where the client and its assigned proxy connect to each other
 with WebRTC, using information exchanged during rendezvous.
 Finally, there is data transfer,
-where the proxy ferries data back and forth
-between the client and a remote service
-(e.g., a Tor bridge).
-\autoref{fig:architecture}
-illustrates the process.
+where the proxy ferries data
+between the client and the bridge.
+The bridge takes responsibility for directing the client's traffic
+to its eventual destination
+(in our case, by feeding it into the Tor network).
+\autoref{fig:architecture} illustrates the process.
 
-The client's circumvention session
-does not begin and end with any particular temporary proxy.
-Rather, the client strings together
+These phases repeat as needed, as temporary proxies go offline.
+A~circumvention session is not tied to any single proxy.
+A~client builds a session over
 a series of proxies, switching to a new one
-whenever an old one goes offline.
-This proxy handoff is hidden from the upper-layer protocols
-(i.e., the web browser) that use the circumvention tunnel:
-to them the Snowflake session appears as one long unbroken connection.
+whenever the current one stops working.
+State variables stored at the client and the bridge
+ensure the session can pick up where it left off.
+The change of proxies is invisible to the applications using Snowflake
+(except, perhaps, for a brief delay while rendezvous takes place again):
+the Snowflake client presents an abstraction of a single, uninterrupted connection.
 
-There is an ambient population of temporary Snowflake proxies.
-For the most part, these proxies are the web browsers of people who have
-installed the Snowflake proxy WebExtension,
-or a functionally equivalent headless command-line version.
-The proxies periodically poll a centralized server, the broker,
-to inquire whether there are any clients that need service.
-The broker is responsible for matching clients with proxies and facilitating the
-exchange of information necessary for both peers to establish a WebRTC connection.
-
-A~client begins a Snowflake session by
-sending a rendezvous message to the broker.
-The rendezvous message must be sent over a blocking-resistant channel,
-which may however be slow or expensive; see \autoref{sec:rendezvous} for some examples.
-When a client rendezvous message arrives,
-the broker chooses one of the immediately available proxies,
-subject to NAT compatibility and other matching criteria,
-\todo{Are there other matching criteria? \#Comment: Currently no: \url{https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/blob/main/broker/ipc.go\#L235} }
-forwards the client's rendezvous message to that proxy,
-and conveys the client's downstream answer to the rendezvous back to the client.
-The client and proxy then initiate a WebRTC connection
-with each other; the broker is no longer involved.
-Further details on rendezvous will be presented in \autoref{sec:rendezvous}.
-
-The temporary proxy connects both to its assigned client
-and to a centralized bridge,
-and begins to copy bytes between the client and the bridge
-in both directions.
-Details about how the connections are established are in \autoref{sec:ice}.
-This continues until the client ends its session by disconnecting,
-or the proxy goes offline
-(which happens, for example, when the web browser where a proxy is running is closed).
-When a proxy goes offline,
-it does not spell the end of the client's session:
-the client and the bridge share end-to-end session state
-that persists beyond the lifetime of any single proxy.
-The client sends another rendezvous message to the broker,
-is assigned another proxy,
-and picks up where it left off.
-More information about the data transfer phase is in \autoref{sec:data-transfer}.
-
-Never does the client communicate with the broker or bridge directly.
-Both the broker and the bridge may be blocked,
-from the perspective of the client.
-The client only communicates with the broker over an indirect rendezvous channel
-that is assumed to be difficult and expensive for a censor to block.
-The client only communicates with the bridge via a temporary proxy.
-No single temporary proxy is critical to the operation of the system.
-A~proxy may be blocked, even while it is in active use by a client, and
-clients can adapt by using a different proxy.
+It~does not avail a censor to block the broker or bridge,
+because Snowflake clients never contact either directly.
+Clients reach the broker over an indirect rendezvous channel.
+Access to the bridge is always mediated by a temporary proxy.
 
 \subsection{Rendezvous}
 \label{sec:rendezvous}
