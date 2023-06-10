@@ -123,7 +123,7 @@ Video and voice chat are typical examples
 of WebRTC applications.
 Snowflake exchanges WebRTC data formats
 in the course of establishing a connection,
-and uses WebRTC protocols for NAT traversal
+and uses WebRTC protocols for traversal of NAT (network address translation)
 and communication between clients and proxies.
 Crucially for Snowflake, WebRTC APIs
 are available to JavaScript code in web browsers,
@@ -605,59 +605,45 @@ the system is only as strong as the weaker of the~two.
 \subsection{Peer-to-peer connection establishment}
 \label{sec:ice}
 
-After rendezvous,
-a censored client in need of service
-and a temporary snowflake proxy
-will have exchanged
-(among other information)
-their IP addresses,
-using the broker as an intermediary.
-After this point, the broker is no longer involved
-(as~far as that specific client--proxy pairing goes).
-The next step is for the client and proxy
-to establish a direct connection---which
-is not a trivial operation,
-even in the absence of censorship,
-because of possible interference by
-network address translation (NAT)
-and ingress filters at either endpoint.
-(Recall that many proxies run in web browsers
-in ordinary residential ISPs,
-without the connectivity of a typical Internet server.)
-WebRTC is designed for exactly this use case
-and has built-in facilities for traversing NAT.
-Specifically, WebRTC uses
+Now the client and the proxy connect to each other directly.
+Even without censorship,
+making a direct connection between two Internet peers is not always easy,
+because of NAT (network address translation) and firewalls.
+Snowflake clients and proxies alike run in diverse networks
+that have varying NATs and ingress policies.
+Fortunately for us,
+WebRTC is designed with this use case in mind,
+and has built-in support for traversing NAT, namely
 ICE (Interactive Connectivity Establishment)~\cite{rfc8445},
 a procedure for testing candidate pairs of peer network addresses
-until finding one that works.
+to find a pair that works.
 ICE~makes use of
 STUN (Session Traversal Utilities for NAT)~\cite{rfc8489}
-and third-party STUN servers that provide services such as,
-for example, allowing a network host to
-discover its own external IP addresses.
-In~Snowflake, candidate IP addresses are gathered
-during rendezvous, with the assistance of STUN servers,
-and sent as part of rendezvous messages.
-ICE~may also use
+and third-party STUN servers that, among other services,
+enable a host to learn its own external IP addresses.
+The first part of ICE has already taken place at the beginning of rendezvous,
+when the client and proxy contacted STUN servers to gather
+external address candidates and included them in their respective
+SDP offer and answer.
+
+There is no guarantee that any two hosts will be able to make
+a connection using the facilities of STUN alone.
+Some address mapping and
+filtering setups are simply incompatible.
+In~this case, typically, ICE would fall back to using
 TURN (Traversal Using Relays around NAT)~\cite{rfc8656},
 effectively a UDP proxy.
-
-There is no guarantee that two arbitrary peers will be able to make
-a connection using the facilities of STUN alone.
-Some mapping and
-filtering setups are simply incompatible with one other.
-Most uses of ICE would fall back to TURN in this case,
-inserting a relay server between the peers to resolve any difficulties.
-TURN is problematic for Snowflake,
-because TURN relays' IP addresses are
-generally fixed and easily discoverable by a censor.
+This would be problematic for Snowflake,
+because the TURN relays themselves
+would become a focus of blocking by the censor.
 % "Configure TURN servers for the proxy and/or client" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/25596
-But there is a factor working in our favor:
-a client does not need to be matched to a \emph{specific} proxy;
-any compatible proxy will~do.
-In Snowflake, client and proxies self-assess their NAT configuration.
-Then the broker takes care to pair clients
-with proxies that they are most likely to be able to connect to directly.
+But Snowflake has an advantage most WebRTC applications do not.
+Most WebRTC applications want to connect \emph{a particular} pair of peers,
+whereas we are satisfied when a client can connect to \emph{any} proxy.
+Snowflake clients and proxies self-assess their NAT type
+and report it in interactions with the broker.
+The broker takes NAT compatibility into account when matching
+and avoids cases that would require a fallback to TURN.
 
 % "Investigate Snowflake proxy failures" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/33666#note_2595319
 % "Okay here's a summary of what I've found: ..."
@@ -756,7 +742,7 @@ For clients, we use the NAT discovery feature in STUN~\cite{rfc5780}.
 % "Use STUN to determine NAT behaviour of peers" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/34129
 % "Add utility to help user discover their NAT type" https://github.com/pion/stun/issues/8
 Not all STUN servers support NAT behavior discovery,
-but we ensure that those whose addresses we ship with the Snowflake client~do.
+but we ensure that those we ship with the Snowflake client~do.
 If NAT discovery fails, the client will classify their NAT type as ``unknown''.
 The client reports its NAT type to the broker
 in its rendezvous message.
