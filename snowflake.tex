@@ -420,184 +420,64 @@ Access to the bridge is always mediated by a temporary proxy.
 \subsection{Rendezvous}
 \label{sec:rendezvous}
 
-In the first phase of establishing a Snowflake circumvention session,
-the client exchanges a small amount of information with a server
-outside the censor's zone of control,
-in a process called rendezvous.
-It is not possible for a Snowflake client
-to establish a peer-to-peer WebRTC connection
-with a temporary proxy straight away.
-(For one thing, neither the client nor the proxy
-know a network identifier for each other at the outset.)
-The client and proxy bootstrap a connection between them
-by way of a separate blocking-resistant channel
-(i.e., something other than WebRTC)
-and an intermediary known as the broker.
+A~session begins with a client sending a rendezvous message to the broker.
+There is an ambient population of proxies
+constantly polling the broker to check for new clients in need of service.
+The broker matches the client with one of the currently available proxies,
+subject to considerations such as compatibility of NAT types.
+% NAT type is currently the only constraint:
+% matchSnowflake https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/blob/9edaee65470a1483bbdbe984e5e15a885f1e95d2/broker/ipc.go#L236
+% But protocol versions may become a consideration in the future:
+% "Analysis of speed deficiency of Snowflake in China, 2023 Q1" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40251#note_2903271
 
-Rendezvous is not unique to Snowflake;
-it is a fairly common component of circumvention designs.
-Precedents include the
-DEFIANCE Rendezvous Protocol~\cite[\S 3]{Lincoln2012a}
-the facilitator interaction in flash proxy~\cite[\S 3]{Fifield2012a},
-and the registration proxy in Conjure~\cite[\S 4.1]{Frolov2019b}.
-Even commercial VPNs built on commodity protocols
-often require contacting some kind of API server
-before initiating a connection, which can also be considered rendezvous.
-A~key property of rendezvous-using systems
-is that they do not rely on any preshared secret information.
-\todo{This may not be fully accurate, see comments in source
-%
-% as it is possible to require non-user-specific secret to get access to the channel,
-% and/or use user-specific credenital to authenticate to the channel.
-% Let's say in the case of https://shadowsocks.org/doc/sip008.html
-% A general purpose client don't ship with subscrition links in the form of HTTPS links
-% like https://s3.aws/secretbucket/usernameandpassword
-% A client would require user to input this link and client will in turn fetch configuration from such link
-% An attacker is prevented from getting the path part of url,
-% even with privilaged network position
-% and won't be able to probe if s3.aws hosts such an rendezvous channel without secret(path)
-% this is needed as not all websites have high collateral damages,
-% and the one providing the configuration hope that censor have no idea which server name is used
-% to provide configuration
-}
-The client user needs only to acquire the necessary software;
-whatever additional information is required to establish a circumvention session
-is exchanged dynamically, at runtime.
-A~corollary of the no-secret-information property
-is that an adversary---the censor---has
-no special disadvantage in attacking the system:
-they may download the client software
-and then act in every way as a normal user.
-This is in contrast to other systems in which,
-after acquiring the necessary circumvention software,
-a~client must also get ahold of some secret,
-such as a password or proxy address,
-through an out-of-band channel
-presumed to be unavailable to the censor---and
-blocking resistance hinges on that secret information
-remaining unknown to the censor.
-In rendezvous-based systems like Snowflake,
-if the censor does not block a proxy server,
-it is not out of ignorance,
-but because the censor is constrained in some other way,
-for example by computational limitations
-or fear of collateral blocking.
-
-If rendezvous has the advantage of not requiring secrecy,
-its disadvantage is that it presents one more thing to worry about.
-Not only the main data transfer channel
-but also the rendezvous channel must resist blocking:
-the system as a whole is only as secure as the weaker of the two.
-The saving grace here is that the security and performance requirements
-of rendezvous are different, and generally more lenient.
-Rendezvous can afford to be relatively more heavyweight,
-slow, expensive, or inefficient for the sake of blocking resistance,
-because it accounts for only a small fraction of the overall communication
-and occurs only intermittently.
-The enlarged design space of rendezvous encompasses
-forms of data hiding that would be impractical
-for bulk data transfer.
-Another helpful consideration is that rendezvous protocols
-are separable from the rest of the system.
-The assumption of using WebRTC is embedded fairly deeply in Snowflake;
-but the rendezvous part is modular,
-not coupled to WebRTC or even any single other protocol.
-
-Snowflake rendezvous requires a bidirectional exchange:
-the client sends one message to the broker, then receives
-one message in reply.
-(This is a step backward from flash proxy,
-which required only one outgoing message for its rendezvous,
-but the communication model of WebRTC makes a reply message unavoidable.)
-It is therefore a good fit for request--response protocols,
-like those based on HTTP.
-We currently support two rendezvous methods in Snowflake:
-
-\begin{description}
-\item[Domain fronting]
-In this method, the client does one HTTPS exchange
-with the broker; however routing through an intermediary such as a CDN,
-and disguising the externally visible domain name\todo{Audit ``domain name'' vs.\ ``hostname''.}
-(the TLS Server Name Indication, or SNI) so that the exchange
-appears to be destined to a different ``front domain''~\cite{Fifield2015a}.
-The well-known drawback of domain fronting
-is the high financial cost of CDN bandwidth,
-but because we use it only for rendezvous and not bulk data transfer,
-the cost is vastly lower than it would be in a system like~meek.
-
-% "AMP cache rendezvous" https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/merge_requests/50
-\item[AMP cache]
-AMP is a framework for web pages written in a restricted dialect of HTML.
-Part of this framework is a free-to-use
-cache server~\cite{amp-cache}.
-Because the cache fetches upstream pages on demand,
-it works as a specialized sort of HTTP proxy.
-By encoding rendezvous messages as AMP-conformant HTML,
-we can use the cache as a proxy for rendezvous,
-one that is not easily blocked without blocking the cache server as a whole.
-This rendezvous method still requires domain fronting,
-because the AMP cache protocol would otherwise expose the
-upstream server's domain name in the TLS SNI,
-but it increases the number of usable front domains.
-\end{description}
-
-The rendezvous component is, however, modular,
-and any system that can be persuaded to indirectly convey a request
-of about 1500 bytes, and a response of about the same size,
-can work as a plug-in rendezvous method.
-% https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/25594
-For example, encrypted DNS
-% https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/25874
-% \cite[\S 3.4]{Fifield2020a}
-(DNS over TLS or DNS over HTTPS):
-the client encodes its registration message as a series of DNS queries;
-the broker acts as an authoritative resolver;
-and a third-party recursive resolver acts as an indirect intermediary,
-while DNS encryption hides the broker's domain name in queries
-from external observers.
-% Flash proxy email rendezvous would not work for Snowflake, because unidirectional.
-% https://gitweb.torproject.org/flashproxy.git/tree/flashproxy-reg-email
-% https://gitweb.torproject.org/flashproxy.git/tree/facilitator/fp-registrar-email
-
-A~Snowflake rendezvous message is a serialized bundle of data.
-Its essential element
-is the information necessary to establish a WebRTC connection,
-namely a Session Description Protocol (SDP) \firstterm{offer}~\cite{rfc8839}.
-The offer contains information needed for a network connection,
-such as the client's external IP addresses;
-as well as cryptographic information to secure a later key exchange between the peers.
+The client's rendezvous message
+% ClientPollRequest https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/blob/9edaee65470a1483bbdbe984e5e15a885f1e95d2/common/messages/client.go#L64
+is a bundle of data that the broker users to match the client with a proxy,
+and that the proxy will need in order to make a connection with the client.
+The essential element is a
+Session Description Protocol (SDP) \firstterm{offer}~\cite{rfc8839},
+which contains the information necessary for a WebRTC connection,
+such as the client's external IP addresses
+and cryptographic details to secure a later key exchange.
 % Specifically, a certificate fingerprint: https://www.rfc-editor.org/rfc/rfc8122.html#section-5
-The rendezvous message also contains the client's
-self-measured NAT type, which the broker will use to try to match it
-with a compatible proxy.
-The client serializes all these pieces of data and sends them to the broker.
-The broker chooses an available proxy
-and forwards the client's offer to it.
-The proxy composes an SDP \firstterm{answer},
-containing its own external addresses and cryptographic information,
-and sends it back to the broker,
-which then forwards it to the client.
-Having exchanged an offer and answer,
-the client and proxy are now able to establish a direct WebRTC connection,
-without the broker in the middle.
-The gathering of external IP addresses
-forms part of the ICE protocol
-and uses third-party STUN servers,
-\todo{Should say more about STUN and gathering of ICE candidates here.}
-which are described in more detail in \autoref{sec:ice}.
-
-In WebRTC terms, the offer/answer exchange is called
+The broker forwards the client's SDP offer to the proxy,
+and the proxy sends back an SDP \firstterm{answer},
+containing its share of connection details.
+The broker forwards the proxy's SDP answer back to the client.
+The client and the proxy then connect to each other directly.
+In WebRTC terms, this offer/\allowbreak answer exchange is called
 ``signaling,'' and the broker here acts as a signaling server.
-While signaling is a necessary component
-of any WebRTC-based system,
-there is no specified way of doing it.
-Every application must invent its own signaling system
-according to its requirements
-(which for us include covertness and blocking resistance).
-Because of the lack of uniformity in accomplishing signaling,
-the way a WebRTC application does (or does not do) signaling
-may be a distinguishing feature; see \autoref{sec:fingerprinting}
-for more considerations along these lines.
+To~gather the information necessary to construct an offer or answer,
+clients and proxies communicate with third-party STUN servers
+before contacting the broker.
+We~additionally use STUN servers to identify the NAT type of clients.
+We~will say more about how this information is used in \autoref{sec:ice}.
+The contacting of STUN servers is a normal and expected part of WebRTC,
+though there are fingerprinting considerations
+that we discuss in \autoref{sec:fingerprinting}.
+
+Communication with the broker uses a ``long-polling'' model.
+An~example is shown in \autoref{fig:rendezvous}.
+Proxies poll the broker periodically,
+by making an HTTPS request to a designated URL path.
+The broker does not respond immediately to a proxy poll request,
+but holds the connection idle for a few seconds
+to see if a client rendezvous message will arrive.
+If~not, the broker sends a response saying ``no clients''
+and the proxy goes to sleep until it is time for its next poll.
+If~a client does arrive,
+the broker sends SDP offer to the proxy
+in the response to the proxy's poll request.
+As~it is now too late for the proxy to send more information
+in the same HTTPS exchange,
+the proxy sends its SDP answer back to the broker
+in a second HTTPS request.
+All this happens while the client waits for a response
+to its initial rendezvous message.
+The broker responds to the client with the proxy's SDP answer,
+simultaneously sending an acknowledgement to the proxy.
+At~that point rendezvous is finished
+and the client and the proxy connect to one another.
 
 \begin{figure}
 \includegraphics{figures/rendezvous/rendezvous}
@@ -605,7 +485,7 @@ for more considerations along these lines.
 The long-polling communication model of Snowflake rendezvous.
 The assigned proxy connects twice in between the time
 the client sends its message and receives the response;
-to the client it looks like one roundtrip.
+to the client it looks like one round trip.
 Here, the client's rendezvous method is abstracted;
 in reality the censor never contacts the broker directly,
 but only via an intermediary.
@@ -613,34 +493,114 @@ The shaded background shows the censor's zone of control.
 }
 \label{fig:rendezvous}
 \todo[inline]{Replace provisional graphic.}
+\todo[inline]{Replace ``rendezvous request,'' a term not used elsewhere.}
 \end{figure}
 
-We use a ``long polling'' model for the client's side of broker interaction.
-See \autoref{fig:rendezvous}.
-There are proxies polling the broker constantly.
-Each poll is an HTTPS request to a designated URL path.
-(We assume there is no need for covertness
-in the proxies' interaction with the broker,
-because this side is outside the censor's observation and control.)
-On receiving a poll request,
-the broker does not send an HTTPS response immediately,
-but waits for a few seconds to see if a client will become available.
-If not, the broker sends a response saying ``no clients''
-and the proxy sleeps for a while before trying again.
-If a client rendezvous does arrive,
-the broker extracts the SDP offer and forwards it to the proxy
-in the HTTPS response.
-The proxy computes its SDP answer,
-then sends it back to the broker in a new HTTPS request
-(with an attached identifier to permit the broker to match it
-with the earlier polling request.)
-Meanwhile, the client has been waiting for a response
-to its rendezvous message.
-The broker encapsulates the proxy's SDP answer
-and sends it to the client over the rendezvous channel,
-and simultaneously sends an acknowledgement to the proxy.
-Now that the client and proxy have each other's
-SDP information, they are ready to actually connect to one another.
+The client needs to use an indirect channel,
+resistant to blocking,
+when communicating contacting the broker.
+What is needed, essentially,
+is a miniature circumvention system
+to bootstrap into the full system.
+What makes the rendezvous facet of circumvention
+different from general circumvention
+are its different, generally more lenient, requirements and assumptions,
+which permit a larger solution space.
+Because rendezvous accounts for only a small fraction
+of total communication volume,
+and it happens only infrequently,
+it~can afford to use techniques that would be
+too slow, expensive, or complicated
+for real-time or bulk data transfer.
+Another nice feature is that rendezvous is separable and modular:
+more than one method can be used,
+and the methods do not necessarily have to bear any relation
+to the circumvention techniques of the main system.
+While the assumption of WebRTC permeates Snowflake's design,
+its rendezvous modules are independent.
+We~currently support two rendezvous methods in Snowflake:
+
+\begin{description}
+\item[Domain fronting]
+In~this method, the client does an HTTPS exchange with the broker
+by an intermediary web service such as a CDN,
+taking care to change the externally visible hostname\todo{Audit ``domain name'' vs.\ ``hostname''.}
+(the TLS Server Name Indication, or SNI)
+from that of the broker to some other ``front domain''~\cite{Fifield2015a}.
+The CDN routes the HTTPS request to the broker
+according to the HTTP Host header, which remains unmodified
+under the TLS encryption.
+The well-known drawback of domain fronting
+is the high financial cost of CDN bandwidth.
+Because we use it only for rendezvous,
+the cost is much more manageable than in a system
+that uses domain fronting for all its data transfer.
+
+% "AMP cache rendezvous" https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/merge_requests/50
+\item[AMP cache]
+AMP is a framework for web pages written in a restricted dialect of HTML.
+Part of this framework is a free-to-use
+cache server~\cite{amp-cache}.
+The cache fetches origin web pages on demand,
+which means that it is effectively as a restricted sort of HTTP proxy.
+If~rendezvous messages are encoded to conform to AMP requirements,
+they can be sent to the broker via the cache server.
+Rendezvous through the AMP cache is not easily blocked
+without blocking the cache server as a whole.
+This rendezvous method still technically requires domain fronting,
+because the AMP cache protocol would otherwise expose the
+upstream server's hostname in the TLS SNI,
+but it enlarges the set of usable intermediary web services and front domains.
+\end{description}
+
+Anything that can be persuaded to convey a rendezvous message
+of about 1500 bytes indirectly to the broker,
+and return a response of about the same size,
+might work as a rendezvous module.
+% "Broker: investigate non-domain-fronting secure client / proxy registrations" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/25594
+For example, encrypted DNS
+(DNS over TLS or DNS over HTTPS) would serve:
+% "DNS-based rendezvous for Snowflake" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/25874
+% \cite[\S 3.4]{Fifield2020a}
+the client encodes its rendezvous message into a series of DNS queries
+for hostnames whose authoritative resolver is the broker itself,
+equipped with a module to reassemble the rendezvous message
+and send a response in the form of DNS responses.
+A~third-party recursive resolver acts as an intermediary for the broker,
+while DNS encryption hides the broker's DNS zone from the censor.
+% Flash proxy email rendezvous would not work for Snowflake, because unidirectional.
+% https://gitweb.torproject.org/flashproxy.git/tree/flashproxy-reg-email
+% https://gitweb.torproject.org/flashproxy.git/tree/facilitator/fp-registrar-email
+
+Rendezvous is not unique to Snowflake.
+Other examples of rendezvous in circumvention include
+the DEFIANCE Rendezvous Protocol~\cite[\S 3]{Lincoln2012a},
+the facilitator interaction in flash proxy~\cite[\S 3]{Fifield2012a},
+and the registration proxy in Conjure~\cite[\S 4.1]{Frolov2019b}.
+A~key property of rendezvous-based systems
+is that they do not rely on preshared secret information.
+The client needs only to acquire the necessary software;
+whatever additional information is required to establish a circumvention session
+is exchanged dynamically, at runtime.
+A~corollary of the no-secret-information property
+is that an adversary---the censor---is
+at no special disadvantage in attacking the system.
+The censor may download the client software,
+run it, study its network connections,
+and the system must remain blocking-resistant despite this.
+This is in contrast to other systems in which,
+in~addition to the necessary software,
+a~client must acquire some secret,
+such as a password or proxy IP address,
+through an out-of-band channel
+that is presumed to be unavailable to the censor,
+and the system's blocking resistance depends on
+clients keeping that information secret from the censor.
+If~rendezvous has the advantage of not needing to manage secrets,
+its disadvantage is that it just one more thing to get right.
+Not only the main circumvention channel
+but also the rendezvous must resist blocking:
+the system is only as strong as the weaker of the~two.
 
 \subsection{Peer-to-peer connection establishment}
 \label{sec:ice}
