@@ -155,17 +155,17 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.9269251"
-     inkscape:cx="134.48969"
-     inkscape:cy="146.45735"
+     inkscape:zoom="1.2501469"
+     inkscape:cx="130.54569"
+     inkscape:cy="252.01868"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      inkscape:document-rotation="0"
      showgrid="true"
      units="in"
      inkscape:snap-global="true"
-     inkscape:window-width="1366"
-     inkscape:window-height="752"
+     inkscape:window-width="1387"
+     inkscape:window-height="1420"
      inkscape:window-x="0"
      inkscape:window-y="16"
      inkscape:window-maximized="1"
@@ -199,8 +199,8 @@
     <circle
        style="fill:#aa0000;fill-opacity:0.203437;stroke:none;stroke-width:0.916904;stroke-linecap:square;stroke-linejoin:round"
        id="path833"
-       cx="-53.513897"
-       cy="29.284206"
+       cx="-63.038906"
+       cy="24.606251"
        r="89.331894" />
   </g>
   <g
@@ -315,7 +315,7 @@
            sodipodi:role="line"
            id="tspan1278"
            x="-8.0368757"
-           y="60.000004">Rendezvous request</tspan><tspan
+           y="60.000004">Rendezvous message</tspan><tspan
            sodipodi:role="line"
            x="-8.0368757"
            y="73"
