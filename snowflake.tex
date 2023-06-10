@@ -524,7 +524,7 @@ We~currently support two rendezvous methods in Snowflake:
 \item[Domain fronting]
 In~this method, the client does an HTTPS exchange with the broker
 by an intermediary web service such as a CDN,
-taking care to change the externally visible hostname\todo{Audit ``domain name'' vs.\ ``hostname''.}
+taking care to change the externally visible hostname
 (the TLS Server Name Indication, or SNI)
 from that of the broker to some other ``front domain''~\cite{Fifield2015a}.
 The CDN routes the HTTPS request to the broker
@@ -2311,7 +2311,7 @@ could be used to attack third parties.
 % An alternative vision: "(More) Distributed servers" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40248
 When the client expresses its bridge selection
 in its rendezvous message, the selection is represented
-not as an IP address or domain name,
+not as an IP address or hostname,
 but as a bridge fingerprint (a~\mbox{40-digit} hexadecimal string).
 The broker maps the fingerprint to a WebSocket URL
 by consulting a local database of known Snowflake bridges.
@@ -2681,7 +2681,7 @@ Snowflake may have been caught up in blocking that was intended for another syst
 
 % "Blocking of cdn.sstatic.net by SNI in Iran, 2023-01-16 to 2023-01-24 and sporadically thereafter" https://bugs.torproject.org/tpo/anti-censorship/team/115#note_2873040
 
-The default domain name used for domain fronting rendezvous
+The default front domain of domain fronting rendezvous
 was blocked in some ISPs, matching on the TLS SNI field,
 between \mbox{2023-01-16} and \mbox{2023-01-24}.
 We~confirmed this by examining OONI measurements;
@@ -2741,7 +2741,7 @@ Turkmenistan remains a difficult environment for circumvention.
 
 Among the mechanisms used for censorship in Turkmenistan
 are DNS injection and TCP RST injection.
-DNS queries for blocked domain names receive an injected response
+DNS queries for blocked hostnames receive an injected response
 containing the localhost IP address 127.0.0.1;
 TLS handshakes with a blocked SNI receive an injected TCP RST packet
 that terminates the connection.
