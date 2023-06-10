@@ -483,13 +483,14 @@ and the client and the proxy connect to one another.
 \includegraphics{figures/rendezvous/rendezvous}
 \caption{
 The long-polling communication model of Snowflake rendezvous.
-The assigned proxy connects twice in between the time
-the client sends its message and receives the response;
-to the client it looks like one round trip.
-Here, the client's rendezvous method is abstracted;
-in reality the censor never contacts the broker directly,
-but only via an intermediary.
-The shaded background shows the censor's zone of control.
+Proxies poll periodically to check for new clients.
+When the broker makes a match,
+the proxy gets the client's SDP offer,
+then immediately re-connects to send back its SDP answer.
+It~all happens during one round trip from the client's perspective.
+Not shown here is the indirect channel
+used by the client to access the broker through the censor's zone of control
+(shaded background).
 }
 \label{fig:rendezvous}
 \todo[inline]{Replace provisional graphic.}
