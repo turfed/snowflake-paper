@@ -659,7 +659,7 @@ In Snowflake, client and proxies self-assess their NAT configuration.
 Then the broker takes care to pair clients
 with proxies that they are most likely to be able to connect to directly.
 
-% "Investigate Snowflake proxy failures" https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/issues/33666#note_2595319
+% "Investigate Snowflake proxy failures" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/33666#note_2595319
 % "Okay here's a summary of what I've found: ..."
 
 Snowflake clients and proxies have one of a few possible
@@ -690,7 +690,7 @@ there has been a recent outgoing packet
 to the same remote IP--port pair.
 \item[Symmetric]
 The external IP--port pair depends on both
-the internal IP--port pair and the external IP--port pair.
+the internal IP--port pair and the external\todo{``external'' should be ``remote''?} IP--port pair.
 Incoming packets are allowed only if
 there has been a recent outgoing
 packet to the remote address.
@@ -931,8 +931,8 @@ A~lack of session persistence across temporary proxies
 was an unsolved problem in flash proxy~\cite[\S 5.2]{Fifield2012a}.
 
 To make this possible, we employ the
-Turbo Tunnel design pattern~\cite{Fifield2020a};
-that is, we interpose an additional, userspace,
+Turbo Tunnel design pattern~\cite{Fifield2020a}.
+We~interpose an additional, userspace,
 session/reliability layer between the raw transport layer
 and client application streams.
 % "[anti-censorship-team] Turbo Tunnel in Snowflake" https://lists.torproject.org/pipermail/anti-censorship-team/2020-February/000059.html
@@ -2773,7 +2773,7 @@ Not being able to reach a STUN server,
 a~client cannot find its own ICE candidate addresses
 (refer to \autoref{sec:ice}),
 causing the overwhelming majority of peer-to-peer connections with proxies to fail.
-Althought clients without STUN candidates could theoretically connect
+Although clients without STUN candidates could theoretically connect
 to proxies without any NAT or firewall, most VPS providers are blocked
 wholesale in Turkmenistan, leaving proxies located on residential networks
 as the only option.
