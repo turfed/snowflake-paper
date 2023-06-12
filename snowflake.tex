@@ -648,38 +648,38 @@ and avoids cases that would require a fallback to TURN.
 % "Investigate Snowflake proxy failures" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/33666#note_2595319
 % "Okay here's a summary of what I've found: ..."
 
-Snowflake clients and proxies have one of a few possible
-network configurations that can be categorized by two factors:
-the mapping behavior of its NAT,
-and the filtering behavior of its firewall.
-The implementation details of how NATs map internal IP address and port combinations
-to external ports varies significantly, but for our purposes it suffices
-to condense these variations, together with common firewall filtering behaviors,
+Two factors are relevant
+a Snowflake client or proxy's
+ability to make a peer-to-peer connection:
+how its NAT maps internal IP--port combinations to external ports,
+and how its firewall filters incoming packets.
+For our purposes, it suffices
+to condense the combinations of NAT mapping and firewall filtering
 into the following well-known NAT variations:
 
+% https://datatracker.ietf.org/doc/html/rfc3489#section-5
 \begin{description}
 \item[Full cone]
-All connections from the same internal IP address
-and port are mapped to the same external IP address and port. Any remote
-host may send a packet to an internal host by sending a packet to the
-mapped external IP--port pair.
+The same internal IP--port pair always maps to the same external port.
+Any remote host may send a packet to an internal IP address and port by sending a packet to the
+mapped external port.
 \item[Restricted cone]
-Like full-cone NAT,
-except that incoming packets
+Like full cone,
+but incoming packets
 are allowed only if
-there has been a recent outgoing packet
+there has recently been an outgoing packet
 to the same remote IP address.
 \item[Port-restricted cone]
-Like restricted-cone NAT,
-except that incoming packets are allowed only if
-there has been a recent outgoing packet
+Like restricted cone,
+but incoming packets are allowed only if
+there has recently been an outgoing packet
 to the same remote IP--port pair.
 \item[Symmetric]
-The external IP--port pair depends on both
-the internal IP--port pair and the external\todo{``external'' should be ``remote''?} IP--port pair.
+The external port depends on both
+the internal IP--port pair and the remote IP--port pair.
 Incoming packets are allowed only if
-there has been a recent outgoing
-packet to the remote address.
+there has recently been an outgoing
+packet to the same remote address.
 \end{description}
 
 \begin{table}
@@ -699,40 +699,50 @@ packet to the remote address.
 \rot{Restricted cone} &
 \rot{Port-restricted cone} &
 \rot{Symmetric} &
-&
 \\
-No NAT               & \Y & \Y & \Y & \Y & \Y & \multirow{3}{*}{$\left.\rule[-12pt]{0pt}{24pt}\right\}$} & \multirow{3}{*}{\small ``unrestricted''} \\
-Full cone            & \Y & \Y & \Y & \Y & \Y & \\
-Restricted cone      & \Y & \Y & \Y & \Y & \Y & \\
-Port-restricted cone & \Y & \Y & \Y & \Y & \n & \multirow{2}{*}{$\left.\rule[-7pt]{0pt}{14pt}\right\}$}  & \multirow{2}{*}{\small ``restricted''} \\
-Symmetric            & \Y & \Y & \Y & \n & \n & \\
+No NAT               & \Y & \Y & \Y & \Y & \Y \\
+Full cone            & \Y & \Y & \Y & \Y & \Y \\
+Restricted cone      & \Y & \Y & \Y & \Y & \Y \\
+Port-restricted cone & \Y & \Y & \Y & \Y & \n \\
+Symmetric            & \Y & \Y & \Y & \n & \n \\
 \end{tabular}
 \caption{
-Pairwise compatibility of NAT types for connection establishment with STUN.
+Compatibility of NATs using the facilities of STUN alone
+(no fallback to TURN).
 The incompatible cases are when one peer's NAT is symmetric
-and the other's is symmetric or port-restricted.
+and the other's is symmetric or port-restricted cone.
 }
 \label{tab:nat-matching}
-\todo[inline]{Update this figure with one that shows how the ``restricted'' and ``unrestricted'' label is allotted differently for clients and proxies.}
+\todo[inline]{Update this figure to show that unrestricted and restricted are different for proxies and clients.}
 \todo[inline]{Check style guide to see if caption should be before or after a table.}
 \end{table}
 
-Table~\ref{tab:nat-matching}
+\autoref{tab:nat-matching}
 shows the pairwise compatibility of NAT variations.
-As the incompatible cases always involve a symmetric NAT,
-we further simplify matching by categorizing the NAT type of peers as either
-``unrestricted'' (i.e., works with most other types of NATs) and ``restricted''
-(i.e., works only with the more permissive NATs). For load-balancing reasons,
-we categorize port-restricted NATs differently for proxies and clients.
-Proxies are considered ``restricted'' if they have a port-restricted cone NAT
-or a symmetric NAT, and ``unrestricted'' otherwise. Clients are considered
-``restricted'' only if they have a symmetric NAT. This wasn't always the case; the
-use of different categorizations was motivated by the scarcity of ``unrestricted''
-proxies. Because port-restricted NATs work with other port-restricted NATs and are
-prevalent in the proxy pool, we decided to save the ``unrestricted'' proxies for
-symmetric NAT clients. Our measurements show that clients with port-restricted NATs
-can still connect to around 80\% of ``restricted'' proxies and will establish a working
-connection in a reasonable amount of time.\todo{measure that 80\% number again}
+As~the incompatible cases always involve a symmetric NAT,
+we further simplify matching by categorizing the variations into the types
+\firstterm{unrestricted} (works with most other NATs) and
+\firstterm{restricted} (works only with the more permissive NATs).
+Unrestricted proxies may be matched with any client;
+restricted proxies may only be matched to unrestricted clients.
+(The broker prefers to match unrestricted clients with restricted proxies,
+in order to conserve the relatively scarce unrestricted proxies
+for clients that need them.)
+% https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/blob/9edaee65470a1483bbdbe984e5e15a885f1e95d2/broker/ipc.go#L236
+The symmetric NAT variation is always considered restricted,
+but port-restricted cone is categorized as
+restricted for proxies and unrestricted for clients.
+This is for reasons of economy:
+though it creates the opportunity for an incompatible match
+between a symmetric proxy and a port-restricted cone client,
+port-restricted cone proxies are prevalent in the proxy pool,
+and we want to save unrestricted proxies for clients
+with symmetric NATs as much as possible.
+Our measurements show that clients with port-restricted cone NAT
+can connect to around 80\%\todo{Measure that 80\% number again.}
+of restricted proxies.\todo{Does this mean 80\% of restricted proxies,
+or 80\% of the time a client eventually gets a compatible proxy after repeated retries?}
+In~any case, if a match fails, the client can re-rendezvous and try again.
 
 We determine the NAT and firewall behavior of snowflake peers
 differently for clients and proxies, due to
@@ -784,6 +794,7 @@ and may only be matched to known ``unrestricted'' clients.
 Clients and proxies
 retest their NAT type periodically, to account for changes in their local networking
 environment.
+% Can contact broker directly, because not under the censor's control.
 
 We have a number of
 mechanisms in place to avoid too much reliance on single points of failure.
