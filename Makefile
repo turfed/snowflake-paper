@@ -3,7 +3,6 @@ BIBTEX = bibtex
 
 FIGURES = \
 	figures/rendezvous/rendezvous.pdf \
-	figures/clients-by-nat.png \
 	figures/users/users-global.pdf \
 	figures/users/users-ru.pdf \
 	figures/proxies/proxy-type.pdf \
