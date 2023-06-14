@@ -126,7 +126,7 @@ p <- ggplot() +
 		date_labels = "%Y"
 	) +
 	scale_color_brewer(palette = "Set1") +
-	coord_cartesian(xlim = DATE_LIMITS, expand = FALSE, clip = "off") +
+	coord_cartesian(xlim = DATE_LIMITS, ylim = c(0, NA), expand = FALSE, clip = "off") +
 	labs(x = NULL, y = "Unique proxy IP addresses") +
 
 	# Make room for the margin labels added by geom_text above.
