@@ -108,6 +108,10 @@ for (g in list(
 			data = bridge_combined %>% filter(country == g$country),
 			aes(x = date, y = users),
 		) +
+		scale_y_continuous(
+			minor_breaks = NULL,
+			labels = scales::comma
+		) +
 		scale_x_date(
 			date_breaks = "1 month",
 			minor_breaks = NULL,
