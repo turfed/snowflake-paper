@@ -630,10 +630,11 @@ There is no guarantee that any two hosts will be able to make
 a connection using the facilities of STUN alone.
 Some address mapping and
 filtering setups are simply incompatible.
-In~this case, typically, ICE would fall back to using
+In~the case of an incompatible pairing,
+ICE would normally fall back to using
 TURN (Traversal Using Relays around NAT)~\cite{rfc8656},
-effectively a UDP proxy.
-This would be problematic for Snowflake,
+which is a kind of UDP proxy.
+Such a fallback would be problematic for Snowflake,
 because the TURN relays themselves
 would become a focus of blocking by the censor.
 % "Configure TURN servers for the proxy and/or client" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/25596
@@ -744,11 +745,8 @@ of restricted proxies.\todo{Does this mean 80\% of restricted proxies,
 or 80\% of the time a client eventually gets a compatible proxy after repeated retries?}
 In~any case, if a match fails, the client can re-rendezvous and try again.
 
-In~order for the broker to take NAT compatibility into account
-when matching clients and proxies,
-clients and proxies need to assess their own NAT type
-and report it to the broker.
-This self-assessment works differently in clients and proxies.
+In~order for the broker to take NAT compatibility into account when matching,
+clients and proxies need to self-assess their NAT type.
 Clients use the NAT behavior discovery feature of STUN~\cite{rfc5780}.
 % "Use STUN to determine NAT behaviour of peers" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/34129
 % "Add utility to help user discover their NAT type" https://github.com/pion/stun/issues/8
@@ -756,15 +754,16 @@ Not all STUN servers support NAT behavior discovery,
 but those whose addresses we ship with the Snowflake client~do.
 Approximately one quarter of client polls
 self-report having a restricted NAT type.\todo{Double-check this number and update if needed.}
-Proxies cannot use STUN to determine their NAT type,
-because the necessary features are not exposed
-in the WebRTC API in web browsers.
+Proxies cannot use the same technique to discover their NAT type,
+because the necessary STUN features are not available
+to JavaScript code running in web browsers.
 % "Have a remote probe service to test snowflake proxy NAT compatability" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40013
 Instead
 we adapt a technique from MassBrowser~\cite[\S \mbox{V-A}]{Nasr2020a}:
-we~run a centralized, always-on WebRTC peer behind a simulated symmetric NAT,
-which proxies try to connect~to.
-If~the connection succeeds, the proxy's NAT type is unrestricted;
+we~run a centralized, always-on WebRTC testing peer
+behind a simulated symmetric NAT.
+Proxies try connecting to this peer;
+if the connection succeeds, the proxy's NAT type is unrestricted,
 otherwise it is restricted.
 Clients and proxies retest their NAT type periodically,
 to account for potential changes in their local networking environment.
@@ -772,7 +771,7 @@ If~a client or proxy is unable to determine its NAT type for some reason,
 it reports the type ``unknown'' to the broker,
 and the broker conservatively treats it as if it were restricted.
 
-\begin{figure}[t]
+\begin{figure}
 \includegraphics{figures/proxies/proxy-nat-type}
 \caption{
 Proxy NAT types, in unique IP addresses per day.
