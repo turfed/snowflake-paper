@@ -775,11 +775,16 @@ and the broker conservatively treats it as if it were restricted.
 \begin{figure}[t]
 \includegraphics{figures/proxies/proxy-nat-type}
 \caption{
-Unique proxy IP addresses per day,
-by NAT type.
+Proxy NAT types, in unique IP addresses per day.
+The places in 2021 and 2022
+where there is an increase in the ``unknown'' NAT type
+and a decrease in the other types
+were the result of temporary operational problems with the
+testing peer that proxies use to assess their NAT type.
+% "Increase of 'unknown' NAT assignments by probetest since 2021-10-25" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40071
+% "Move snowflake-broker to a systemd based setup" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40147
 }
 \label{fig:proxy-nat}
-\todo[inline]{Explain temporary inversions of restricted and unknown (\href{https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40071}{\#40071}, \href{https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40147}{\#40147}).}
 \end{figure}
 
 The majority of browser-based Snowflake proxies
