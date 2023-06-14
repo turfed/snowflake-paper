@@ -88,7 +88,7 @@ p <- ggplot() +
 				slice(1) %>%
 			ungroup() %>%
 			mutate(date = max(date)) %>%
-			mutate(y = place_no_overlap(unique_ips, -1000, 5000)),
+			mutate(y = place_no_overlap(unique_ips, -10000, 4000)),
 		aes(
 			x = date,
 			y = y,
