@@ -606,7 +606,7 @@ the system is only as strong as the weaker of the~two.
 \label{sec:ice}
 
 Now the client and the proxy connect to each other directly.
-Even without censorship,
+Even in the absence of censorship,
 making a direct connection between two Internet peers is not always easy,
 because of NAT (network address translation) and firewalls.
 Snowflake clients and proxies alike run in diverse networks
@@ -726,50 +726,48 @@ we further simplify matching by categorizing the variations into the types
 \firstterm{restricted} (works only with the more permissive NATs).
 Unrestricted proxies may be matched with any client;
 restricted proxies may only be matched to unrestricted clients.
-(The broker prefers to match unrestricted clients with restricted proxies,
-in order to conserve the relatively scarce unrestricted proxies
-for clients that need them.)
+The broker prefers to match unrestricted clients with restricted proxies,
 % https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/blob/9edaee65470a1483bbdbe984e5e15a885f1e95d2/broker/ipc.go#L236
-The symmetric NAT variation is always considered restricted,
-but port-restricted cone is categorized as
-restricted for proxies and unrestricted for clients.
-This is for reasons of economy:
-though it creates the opportunity for an incompatible match
+in~order to conserve the relatively scarce unrestricted proxies
+for the clients that need them.
+Symmetric NAT is always considered restricted,
+but port-restricted cone NAT is categorized differently
+depending on the role of the peer:
+for proxies it is restricted, but
+for clients it is unrestricted.
+Though this simplification creates the potential for an incompatible match
 between a symmetric proxy and a port-restricted cone client,
-port-restricted cone proxies are prevalent in the proxy pool,
-and we want to save unrestricted proxies for clients
-with symmetric NATs as much as possible.
+port-restricted cone proxies are common in practice.
 Our measurements show that clients with port-restricted cone NAT
 can connect to around 80\%\todo{Measure that 80\% number again.}
-of restricted proxies.\todo{Does this mean 80\% of restricted proxies,
+of proxies considered restricted under this categorization.\todo{Does this mean 80\% of restricted proxies,
 or 80\% of the time a client eventually gets a compatible proxy after repeated retries?}
-In~any case, if a match fails, the client can re-rendezvous and try again.
+This helps us further conserve unrestricted proxies
+for clients with symmetric NATs.
 
-In~order for the broker to take NAT compatibility into account when matching,
-clients and proxies need to self-assess their NAT type.
+Clients and proxies self-assess their NAT type
+and send it to the broker in their rendezvous messages.
 Clients use the NAT behavior discovery feature of STUN~\cite{rfc5780}.
 % "Use STUN to determine NAT behaviour of peers" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/34129
 % "Add utility to help user discover their NAT type" https://github.com/pion/stun/issues/8
 Not all STUN servers support NAT behavior discovery,
 but those whose addresses we ship with the Snowflake client~do.
-Approximately one quarter of client polls
-self-report having a restricted NAT type.\todo{Double-check this number and update if needed.}
-Proxies cannot use the same technique to discover their NAT type,
+Proxies cannot use the same technique,
 because the necessary STUN features are not available
-to JavaScript code running in web browsers.
+to JavaScript code in web browsers.
 % "Have a remote probe service to test snowflake proxy NAT compatability" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40013
 Instead
 we adapt a technique from MassBrowser~\cite[\S \mbox{V-A}]{Nasr2020a}:
 we~run a centralized, always-on WebRTC testing peer
 behind a simulated symmetric NAT.
-Proxies try connecting to this peer;
-if the connection succeeds, the proxy's NAT type is unrestricted,
+Proxies try to connect to this peer;
+if~the connection succeeds, its type is unrestricted,
 otherwise it is restricted.
 Clients and proxies retest their NAT type periodically,
 to account for potential changes in their local networking environment.
 If~a client or proxy is unable to determine its NAT type for some reason,
-it reports the type ``unknown'' to the broker,
-and the broker conservatively treats it as if it were restricted.
+it reports the type ``unknown,''
+which the broker conservatively treats it as if it were restricted.
 
 \begin{figure}
 \includegraphics{figures/proxies/proxy-nat-type}
