@@ -708,7 +708,8 @@ Port-restricted cone & \Y & \Y & \Y & \Y & \n \\
 Symmetric            & \Y & \Y & \Y & \n & \n \\
 \end{tabular}
 \caption{
-Compatibility of NATs using the facilities of STUN alone
+Pairwise compatibility of NAT variants,
+using the facilities of STUN alone
 (no fallback to TURN).
 The incompatible cases are when one peer's NAT is symmetric
 and the other's is symmetric or port-restricted cone.
@@ -725,25 +726,29 @@ we further simplify matching by categorizing the variations into the types
 \firstterm{unrestricted} (works with most other NATs) and
 \firstterm{restricted} (works only with the more permissive NATs).
 Unrestricted proxies may be matched with any client;
-restricted proxies may only be matched to unrestricted clients.
+restricted proxies may be matched only with unrestricted clients.
 The broker prefers to match unrestricted clients with restricted proxies,
 % https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/blob/9edaee65470a1483bbdbe984e5e15a885f1e95d2/broker/ipc.go#L236
-in~order to conserve the relatively scarce unrestricted proxies
+in~order to conserve unrestricted proxies
 for the clients that need them.
 Symmetric NAT is always considered restricted,
 but port-restricted cone NAT is categorized differently
-depending on the role of the peer:
+depending on the peer:
 for proxies it is restricted, but
 for clients it is unrestricted.
-Though this simplification creates the potential for an incompatible match
+The asymmetric categorization is an approximation
+to further help conserve unrestricted proxies
+for clients with symmetric NATs.
+Though it creates the potential for an incompatible match
 between a symmetric proxy and a port-restricted cone client,
-port-restricted cone proxies are common in practice.
+port-restricted cone proxies are common in practice,
+and are compatible with port-restricted cone clients.
 Our measurements show that clients with port-restricted cone NAT
 can connect to around 80\%\todo{Measure that 80\% number again.}
 of proxies considered restricted under this categorization.\todo{Does this mean 80\% of restricted proxies,
 or 80\% of the time a client eventually gets a compatible proxy after repeated retries?}
-This helps us further conserve unrestricted proxies
-for clients with symmetric NATs.
+In~case of a connection failure,
+clients re-rendezvous and try again.
 
 Clients and proxies self-assess their NAT type
 and send it to the broker in their rendezvous messages.
@@ -784,17 +789,21 @@ testing peer that proxies use to assess their NAT type.
 \label{fig:proxy-nat-type}
 \end{figure}
 
-The majority of browser-based Snowflake proxies
-fall into the ``restricted'' category.
-\autoref{fig:proxy-nat-type} shows the distribution of proxies by NAT type.
-\todo{Consider moving \autoref{fig:proxy-nat-type} to \autoref{sec:experience} so as not to slow the pace here.}
-Despite this, we have managed to maintain a sufficient number of unrestricted proxies,
-thanks in large part to the standalone, command-line
-version of the Snowflake proxy,
-which tends to be run on rented VPSes in less restricted networks.
-\todo{Perhaps dwell on the duality here:
-standalone proxies knowingly sacrifice some address diversity
-for better NAT compatibility in a common case.}
+\autoref{fig:proxy-nat-type}
+shows that unrestricted proxies are
+a relatively small fraction of the proxy population.
+In~absolute terms, there are enough,
+thanks in large part to the volunteers who run
+the command-line
+version of the Snowflake proxy
+on networks unencumbered by NAT.
+Though stable, long-term proxies are
+against the ethos of Snowflake,
+it~has proved useful, as a matter of practicality,
+to~sacrifice a measure of address diversity
+for better NAT compatibility in a common case.
+Approximately one quarter of client polls
+report a restricted NAT type.\todo{Double-check this number and document how it was calculated.}
 
 At the same time as the snowflake proxy makes a connection to its assigned client,
 % "At the same time": https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40228
