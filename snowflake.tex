@@ -805,29 +805,24 @@ for better NAT compatibility in a common case.
 Approximately one quarter of client polls
 report a restricted NAT type.\todo{Double-check this number and document how it was calculated.}
 
-At the same time as the snowflake proxy makes a connection to its assigned client,
+At the same time as the proxy makes a connection to its assigned client,
 % "At the same time": https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40228
 it also connects to the bridge.
-In~contrast to the client--proxy link,
-the proxy--bridge link
-uses the WebSocket protocol~\cite{rfc6455}, not WebRTC.
-WebSocket offers a TCP-like, point-to-point, client--server connection
-layered atop HTTPS.
-As we assume the danger from a censor is past
-once a client reaches a snowflake proxy,
-the choice of protocol for the next hop to the bridge is somewhat arbitrary.
-It just needs to be a protocol that is supported in browsers
-and has reasonable performance.
-WebRTC would fit the bill for this link too,
-but WebSocket is somewhat less complex and easier to program.
+For this connection we
+use the WebSocket protocol~\cite{rfc6455}, which
+offers a TCP-like, point-to-point, client--server connection
+layered on HTTPS.
+The choice of protocol for the proxy--bridge link is arbitrary,
+and could be changed
+without affecting the rest of the system.
+The protocol does not need to be blocking-resistant;
+it~just needs to be available to JavaScript code in web browsers.
+WebRTC would serve for this link too.
 
-At the end of this phase,
-a temporary snowflake proxy has made two connections,
-one to its client and one to the bridge.
-It~then proceeds to proxy a data stream between them
-in both directions,
+The proxy transfers data back and forth
+between the client and bridge
 until the client terminates the session,
-or the proxy itself stop operating
+or the proxy itself stops operating
 (when the web browser it is running in closes, for example).
 
 \subsection{Data transfer}
