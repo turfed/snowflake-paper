@@ -2,6 +2,7 @@
 
 \usepackage[top=1in,bottom=1in,left=0.75in,right=0.75in]{geometry}
 \usepackage{graphicx}
+\usepackage{makecell}
 \usepackage{multirow}
 \usepackage{newtxtext}
 \usepackage{newtxmath}
@@ -700,12 +701,17 @@ packet to the same remote address.
 \rot{Restricted cone} &
 \rot{Port-restricted cone} &
 \rot{Symmetric} &
+&
 \\
-No NAT               & \Y & \Y & \Y & \Y & \Y \\
-Full cone            & \Y & \Y & \Y & \Y & \Y \\
-Restricted cone      & \Y & \Y & \Y & \Y & \Y \\
-Port-restricted cone & \Y & \Y & \Y & \Y & \n \\
-Symmetric            & \Y & \Y & \Y & \n & \n \\
+No NAT               & \Y & \Y & \Y & \Y & \Y & \multirow{3}{*}{\(\left.\rule[-12pt]{0pt}{24pt}\right\}\)} & \multirow{3}{*}{\footnotesize \makecell[l]{unrestricted \\proxy}} \\
+Full cone            & \Y & \Y & \Y & \Y & \Y & \\
+Restricted cone      & \Y & \Y & \Y & \Y & \Y & \\
+Port-restricted cone & \Y & \Y & \Y & \Y & \n & \multirow{2}{*}{\(\left.\rule[-7pt]{0pt}{14pt}\right\}\)} & \multirow{2}{*}{\footnotesize \makecell[l]{restricted \\proxy}} \\
+Symmetric            & \Y & \Y & \Y & \n & \n & \\
+% \hfill hack to make \upbracefill work with colortbl:
+% https://tex.stackexchange.com/questions/202138/upbracefill-filling-entire-tabular-cell-and-package-colortbl#comment474604_202143
+                     & \multicolumn{4}{c}{\def\hfill{\hskip 0pt plus 1filll}\upbracefill} & \multicolumn{1}{c}{\clap{\footnotesize \def\hfill{\hskip 0pt plus 1filll}\upbracefill}} & \\
+                     & \multicolumn{4}{c}{\footnotesize \makecell{unrestricted \\client}} & \multicolumn{1}{c}{\clap{\footnotesize \makecell{restricted \\client}}} \\
 \end{tabular}
 \caption{
 Pairwise compatibility of NAT variants,
@@ -715,7 +721,6 @@ The incompatible cases are when one peer's NAT is symmetric
 and the other's is symmetric or port-restricted cone.
 }
 \label{tab:nat-matching}
-\todo[inline]{Update this figure to show that unrestricted and restricted are different for proxies and clients.}
 \todo[inline]{Check style guide to see if caption should be before or after a table.}
 \end{table}
 
