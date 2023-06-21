@@ -834,26 +834,22 @@ or the proxy itself stops operating
 \subsection{Data transfer}
 \label{sec:data-transfer}
 
-No complicated processing takes place at the proxy.
+No~complicated or stateful processing is done by the proxy.
 The main value of a Snowflake proxy is its IP address:
 it~gives the client a peer to connect to that is not on the censor's address blocklist.
-Having provided that, the proxy assumes a role
-of pure data transfer until it, or one of the endpoints, goes away.
-Snowflake proxies are simple conduits that transfer
-a bidirectional data stream between endpoints,
-without interpreting~it.
-In particular, the proxy may not interfere with any
-end-to-end secure information exchanged between client and bridge,
-which in our deployment using Tor,
-includes not only the contents of the client's streams
-but also their eventual destination.
-It~may be considered an instance of the
-``untrusted messenger'' model described by
-Feamster et~al.~\cite[\S 3]{Feamster2003a}:
-what they call a ``messenger'' is our snowflake proxy;
-their ``portal'' is our bridge.
+Having provided that,
+the proxy assumes a role of pure data transfer,
+copying chunks of data in both directions without interpretation.
+The proxy does not know what protocol it is conveying;
+neither does it know whether it is the first
+in a client's circumvention session
+or a replacement for an earlier proxy.
+Any features that require more state or awareness
+must be provided not by proxies,
+but by end-to-end coordination
+between clients and the bridge.
 
-The full stack of protocol layers is shown below.
+The full protocol stack is shown below.
 We will describe each layer and its purpose.
 
 \bigskip
@@ -963,6 +959,18 @@ between the client and the bridge,
 whereas the WebRTC data channel is only a
 \emph{hop-by-hop} session
 whose lifetime is tied to a single temporary proxy.
+
+The large number of proxies presumed by the Snowflake model
+precludes checking each one for trustworthiness.
+If~a suitable encrypted and authenticated protocol is used,
+as with the Tor protocol in our deployment,
+then even a malicious proxy cannot read or subvert
+information transferred between client and bridge.
+It~may be considered an instance of the
+``untrusted messenger'' model of
+Feamster et~al.~\cite[\S 3]{Feamster2003a}:
+what they call a ``messenger'' is our temporary proxy;
+their ``portal'' is our bridge.
 
 The combination of data channels and an inner Turbo Tunnel layer
 provide a long-lasting ``virtual'' connection between the client and the bridge
