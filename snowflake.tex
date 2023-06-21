@@ -1,5 +1,6 @@
 \documentclass[letterpaper,twocolumn]{article}
 
+\usepackage{bigdelim}
 \usepackage[top=1in,bottom=1in,left=0.75in,right=0.75in]{geometry}
 \usepackage{graphicx}
 \usepackage{makecell}
@@ -855,16 +856,18 @@ their ``portal'' is our bridge.
 The full stack of protocol layers is shown below.
 We will describe each layer and its purpose.
 
-\begin{verbatim}
-UDP  \ WebRTC       \
-DTLS | data channel | ephemeral, per proxy
-SCTP /              /
-KCP  \ Turbo        \
-smux / Tunnel       | persistent, per session
-Tor protocol        /
-client streams
-\end{verbatim}
-\todo[inline]{Redraw ASCII art as a proper figure.}
+\bigskip
+\noindent
+\begin{tabular}{@{}l@{\,}l@{}l@{\,}l}
+UDP & \rdelim\}{3}{*} & \multirow{3}{5em}{WebRTC data channel} & \rdelim\}{3}{*}[\,ephemeral, per proxy]\\
+DTLS \\
+SCTP \\
+KCP & \rdelim\}{2}{*} & \multirow{2}{*}{Turbo Tunnel} & \rdelim\}{3}{*}[\,persistent, per session] \\
+smux \\
+\multicolumn{3}{@{}l}{Tor protocol} \\
+\multicolumn{4}{@{}l}{application streams} \\
+\end{tabular}
+\bigskip
 
 Communication between the client and the snowflake proxy
 takes place over
