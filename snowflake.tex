@@ -853,6 +853,7 @@ The full protocol stack is shown below.
 We will describe each layer and its purpose.
 
 \bigskip
+
 \noindent
 \begin{tabular}{@{}l@{\,}l@{}l@{\,}l}
 UDP & \rdelim\}{3}{*} & \multirow{3}{5em}{WebRTC data channel} & \rdelim\}{3}{*}[\,ephemeral, per proxy]\\
@@ -860,9 +861,10 @@ DTLS \\
 SCTP \\
 KCP & \rdelim\}{2}{*} & \multirow{2}{*}{Turbo Tunnel} & \rdelim\}{3}{*}[\,persistent, per session] \\
 smux \\
-\multicolumn{3}{@{}l}{Tor protocol} \\
+\multicolumn{3}{@{}l}{Tor protocol (TLS)} \\
 \multicolumn{4}{@{}l}{application streams} \\
 \end{tabular}
+
 \bigskip
 
 Communication between the client and the snowflake proxy
@@ -881,7 +883,7 @@ The peers mutually authenticate one another
 at the DTLS layer using certificate fingerprints
 that were exchanged during rendezvous~\cite[\S 5.1]{rfc8842}.
 DTLS records are placed in UDP datagrams for transport.
-The UDP--DTLS--SCTP combination comes as a packaged unit
+The UDP/\allowbreak DTLS/\allowbreak SCTP combination comes as a packaged unit
 that cannot be decomposed using the interfaces available to web browsers.
 
 Data channels are a convenient abstraction for Snowflake,
@@ -908,7 +910,7 @@ that is independent of any single temporary proxy connection,
 so that the download can be resumed where it left off,
 once connectivity is restored on a new proxy.
 A~lack of session persistence across temporary proxies
-was an unsolved problem in flash proxy~\cite[\S 5.2]{Fifield2012a}.
+had been an unsolved problem in flash proxy~\cite[\S 5.2]{Fifield2012a}.
 
 To make this possible, we employ the
 Turbo Tunnel design pattern~\cite{Fifield2020a}.
@@ -925,11 +927,11 @@ KCP~\cite{kcp} and
 smux~\cite{smux}:
 KCP provides reliability and reordering,
 and smux detects the end of idle sessions and terminates them.
-There is nothing essential about KCP/smux;
+There is nothing essential about KCP/\allowbreak smux;
 any other transport protocol that provides the necessary features
 and can be implemented in userspace would~do,
-such as QUIC, TCP, or (another layer of) SCTP.
-(In~fact, we prototyped successfully with QUIC, before settling on KCP/smux.)
+such as QUIC, TCP, or (a~second layer of) SCTP.
+(We~prototyped successfully with QUIC, before deciding on KCP/\allowbreak smux.)
 The Turbo Tunnel layer does not depend on any browser features,
 because its packets are encapsulated into the data channel;
 from the proxy's point of view, it's just a sequence of bytes.
