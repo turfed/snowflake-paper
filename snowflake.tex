@@ -825,32 +825,17 @@ The protocol does not need to be blocking-resistant;
 it~just needs to be available to JavaScript code in web browsers.
 WebRTC would serve for this link too.
 
-The proxy transfers data back and forth
-between the client and bridge
-until the client terminates the session,
-or the proxy itself stops operating
-(when the web browser it is running in closes, for example).
-
 \subsection{Data transfer}
 \label{sec:data-transfer}
 
-No~complicated or stateful processing is done by the proxy.
+No~complicated processing takes place at the proxy.
 The main value of a Snowflake proxy is its IP address:
 it~gives the client a peer to connect to that is not on the censor's address blocklist.
 Having provided that,
-the proxy assumes a role of pure data transfer,
-copying chunks of data in both directions without interpretation.
-The proxy does not know what protocol it is conveying;
-neither does it know whether it is the first
-in a client's circumvention session
-or a replacement for an earlier proxy.
-Any features that require more state or awareness
-must be provided not by proxies,
-but by end-to-end coordination
-between clients and the bridge.
+the proxy assumes a role of pure data transfer.
 
-The full protocol stack is shown below.
-We will describe each layer and its purpose.
+Snowflake uses a stack of nested protocol layers.
+We~will walk though each layer and describe its purpose.
 
 \bigskip
 
@@ -861,11 +846,25 @@ DTLS \\
 SCTP \\
 KCP & \rdelim\}{2}{*} & \multirow{2}{*}{Turbo Tunnel} & \rdelim\}{3}{*}[\,persistent, per session] \\
 smux \\
-\multicolumn{3}{@{}l}{Tor protocol (TLS)} \\
+\multicolumn{3}{@{}l}{Tor protocol} \\
 \multicolumn{4}{@{}l}{application streams} \\
 \end{tabular}
 
 \bigskip
+
+\noindent
+This is the stack for the client--proxy link,
+which is where WebRTC is used and which is
+observed by the censor.
+The stack for the proxy--bridge link is the same,
+but with WebSocket in place of the
+WebRTC data channel at the top.
+The layers marked ``ephemeral'' are skimmed off
+and replaced as proxies come and~go.
+The layers marked ``persistent'' are instantiated once
+in each circumvention session,
+hold long-term state,
+and are end-to-end between client and bridge.
 
 Communication between the client and the snowflake proxy
 takes place over
