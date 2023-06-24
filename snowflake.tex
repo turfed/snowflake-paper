@@ -867,64 +867,57 @@ in each circumvention session,
 hold long-term state,
 and are end-to-end between client and bridge.
 
-Communication between the client and the snowflake proxy
-takes place over
-a WebRTC data channel~\cite{rfc8831}, which
-provides a TCP-like
-reliable stream interface over a UDP-based carrier.
-Reliability comes from an embedded layer of
-Stream Control Transmission Protocol (SCTP), which
-does reordering and retransmission of dropped packets---similar
-to what an OS kernel does for a TCP connection,
-but in userspace.
-SCTP packets are then encapsulated in Datagram TLS (DTLS)~\cite{rfc9147}
-for confidentiality and integrity between the WebRTC peers.
-The peers mutually authenticate one another
+The connection between a client and its proxy is
+a WebRTC data channel~\cite{rfc8831},
+which provides a way to send arbitrary binary messages between peers.
+A~data channel is its own stack of three protocols:
+UDP for network transport,
+DTLS (Datagram TLS)
+for confidentiality and integrity, and
+SCTP (Stream Control Transmission Protocol)
+for delimiting message boundaries
+and other features like congestion control.
+Working UDP port numbers will have been discovered
+using ICE in the previous phase.
+The peers authenticate one another
 at the DTLS layer using certificate fingerprints
 that were exchanged during rendezvous~\cite[\S 5.1]{rfc8842}.
-DTLS records are placed in UDP datagrams for transport.
-The UDP/\allowbreak DTLS/\allowbreak SCTP combination comes as a packaged unit
-that cannot be decomposed using the interfaces available to web browsers.
 
-Data channels are a convenient abstraction for Snowflake,
-because transmission of reliable,
-connection-oriented streams data is closely matched
-to the use case of a circumvention proxy.
-But data channels are not the only available option:
-WebRTC also provides media streams,
-for unreliable transmission of real-time audio and video.
-Data channels and media streams have distinguishable wire representations
-that give rise to fingerprinting concerns we take up in \autoref{sec:fingerprinting}.
+Data channels are well-suited to Snowflake's needs.
+Circumvention is even one of the use cases listed in the specification~\cite[\S 3.2]{rfc8831}.
+But data channels are not the only option:
+WebRTC also offers \emph{media streams},
+for unreliable transport of real-time audio and video.
+Though both are encrypted,
+they use different cryptographic containers,
+and an unprivileged observer can tell which is which.
+We~will take up this topic in \autoref{sec:fingerprinting}.
 
-If snowflake proxies were as reliable as traditional proxies,
-what we have described so far would already suffice:
-send client traffic through the WebRTC data channel,
-and have the proxy relay it to the bridge.
-But Snowflake's temporary proxies might
+If~clients only ever used one proxy,
+the WebRTC data channel would be sufficient.
+But a Snowflake proxy might
 disappear at any moment,
-and the design must account for that.
-If the client is in the middle of a long download,
-for example, the failure of a proxy should not interrupt it:
-the client and the bridge need a shared notion of session state
-that is independent of any single temporary proxy connection,
-so that the download can be resumed where it left off,
-once connectivity is restored on a new proxy.
-A~lack of session persistence across temporary proxies
+and when that happens, its data channel goes with~it.
+If~the client was in the middle of a long download,
+for example, the download should resume
+without interruption on a new proxy.
+For this we need a shared notion of session state that exists
+at the client and the bridge, not tied to any temporary proxy.
+A~lack of session continuity across proxy failures
 had been an unsolved problem in flash proxy~\cite[\S 5.2]{Fifield2012a}.
 
-To make this possible, we employ the
-Turbo Tunnel design pattern~\cite{Fifield2020a}.
-We~interpose an additional, userspace,
-session/reliability layer between the raw transport layer
-and client application streams.
+We~adopt the
+Turbo Tunnel design pattern~\cite{Fifield2020a}
+and insert a userspace
+session/\allowbreak reliability layer
+between the temporary proxy connection
+and the client's own streams.
 % "[anti-censorship-team] Turbo Tunnel in Snowflake" https://lists.torproject.org/pipermail/anti-censorship-team/2020-February/000059.html
-This additional layer gives the proxy and the bridge
-shared end-to-end state that persists throughout
-the sequence of temporary proxies that are the carriers of a Snowflake session.
-For the embedded session/reliability layer
-we use a combination of
+This part of the protocol stack
+outlives any single proxy.
+We~use a combination of
 KCP~\cite{kcp} and
-smux~\cite{smux}:
+smux~\cite{smux}.
 KCP provides reliability and reordering,
 and smux detects the end of idle sessions and terminates them.
 There is nothing essential about KCP/\allowbreak smux;
@@ -942,25 +935,13 @@ The failure of a proxy
 is not fatal to a Snowflake session,
 just as a dropped packet does not mean the end of a TCP connection.
 
-Snowflake's Turbo Tunnel layer
-is partially redundant with the data channel SCTP layer
-on the WebRTC link between client and proxy,
-which similarly builds a reliable stream interface
-on an unreliable substrate.
-\todo{Clarify/\allowbreak refine this in light of the fact that
-\href{https://lists.torproject.org/pipermail/anti-censorship-team/2023-March/000286.html}{data channels can be unreliable and unordered}.
+% Not going to get into how we currently use reliable, ordered (TCP-like) data
+% channels, but plan to switch to unreliable, unordered (UDP-like) data
+% channels, a better fit for the underlying datagram-oriented Turbo Tunnel
+% layer.
+%
 % "turn off reliable mode for WebRTC DataChannel" https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/merge_requests/109
 % "Snowflake is currently using network resource in a so suboptimal way..." https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40251#note_2891751
-}
-The duplication is, in any case, unavoidable:
-the data channel's SCTP layer is walled off by abstractions
-in the WebRTC APIs available to browsers.
-But more significantly, Snowflake requires an
-\emph{end-to-end} notion of a session,
-between the client and the bridge,
-whereas the WebRTC data channel is only a
-\emph{hop-by-hop} session
-whose lifetime is tied to a single temporary proxy.
 
 The large number of proxies presumed by the Snowflake model
 precludes checking each one for trustworthiness.
