@@ -884,9 +884,9 @@ at the DTLS layer using certificate fingerprints
 that were exchanged during rendezvous~\cite[\S 5.1]{rfc8842}.
 
 Data channels are well-suited to Snowflake's needs.
-Circumvention is even one of the use cases listed in the specification~\cite[\S 3.2]{rfc8831}.
+(Circumvention is even one of the use cases listed in the specification~\cite[\S 3.2]{rfc8831}.)
 But data channels are not the only option:
-WebRTC also offers \emph{media streams},
+WebRTC also offers \firstterm{media streams},
 for unreliable transport of real-time audio and video.
 Though both are encrypted,
 they use different cryptographic containers,
@@ -899,8 +899,8 @@ But a Snowflake proxy might
 disappear at any moment,
 and when that happens, its data channel goes with~it.
 If~the client was in the middle of a long download,
-for example, the download should resume
-without interruption on a new proxy.
+for example, it should be possible to resume the download
+without interruption after rendezvousing with a new proxy.
 For this we need a shared notion of session state that exists
 at the client and the bridge, not tied to any temporary proxy.
 A~lack of session continuity across proxy failures
@@ -909,31 +909,29 @@ had been an unsolved problem in flash proxy~\cite[\S 5.2]{Fifield2012a}.
 We~adopt the
 Turbo Tunnel design pattern~\cite{Fifield2020a}
 and insert a userspace
-session/\allowbreak reliability layer
-between the temporary proxy connection
-and the client's own streams.
+session and reliability protocol
+between the ephemeral proxy data channels
+and the client's own application streams.
 % "[anti-censorship-team] Turbo Tunnel in Snowflake" https://lists.torproject.org/pipermail/anti-censorship-team/2020-February/000059.html
 This part of the protocol stack
-outlives any single proxy.
+outlives any single proxy---it~belongs to
+the client and the bridge.
+Its critical function is to attach sequence numbers and acknowledgements
+to packets of data---this
+is how both ends know what parts of the data stream
+need to be retransmitted after a temporary loss of proxy connectivity.
 We~use a combination of
 KCP~\cite{kcp} and
 smux~\cite{smux}.
-KCP provides reliability and reordering,
+KCP provides reliability,
 and smux detects the end of idle sessions and terminates them.
-There is nothing essential about KCP/\allowbreak smux;
-any other transport protocol that provides the necessary features
+KCP and smux have shown their worth in other deployments,
+and are easy to program,
+but there is nothing about them on which we depend essentially.
+Any other transport protocol that provides the necessary features
 and can be implemented in userspace would~do,
-such as QUIC, TCP, or (a~second layer of) SCTP.
-(We~prototyped successfully with QUIC, before deciding on KCP/\allowbreak smux.)
-The Turbo Tunnel layer does not depend on any browser features,
-because its packets are encapsulated into the data channel;
-from the proxy's point of view, it's just a sequence of bytes.
-A~switch from one temporary proxy to another
-is invisible to the upper application layers,
-except for a brief delay in packet delivery.
-The failure of a proxy
-is not fatal to a Snowflake session,
-just as a dropped packet does not mean the end of a TCP connection.
+such as QUIC, TCP, or (our own layer~of) SCTP.
+We~prototyped successfully with QUIC, before settling on KCP/\allowbreak smux.
 
 % Not going to get into how we currently use reliable, ordered (TCP-like) data
 % channels, but plan to switch to unreliable, unordered (UDP-like) data
@@ -943,8 +941,8 @@ just as a dropped packet does not mean the end of a TCP connection.
 % "turn off reliable mode for WebRTC DataChannel" https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/merge_requests/109
 % "Snowflake is currently using network resource in a so suboptimal way..." https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40251#note_2891751
 
-The large number of proxies presumed by the Snowflake model
-precludes checking each one for trustworthiness.
+The large number and easy deployability of Snowflake proxies
+preclude vetting each one for trustworthiness.
 If~a suitable encrypted and authenticated protocol is used,
 as with the Tor protocol in our deployment,
 then even a malicious proxy cannot read or subvert
