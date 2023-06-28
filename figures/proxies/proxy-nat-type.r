@@ -25,13 +25,21 @@ DATE_LIMITS <- lubridate::ymd(c(
 	output_path <<- args[[2]]
 })()
 
-proxy_nat_type <- read_csv(proxy_nat_type_csv_path) %>%
+proxy_nat_type <- read_csv(proxy_nat_type_csv_path, col_types = cols(
+	date = col_date(),
+	nat_type = col_character(),
+	unique_ips = col_double(),
+	coverage = col_double()
+)) %>%
 	# Unlike in the user graphs, here we do not compensate for days where
 	# coverage < 1.0: because of deduplication, unique_ips does not scale
 	# linearly with time like the number of concurrent users does.
 
 	# Put a label on the rows with type == NA.
 	replace_na(list(nat_type = "untested")) %>%
+
+	# Order the types by the value of unique_ips at the right side of the graph.
+	mutate(nat_type = fct_reorder2(nat_type, date, unique_ips)) %>%
 
 	# Fill in entirely missing dates with NA.
 	group_by(nat_type) %>%
@@ -47,10 +55,7 @@ proxy_nat_type <- read_csv(proxy_nat_type_csv_path) %>%
 		"Unrestricted" = "unrestricted",
 		"Unknown" = "unknown",
 		"Untested" = "untested"
-	)) %>%
-
-	# Order the types by the value of unique_ips at the right side of the graph.
-	mutate(nat_type = fct_reorder2(nat_type, date, unique_ips))
+	))
 
 # To add a "total" series:
 # proxy_type <- bind_rows(

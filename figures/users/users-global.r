@@ -103,7 +103,7 @@ text_annotation <- function(data) {
 	list(
 		geom_linerange(data = data, aes(x = x, ymin = ymin, ymax = ymax),
 			color = "#808080",
-			size = 0.25
+			linewidth = 0.25
 		),
 		geom_label(data = data,
 			aes(
