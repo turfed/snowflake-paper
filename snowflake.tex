@@ -970,65 +970,58 @@ and
 
 % https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/wikis/Fingerprinting
 
-Snowflake leans heavily into the ``address blocking'' side of blocking resistance,
+Snowflake leans heavily into the ``address blocking'' side of circumvention,
 but the ``content blocking'' part matters too.
-As always, the goal is to make circumvention traffic
-difficult to distinguish from traffic the censor cares not to block.
-Snowflake is, by nature, tied to WebRTC,
-and therefore can only be effective against a censor
-that cannot afford to block WebRTC protocols wholesale.
+The goal, as~always, is to make circumvention traffic
+difficult to distinguish from other traffic the censor cares not to block.
+Snowflake is inherently tied to WebRTC,
+and can only be effective against a censor
+that is not willing to block WebRTC protocols wholesale.
 But even within that scope,
-there are many possible variations in \emph{how}
+there are many variations in \emph{how}
 WebRTC is implemented and used,
-which, if not considered carefully, might permit a censor
+which, if~not carefully considered, might enable a censor
 to selectively block only Snowflake,
 while leaving other uses of WebRTC undisturbed.
-In~this discussion, it is worth remembering
-what Tschantz et~al.\ have observed\cite[\mbox{VI-A}]{Tschantz2016a}:
-that censors prefer to exploit
-simple, precise, deterministic distinguishers
-that appear in the early phase of a circumvention session whenever possible,
-and use long-term, probabilistic, or computationally expensive tests
-only as a last resort.
-It is hardly worth worrying about protocol fingerprints
-in a circumvention system while easier distinguishers exist;
-conversely, small, corrigible fingerprinting flaws may be excused
-as long as the foundation is solid.
+Unfortunately for the circumvention developer,
+the richness of WebRTC protocols
+affords a large attack surface for fingerprinting.
+Not only that, WebRTC leaves the details of
+signaling---in~which peers exchange information
+needed to set up a connection,
+corresponding to Snowflake rendezvous---unspecified~\cite[\S 3]{rfc8825},
+leaving every application to invent its own mechanism.
+% "The choice of protocols for client-server and inter-server signaling, and the definition of the translation between them, are outside the scope of the WebRTC protocol suite described in this document."
+% https://www.rfc-editor.org/rfc/rfc8829.html#section-3.1: "JSEP does not specify a particular signaling model or state machine, other than the generic need to exchange session descriptions in the fashion described by [RFC3264] (offer/answer)..."
 
 As~WebRTC is designed for the web,
 most implementations of WebRTC are embedded in web browsers,
-and are not trivially usable outside that context.
+and are not easily removed from that context.
 Snowflake originally used a WebRTC library extracted from Chromium,
-but that eventually proved unworkable from a practical standpoint---more
-details are in \autoref{sec:deployment}.
-Since 2019, Snowflake has used Pion~\cite{pion-webrtc},
+but that eventually proved unworkable for cross-platform deployment.
+Since~2019, Snowflake has used Pion~\cite{pion-webrtc},
 % "Evaluate pion WebRTC" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/28942
 an independent implementation of WebRTC
-implemented as a generic library,
 not tied to any browser.
 This is both good and bad.
 The good is greater agility and less development friction,
 and a working relationship with upstream developers
-that enables us to get fingerprinting-related changes made.
+that enables us to get fingerprinting-related changes made;
+we~would not be where we are today without~it.
 The bad is that the WebRTC fingerprint of Pion
-does not automatically match that of the primarily browser-originated
+does not automatically match that of the mainly browser-originated
 WebRTC that Snowflake aims to blend in with.
 
-Unfortunately for the circumvention developer,
-the rich set of interacting protocols that comprise WebRTC
-afford a large attack surface for fingerprinting.
-Not only that, WebRTC leaves the details of
-the signaling path---where peers exchange information
-needed to set up a connection,
-corresponding to Snowflake rendezvous---unspecified~\cite[\S 3]{rfc8825},
-leaving applications to invent their own mechanisms.
-% "The choice of protocols for client-server and inter-server signaling, and the definition of the translation between them, are outside the scope of the WebRTC protocol suite described in this document."
-% https://www.rfc-editor.org/rfc/rfc8829.html#section-3.1: "JSEP does not specify a particular signaling model or state machine, other than the generic need to exchange session descriptions in the fashion described by [RFC3264] (offer/answer)..."
-
-The following is a list of potential fingerprinting concerns
-that bear on Snowflake, together with brief descriptions
-of the degree to which we have tried to address them.
-The list may not be exhaustive.
+The following is a list of fingerprinting concerns
+that bear on Snowflake, together with
+how we have tried to address them.
+The existence of a fingerprinting vulnerability
+does not automatically invalidate a circumvention system:
+censorship and circumvention are a dialog,
+and even among demonstrable vulnerabilities,
+some are more and some are less practical for a censor to take advantage~of.
+The important thing is to have a solid foundation;
+minor flaws may be patched up as necessary.
 
 \begin{description}
 \item[Selection of STUN servers]
