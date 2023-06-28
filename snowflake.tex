@@ -1100,7 +1100,7 @@ Due to practical implementation considerations,
 the defenses to DTLS fingerprinting in Snowflake are not very robust,
 and are reactive rather than proactive.
 In~the world of TLS one may use the uTLS package~\cite[\S VII]{Frolov2019a},
-or~(at a not inconsiderable cost of complexity)
+or~(at~a not inconsiderable cost of complexity)
 tunnel through a locally installed web browser
 to borrow its TLS fingerprint~\cite[\S 5.1]{Fifield2015a}.
 But there is as yet no equivalent of uTLS for DTLS,
@@ -1166,7 +1166,7 @@ as in Protozoa~\cite[\S 4.4]{Barradas2020a}.
 
 \end{description}
 
-The degree of Snowflake's susceptibility to protocol fingerprinting
+Snowflake's susceptibility to protocol fingerprinting
 has been analyzed in the past by
 Fifield and Gil Epner~\cite{arxiv.1605.08805} and by
 MacMillan et~al.~\cite{arxiv.2008.03254}.
@@ -1501,7 +1501,7 @@ as well as migrate the bridge to more substantial server hardware
 and upgrade from a 1~Gbps to a 10~Gbps network link.
 % https://forum.torproject.net/t/tor-project-more-resources-required-for-snowflake-bridge/2353
 % "snowflake-01: Change uplink from 1G to 10G" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40138
-In~May 2022, according to Tor's IP geolocation.
+In~May 2022, according to Tor's IP geolocation,
 about 70\% of Snowflake users were in Russia.
 % > library("tidyverse")
 % > WANTED_FINGERPRINTS <- c(
@@ -1528,7 +1528,7 @@ about 70\% of Snowflake users were in Russia.
 % 4 2022-05-20 snowflake de       256.  258.  257.    1.94
 % 5 2022-05-20 snowflake by       200.  202.  201.    1.52
 % 6 2022-05-20 snowflake gb       184.  186.  185.    1.40
-The count of users in Russia get an additional small boost,
+The count of users in Russia got an additional small boost,
 visible in the graph,
 starting on \mbox{2022-07-14},
 when Tor Browser~11.5 added the Connection Assist feature,
