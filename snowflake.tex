@@ -941,49 +941,29 @@ We~prototyped successfully with QUIC before settling on KCP/\allowbreak smux.
 % "turn off reliable mode for WebRTC DataChannel" https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/merge_requests/109
 % "Snowflake is currently using network resource in a so suboptimal way..." https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40251#note_2891751
 
-Finally, as a practical matter,
-we must specify some concrete proxy protocol
-that the client can use to tell the bridge
+Finally,
+we must specify some concrete protocol
+so that the client can tell the bridge
 what remote destination to access on its behalf.
-Almost anything would work here---with the caveat
-that it should be end-to-end secure between the client and bridge,
-to prevent inspection or tampering
-by curious or malicious proxies.
 In~our deployment, this role is played by the Tor protocol.
 After stripping away the WebRTC and Turbo Tunnel containers,
 the Snowflake bridge feeds the client's data stream
 into a local Tor bridge.
-Tor has its own mechanisms for conveying destination addresses
-to an eventual exit node,
-and on the client side presents a standard SOCKS interface.
+Almost anything would work here, with the caveat
+that it should be end-to-end secure between the client and bridge,
+to prevent inspection or tampering
+by curious or malicious proxies---Snowflake proxies are ``untrusted messengers''
+in the sense of
+Feamster et~al.~\cite[\S 3]{Feamster2003a}.
 Integration with Tor has the nice feature that
 not even the Snowflake bridge is trusted
 to see the plaintext or destination of client traffic,
 let alone the temporary proxies.
-Tor also has drawbacks and complications,
+Using Tor also has some drawbacks,
 which we will comment on in
 \autoref{sec:multi-bridge}
 and
 \autoref{sec:future}.
-
-Snowflake's decoupling of the server
-that accesses remote destinations
-from the means of accessing it
-may be seen as an instance of the
-``untrusted messenger'' model of
-Feamster et~al.~\cite[\S 3]{Feamster2003a}:
-what they call a ``messenger'' is our temporary proxy;
-their ``portal'' is our bridge.
-It~is the presence of an end-to-end secure protocol
-between client and bridge that makes this decoupling possible.
-Clients have confidence to send their traffic through
-untrusted intermediaries when they know those intermediaries
-can see only ciphertext.
-Running a proxy is worry-free,
-as proxy operators know client traffic will not be
-mistakenly attributed to them.
-A~Snowflake connection requires less trust by all concerned
-than most other forms of circumvention proxy.
 
 \section{Protocol fingerprinting}
 \label{sec:fingerprinting}
