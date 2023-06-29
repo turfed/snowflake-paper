@@ -886,11 +886,9 @@ that were exchanged during rendezvous~\cite[\S 5.1]{rfc8842}.
 Data channels are well-suited to Snowflake's needs.
 (Circumvention is even one of the use cases listed in the specification~\cite[\S 3.2]{rfc8831}.)
 But data channels are not the only option:
-WebRTC also offers \firstterm{media streams},
+WebRTC also offers \firstterm{media streams}
 for unreliable transport of real-time audio and video.
-Though both are encrypted,
-they use different cryptographic containers,
-and an unprivileged observer can tell which is which.
+Which of these is used may be a fingerprinting vector.
 We~will take up this topic in \autoref{sec:fingerprinting}.
 
 If~clients only ever used one proxy,
@@ -1025,91 +1023,90 @@ minor flaws may be patched up as necessary.
 
 \begin{description}
 \item[Selection of STUN servers]
-It~is not unusual for a WebRTC application to use STUN;
-but which servers it uses is externally observable
-and is the choice of the application (often hardcoded).
-Running a dedicated STUN server just for Snowflake is a nonstarter---if~there
-are no users of the server other than circumvention users,
-a~censor will experience no harm in simply blocking its IP address.
-In~Snowflake, we use a pool of public STUN servers,
-used for many purposes other than circumvention,
-and filtered for those that support the NAT behavior discovery feature
+It~is not unusual for a WebRTC application to use STUN,
+but the choice of what STUN servers to use is up to the application.
+Running dedicated STUN servers just for Snowflake would not work,
+because a censor would experience no collateral harm in
+simply blocking them by IP address.
+Our deployment uses a pool of public STUN servers
+that are used in applications other than circumvention,
+filtered for those that support the NAT behavior discovery feature
 described in \autoref{sec:ice}.
-The client chooses a random subset of the servers in the pool
-each time it makes a connection.
-This is because not every STUN server is accessible
+The client chooses a random subset of servers from the pool
+when it makes a connection;
+this is because not every STUN server is accessible
 under every censor.
 % I went to check stun.l.google.com for blocking in China,
 % but OONI Probe does not measure that server as of v3.17.1:
 % https://github.com/ooni/probe/issues/2417#issuecomment-1468478811
 
-\item[Format and content of STUN messages]
+\item[Format of STUN messages]
+STUN is most often deployed over plaintext UDP,
+which leaves its messages open to inspection
+and potential fingerprinting.
 STUN messages consist of a fixed header
 followed by a variable-length list of ordered
 attributes~\cite[\S 5]{rfc8489}.
-STUN is most often deployed using plaintext UDP as a transport,
-which leaves its messages open to inspection
-and potentially fingerprintable.
 What attributes appear,
-and their relative order,
-is a property of the implementation
-and the way the application uses STUN.
-Among the attributes are some used
-for the NAT behavior discovery feature~\cite[\S 7]{rfc5780}
-of \autoref{sec:ice}.
+and their order,
+depends on the STUN implementation
+and how the application uses it.
 
-\todo{Have we done anything for STUN message fingerprinting?}
+We have not done anything in particular
+to disguise STUN messages.
+Though plaintext UDP is the most common,
+STUN specifies other transports,
+including encrypted ones like DTLS.
+These may be options for Snowflake in the future---of~course,
+only if they are common enough that their use
+does not stick out on its own.
 % "Investigate if STUN over TCP/TLS is beneficial to us" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40240
 
 \item[Rendezvous]
-The rendezvous methods of
-\autoref{sec:rendezvous},
-being modular,
-generally all need their own security argument
-as to why they should be difficult to block.
-Besides that, each must be implemented in a way
+Because the rendezvous methods of
+\autoref{sec:rendezvous}
+are modular,
+each one needs a separate justification
+as to why it should be difficult to block.
+Besides that, they must be implemented in a way
 that does not expose accidental distinguishers.
 For example, the domain fronting and AMP cache rendezvous methods
-use HTTPS, which is TLS, which means they are susceptible to TLS fingerprinting~\cite[\S 5.1]{Fifield2015a}.
-In Snowflake, we use the uTLS package~\cite[\S VII]{Frolov2019a}
-(commonly used by circumvention programs)
-to get a TLS fingerprint that is randomized or that imitates common browsers.
+use HTTPS, which is TLS,
+which means TLS fingerprinting is a concern~\cite[\S 5.1]{Fifield2015a}.
+Snowflake, like many circumvention systems,
+uses the uTLS package~\cite[\S VII]{Frolov2019a}
+to get a client TLS fingerprint that is randomized or that imitates common browsers.
 See \autoref{sec:block-ir} for an account of when
-domain fronting rendezvous was briefly blocking in Iran,
+domain fronting rendezvous was briefly blocked in Iran,
 because we were slow in activating uTLS.
 
-Though each rendezvous method must be difficult to block in itself,
-a~censor may combine a low-confidence suspicion of having observed a rendezvous exchange
+Though each rendezvous method may be difficult to block in itself,
+a~censor might combine a low-confidence detection of rendezvous
 with features from other phases of the Snowflake data exchange
-to strengthen its guess and possibly effect a blocking decision.
+to strengthen its guess.
 
 \item[DTLS]
-The outermost protocol
-of a WebRTC data connection, exposed to the censor,
-is Datagram TLS (DTLS) over UDP.
-DTLS is an adaptation of TLS~\cite[\S 1]{rfc9147},
-and inherits the fingerprinting concerns of the latter~\cite{Frolov2019a}.
+The outermost layer of a WebRTC data connection,
+the protocol directly exposed to a censor,
+is DTLS (Datagram TLS) over UDP.
+DTLS is an adaptation of TLS~\cite[\S 1]{rfc9147} to the datagram setting,
+and therefore inherits the fingerprinting concerns of TLS~\cite{Frolov2019a}.
 TLS/DTLS fingerprinting may involve, for example,
-inspecting the ClientHello message to see what
+inspecting ClientHello messages to see what
 ciphersuites and extensions are used,
-and their ordering---it may be that a particular fingerprint
-is specific to a particular implementation of a circumvention system
-and may therefore be blocked at low cost to the censor.
+and their order. It~may be that a certain combination
+is specific to a particular implementation of a circumvention system,
+and may therefore be blocked at low cost.
 
-Due to practical implementation considerations,
-the defenses to DTLS fingerprinting in Snowflake are not very robust,
+Due to practical considerations,
+Snowflake's defenses to DTLS fingerprinting are not very robust,
 and are reactive rather than proactive.
-In~the world of TLS one may use the uTLS package~\cite[\S VII]{Frolov2019a},
-or~(at~a not inconsiderable cost of complexity)
-tunnel through a locally installed web browser
-to borrow its TLS fingerprint~\cite[\S 5.1]{Fifield2015a}.
-But there is as yet no equivalent of uTLS for DTLS,
-and using a browser's DTLS implementation proved unworkable
-even for implementation, let alone convenient deployment to users.
+In~the realm of TLS one may use uTLS,
+but there is as yet no equivalent of uTLS for DTLS.
 The present way of altering DTLS fingerprints in Snowflake
-is by submitting pull requests to the Pion project
-whenever a fingerprint feature actually used for blocking is identified.
-\autoref{sec:block-ru} documents how this has happened twice,
+is to submit a pull request upstream to Pion
+whenever a fingerprint feature used for blocking is identified.
+\autoref{sec:block-ru} documents how this has happened twice already,
 in response to blocking in Russia.
 
 % For reference, fingerprinting changes upstreamed to Pion:
@@ -1137,48 +1134,43 @@ in response to blocking in Russia.
 Besides data channels, WebRTC offers \firstterm{media streams},
 in line with its intended purpose of enabling real-time
 audio and video communication.
-Data channels and media streams are externally distinguishable
-because they use different encrypted transports:
-while data channels use DTLS,
-media streams use DTLS-SRTP;
+Though both are encrypted,
+data channels and media streams are externally distinguishable
+because they use different containers.
+Data channels use DTLS,
+and media streams use DTLS-SRTP;
 that is, the Secure Real-Time Transport Protocol
-preceded by a DTLS key exchange~\cite[\S 4.3]{rfc8827}.
+with a DTLS key exchange~\cite[\S 4.3]{rfc8827}.
 
-Data channels are a better match for Snowflake's communication model:
+Data channels are a closer match to Snowflake's communication model:
 media streams are meant to contain encoded audio and video,
-not arbitrary binary data,
-and do not guarantee reliable or in-order delivery.
+not arbitrary binary data.
 But the use of DTLS rather than DTLS-SRTP could become
 a significant feature if most other WebRTC applications use media streams.
-(We do not know which is more common in practice,
-or whether there are enough other uses of data channels
-to support an argument that blocking all data channels would be expensive.)
 Although it would be less convenient,
 it would be possible to adapt the WebRTC link between
-the client and the proxy
+the client and its proxy
 to use a media stream rather than a data channel,
 either by modulating binary data into a well-formed encoded
 audio or video signal in the manner of, say,
-CovertCast~\cite[\S 4.3]{McPherson2016a},
+Stegozoa~\cite[\S 3.3]{Figueira2022a},
 or by directly replacing the ciphertext of SRTP packets,
 as in Protozoa~\cite[\S 4.4]{Barradas2020a}.
 % See idea about WebRTC Encoded Transform: https://lists.torproject.org/pipermail/anti-censorship-team/2023-February/000284.html
 
 \end{description}
 
-Snowflake's susceptibility to protocol fingerprinting
-has been analyzed in the past by
-Fifield and Gil Epner~\cite{arxiv.1605.08805} and by
+Snowflake's general susceptibility to protocol fingerprinting
+has been investigated by
+Fifield and Gil Epner~\cite{arxiv.1605.08805},
+and its DTLS features in particular by
 MacMillan et~al.~\cite{arxiv.2008.03254}.
-\todo{Cite \href{https://www.princeton.edu/~pmittal/publications/nprint-ccs21}{nPrint} \S 5.3,
-which automates the MacMillan et~al.\ analysis of DTLS.}
 The former predates Snowflake's switch to Pion,
-which changed its protocol fingerprints at multiple layers.
-The latter identified specific distinguishing features
+which changed protocol fingerprints at multiple layers.
+The latter correctly anticipated features
 of the Pion DTLS handshake
-that later ended up being used in practice
-to block Snowflake in Russia
-and which we had to work around;
+that would later actually be used
+to block Snowflake in Russia;
 see \autoref{sec:block-ru}.
 
 Chen et~al.~\cite{Chen2023a}
