@@ -5,6 +5,7 @@
 #   Rscript users-country.r userstats-bridge-combined-multi.csv
 
 library("tidyverse")
+library("cowplot")
 
 source("../common.r")
 
@@ -75,7 +76,7 @@ bridge_combined <- bridge_combined_multi %>%
 	complete(date = seq.Date(min(date), max(date), "days")) %>%
 	ungroup()
 
-for (g in list(
+PLOT_INFO <- list(
 	list(
 		country = "ru",
 		date_limits = lubridate::ymd(c(
@@ -102,8 +103,9 @@ for (g in list(
 		)),
 		date_labels = date_labels_abbrev
 	)
-)) {
-	p <- ggplot() +
+)
+plots <- lapply(PLOT_INFO, function(g) {
+	ggplot() +
 		geom_line(
 			data = bridge_combined %>% filter(country == g$country),
 			aes(x = date, y = users),
@@ -119,5 +121,9 @@ for (g in list(
 		) +
 		coord_cartesian(xlim = g$date_limits, expand = FALSE) +
 		labs(x = NULL, y = NULL)
-	ggsave(sprintf("users-%s.pdf", g$country), p, width = DOCUMENT_LINEWIDTH, height = HEIGHT)
+})
+# Make the horizontal axis the same size in each graph.
+plots <- align_plots(plotlist = plots, align = "v", axis = "lr")
+for (i in 1:length(plots)) {
+	ggsave(sprintf("users-%s.pdf", PLOT_INFO[[i]]$country), plots[[i]], width = DOCUMENT_LINEWIDTH, height = HEIGHT)
 }
