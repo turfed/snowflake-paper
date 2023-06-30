@@ -1160,61 +1160,39 @@ as in Protozoa~\cite[\S 4.4]{Barradas2020a}.
 
 \end{description}
 
-Snowflake's general susceptibility to protocol fingerprinting
-has been investigated by
-Fifield and Gil Epner~\cite{arxiv.1605.08805},
-and its DTLS features in particular by
-MacMillan et~al.~\cite{arxiv.2008.03254}.
-The former predates Snowflake's switch to Pion,
-which changed protocol fingerprints at multiple layers.
-The latter correctly anticipated features
+Fifield and Gil Epner~\cite{arxiv.1605.08805}
+studied the network traffic of WebRTC applications,
+with the goal of revealing fingerprinting pitfalls
+that might affect Snowflake, which was then in early development.
+MacMillan et~al.~\cite{arxiv.2008.03254}
+focused on the DTLS handshake,
+comparing Snowflake to three other WebRTC applications.
+They correctly anticipated features
 of the Pion DTLS handshake
 that would later actually be used
 to block Snowflake in Russia;
-see \autoref{sec:block-ru}.
+see more details in \autoref{sec:block-ru}.
 
 Chen et~al.~\cite{Chen2023a}
-have the good idea of combining features
-of rendezvous and the DTLS handshake
-to reduce false positives.
-They first prefilter using DNS queries:
-the Snowflake client's default selection of STUN servers
-on its own may be unexceptional,
-and its default server used for domain fronting rendezvous
-on its own may be unexceptional,
-but DNS queries for all of these within a short time span
-is likely characteristic of Snowflake and little else.
-After DNS prefiltering, they identify Snowflake connections
-by DTLS fingerprinting of the Pion implementation of DTLS
-used in the Snowflake client.
+combined features
+of rendezvous and DTLS
+in order to reduce false positives.
+Their classifier first prefilters
+by looking for DNS queries for
+STUN servers in the Snowflake client's default pool
+and the default front domain used in
+domain fronting rendezvous.
+While a single DNS query is not strong evidence of Snowflake,
+several related queries sent within a short time
+are more deserving of attention.
+They then apply a machine learning classifier
+to features of any subsequent DTLS handshake.
 The authors acknowledge that DTLS fingerprinting
 is fragile, as the DTLS fingerprint is, in principle,
-a~controllable feature.
-The DNS query prefilter may perhaps be mitigated
+controllable by the application.
+The DNS prefilter may perhaps be mitigated
 by alternative rendezvous methods (\autoref{sec:rendezvous}),
-or by smarter selection of STUN servers by the client.
-
-Somewhat related to protocol fingerprinting is traffic analysis;
-that is, inferring the use of a censorship system
-by looking at features like the distribution of packet sizes,
-arrival times, and the sequence of packet directionality (in/out)---the
-kind of analysis that, in other contexts, is known as ``website fingerprinting''---may
-% Could cite IETF survey on website fingerprinting.
-% (But don't want to give this topic more attention than it is due.)
-potentially also be applied to detecting circumvention systems.
-In~our opinion, this possibility has remained more potential than actual.
-As our own (see \autoref{sec:experience}) and others' experience shows,
-censors still prefer to attack easier targets.
-The Snowflake protocol supports traffic shaping (inside the WebRTC layer),
-but it is currently disabled:
-packets are sent with their ``natural'' sizes and without delay,
-reflecting the traffic dynamics of the tunneled Tor traffic
-(which, in turn, more or less represents the dynamics
-of the user's application-layer streams deeper in the tunnel).
-Circumvention research awaits a treatment of
-what is a good strategy for traffic shaping to
-best mitigate attacks of this nature,
-and an analysis of how much of a threat they pose in practice.
+or~by smarter selection of STUN servers by the client.
 
 \begin{figure*}[t]
 \includegraphics{figures/users/users-global}
