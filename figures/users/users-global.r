@@ -1,10 +1,11 @@
 # Makes a graph showing the estimated number of simultaneous Snowflake users
-# worldwide.
+# worldwide, as well as goodput bandwidth per day.
 #
 # Usage:
-#   Rscript users-global.r userstats-bridge-transport-multi.csv users-global.pdf
+#   Rscript users-global.r userstats-bridge-transport-multi.csv bandwidth-multi.csv users-global.pdf
 
 library("tidyverse")
+library("cowplot")
 
 source("../common.r")
 
@@ -125,11 +126,12 @@ text_annotation <- function(data) {
 
 (function() {
 	args <- commandArgs(trailingOnly = TRUE)
-	if (length(args) != 2) {
-		stop("usage: Rscript users-global.r userstats-bridge-transport-multi.csv users-global.pdf")
+	if (length(args) != 3) {
+		stop("usage: Rscript users-global.r userstats-bridge-transport-multi.csv bandwidth-multi.csv users-global.pdf")
 	}
 	bridge_transport_multi_csv_path <<- args[[1]]
-	output_path <<- args[[2]]
+	bandwidth_multi_csv_path <<- args[[2]]
+	output_path <<- args[[3]]
 })()
 
 bridge_transport_multi <- read_csv(bridge_transport_multi_csv_path, comment = "#") %>%
@@ -153,9 +155,38 @@ bridge_transport <- bridge_transport_multi %>%
 	complete(date = seq.Date(min(date), max(date), "days")) %>%
 	ungroup()
 
+bandwidth_multi <- read_csv(bandwidth_multi_csv_path, comment = "#") %>%
+	# Keep only the bridges we care about.
+	filter(fingerprint %in% names(WANTED_FINGERPRINTS)) %>%
+
+	# Compensate for days when not all descriptors were published.
+	mutate(bytes = bytes / (coverage / pmax(num_instances, coverage))) %>%
+
+	# Put all the byte counts per type into one row.
+	pivot_wider(id_cols = c(date, fingerprint), names_from = c(type), values_from = c(bytes))
+
+bandwidth <- bandwidth_multi %>%
+	# Sum the contributions of all bridge fingerprints by day.
+	group_by(date) %>%
+	summarize(across(c(read, write, `dirreq-read`, `dirreq-write`), sum, na.rm = TRUE)) %>%
+
+	# Subtract out dirreq traffic, then average read and write to estimate goodput.
+	mutate(
+		good_read = read - `dirreq-read`,
+		good_write = write - `dirreq-write`,
+		good_avg = (good_read + good_write) / 2
+	) %>%
+
+	# Keep only the records within DATE_LIMITS (necessary to avoid
+	# interference with coord_cartesian(clip = "off") below.
+	filter(lubridate::`%within%`(date, do.call(lubridate::interval, as.list(DATE_LIMITS)))) %>%
+
+	# Fill in entirely missing dates with NA.
+	complete(date = seq.Date(min(date), max(date), "days"))
+
 max_users <- max(bridge_transport$users, na.rm = TRUE)
 
-p <- ggplot() +
+p_users <- ggplot() +
 	# Gaps in the data.
 	geom_rect(data = GAPS,
 		aes(
@@ -207,4 +238,39 @@ p <- ggplot() +
 	coord_cartesian(xlim = DATE_LIMITS, ylim = c(0, 100000), expand = FALSE, clip = "off") +
 	theme(plot.margin = unit(c(13, 0, 0, 0), "mm")) +
 	labs(x = NULL, y = "Average simultaneous users")
-ggsave(output_path, p, width = DOCUMENT_TEXTWIDTH, height = 2)
+
+max_good_avg <- max(bandwidth$good_avg, na.rm = TRUE)
+
+p_bandwidth <- ggplot() +
+	# Event annotations.
+	geom_linerange(data = EVENTS,
+		aes(
+			x = date,
+			# Place the bottom of the indicator line 5% of the data range above or below nearby values.
+			ymin = (max_nearby(bandwidth$date, bandwidth$good_avg, date, 2) + max_good_avg * 0.05) / 1e12,
+			ymax = Inf
+		),
+		color = "#808080",
+		linewidth = 0.25
+	) +
+
+	# Data series.
+	geom_line(data = bandwidth, aes(x = date, y = good_avg / 1e12)) +
+
+	scale_y_continuous(
+		breaks = (0:4)*10,
+		minor_breaks = NULL
+	) +
+	scale_x_date(
+		date_breaks = "1 month",
+		minor_breaks = NULL,
+		labels = NULL
+	) +
+	coord_cartesian(xlim = DATE_LIMITS, ylim = c(0, 40), expand = FALSE, clip = "off") +
+	theme(plot.margin = unit(c(1, 0, 0, 0), "mm")) +
+	labs(x = NULL, y = "TB/day")
+
+p <- plot_grid(plotlist = align_plots(p_users, p_bandwidth, align = "v", axis = "lr"),
+	ncol = 1, rel_heights = c(5, 1))
+
+ggsave(output_path, p, width = DOCUMENT_TEXTWIDTH, height = 2.4)

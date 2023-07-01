@@ -344,7 +344,7 @@ and transfers over 35~TB of circumvention traffic per day.
 %     "5481936581E23D2D178105D44DB6915AB06BFB7F" = "snowflake-01",
 %     "91DA221A149007D0FD9E5515F5786C3DD07E4BB0" = "snowflake-02"
 %   )
-% > read_csv("figures/bandwidth/bandwidth-multi.csv") %>%
+% > read_csv("figures/users/bandwidth-multi.csv") %>%
 %     filter(fingerprint %in% names(WANTED_FINGERPRINTS)) %>%
 %     filter(date < "2023-06-01") %>%
 %     filter(coverage > 0) %>%
@@ -1197,9 +1197,9 @@ or~by smarter selection of STUN servers by the client.
 \begin{figure*}[t]
 \includegraphics{figures/users/users-global}
 \caption{
-Estimated average number of simultaneous Snowflake users per day.
-The value at the far left,
-in early January 2021, is about~60.
+Average simultaneous Snowflake users and bandwidth by day.
+The values at the far left,
+in early January 2021, are about~60 simultaneous users
 % > filter(filtered, abs(date - as.Date("2021-01-01")) < 3)
 % # A tibble: 5 x 3
 %   date       transport users
@@ -1209,20 +1209,40 @@ in early January 2021, is about~60.
 % 3 2021-01-01 snowflake  53.4
 % 4 2021-01-02 snowflake  65.5
 % 5 2021-01-03 snowflake  65.4
-At this point, Snowflake was available
-for desktop platforms and Android
-in Tor Browser's alpha release series,
-but not yet in the stable release series.
-The maximum value in the part of the graph not shown
-is~133, on \mbox{2020-12-09}.
-% > filtered[which.max(filter(filtered, date < "2021-01-01")$users), ]
-% # A tibble: 1 x 3
-%   date       transport users
-%   <date>     <chr>     <dbl>
-% 1 2020-12-09 snowflake  133.
+and 4~GB/day.
+% > library("tidyverse")
+% > options(width = 200)
+% > WANTED_FINGERPRINTS <- c(
+%     "7659DA0F96B156C322FBFF3ACCC9B9DC01C27C73" = "snowman",
+%     "5481936581E23D2D178105D44DB6915AB06BFB7F" = "snowflake-01",
+%     "91DA221A149007D0FD9E5515F5786C3DD07E4BB0" = "snowflake-02"
+%   )
+% > read_csv("figures/users/bandwidth-multi.csv") %>%
+%     filter(fingerprint %in% names(WANTED_FINGERPRINTS)) %>%
+%     filter(date < "2023-06-01") %>%
+%     filter(coverage > 0) %>%
+%     mutate(bytes = bytes / (coverage / pmax(num_instances, coverage))) %>%
+%     pivot_wider(id_cols = c(date, fingerprint), names_from = c(type), values_from = c(bytes)) %>%
+%     group_by(date) %>%
+%     summarize(across(c(read, write, `dirreq-read`, `dirreq-write`), sum, na.rm = TRUE)) %>%
+%     mutate(
+%       good_read = read - `dirreq-read`,
+%       good_write = write - `dirreq-write`,
+%       good_avg = (good_read + good_write) / 2
+%     ) %>%
+%     mutate(across(c(read, write, `dirreq-read`, `dirreq-write`, good_read, good_write, good_avg), scales::label_bytes(units = "auto_si", accuracy = 0.01))) %>%
+%     arrange(date) %>% filter("2020-12-29" <= date & date < "2021-01-04")
+% # A tibble: 6 × 8
+%   date       read     write   `dirreq-read` `dirreq-write` good_read good_write good_avg
+%   <date>     <chr>    <chr>   <chr>         <chr>          <chr>     <chr>      <chr>
+% 1 2020-12-29 9.95 GB  8.89 GB 89.52 MB      825.81 MB      9.86 GB   8.07 GB    8.97 GB
+% 2 2020-12-30 10.77 GB 9.07 GB 87.01 MB      787.05 MB      10.68 GB  8.28 GB    9.48 GB
+% 3 2020-12-31 5.32 GB  5.13 GB 76.97 MB      682.87 MB      5.25 GB   4.45 GB    4.85 GB
+% 4 2021-01-01 4.57 GB  4.25 GB 75.48 MB      683.19 MB      4.49 GB   3.57 GB    4.03 GB
+% 5 2021-01-02 7.34 GB  6.56 GB 90.84 MB      822.81 MB      7.25 GB   5.74 GB    6.49 GB
+% 6 2021-01-03 8.50 GB  7.74 GB 94.69 MB      844.65 MB      8.40 GB   6.90 GB    7.65 GB
 }
 \label{fig:user-counts}
-\todo[inline]{Bandwidth chart? Ideally with aligned horizontal axis.}
 \todo[inline]{Find a good way to represent the intermittent blocking of the domain front in Iran, January--March~2023.}
 \end{figure*}
 
@@ -1618,7 +1638,7 @@ Snowflake had transferred 4.98~PB of user data.\todo{Estimate and subtract non-S
 %     "5481936581E23D2D178105D44DB6915AB06BFB7F" = "snowflake-01",
 %     "91DA221A149007D0FD9E5515F5786C3DD07E4BB0" = "snowflake-02"
 %   )
-% > read_csv("figures/bandwidth/bandwidth-multi.csv") %>%
+% > read_csv("figures/users/bandwidth-multi.csv") %>%
 %     filter(fingerprint %in% names(WANTED_FINGERPRINTS)) %>%
 %     filter(date < "2023-05-01") %>%
 %     filter(coverage > 0) %>%
