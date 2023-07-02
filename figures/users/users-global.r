@@ -135,7 +135,7 @@ text_annotation <- function(data) {
 })()
 
 bridge_transport_multi <- read_csv(bridge_transport_multi_csv_path, comment = "#") %>%
-	# Keep only the transports and bridges we care about.
+	# Keep only the bridges we care about.
 	filter(transport == "snowflake" & fingerprint %in% names(WANTED_FINGERPRINTS)) %>%
 
 	# Compensate for days when not all descriptors were published.
@@ -153,7 +153,10 @@ bridge_transport <- bridge_transport_multi %>%
 	# Fill in entirely missing dates with NA.
 	group_by(transport) %>%
 	complete(date = seq.Date(min(date), max(date), "days")) %>%
-	ungroup()
+	ungroup() %>%
+
+	# Keep only the transport we care about.
+	filter(transport == "snowflake")
 
 bandwidth_multi <- read_csv(bandwidth_multi_csv_path, comment = "#") %>%
 	# Keep only the bridges we care about.
@@ -163,19 +166,30 @@ bandwidth_multi <- read_csv(bandwidth_multi_csv_path, comment = "#") %>%
 	mutate(bytes = bytes / (coverage / pmax(num_instances, coverage))) %>%
 
 	# Put all the byte counts per type into one row.
-	pivot_wider(id_cols = c(date, fingerprint), names_from = c(type), values_from = c(bytes))
-
-bandwidth <- bandwidth_multi %>%
-	# Sum the contributions of all bridge fingerprints by day.
-	group_by(date) %>%
-	summarize(across(c(read, write, `dirreq-read`, `dirreq-write`), sum, na.rm = TRUE)) %>%
+	pivot_wider(id_cols = c(date, fingerprint), names_from = c(type), values_from = c(bytes)) %>%
 
 	# Subtract out dirreq traffic, then average read and write to estimate goodput.
 	mutate(
 		good_read = read - `dirreq-read`,
 		good_write = write - `dirreq-write`,
 		good_avg = (good_read + good_write) / 2
-	) %>%
+	)
+
+# Join the bandwidth_multi data set with the bridge_transport_multi data set,
+# so we can estimate what fraction of bandwidth is due to snowflake versus
+# non-snowflake traffic, per fingerprint and per day.
+bandwidth <- left_join(bridge_transport_multi, bandwidth_multi, by = c("date", "fingerprint")) %>%
+	# Subtract out the pro-rated fraction of non-snowflake transports (basically negligible).
+	group_by(date, fingerprint) %>%
+	mutate(across(c(read, write, `dirreq-read`, `dirreq-write`, good_read, good_write, good_avg), ~ .x * users / sum(users))) %>%
+	ungroup() %>%
+
+	# Sum the contributions of all bridge fingerprints by day.
+	group_by(date, transport) %>%
+	summarize(across(c(read, write, `dirreq-read`, `dirreq-write`, good_read, good_write, good_avg), sum, na.rm = TRUE), .groups = "drop") %>%
+
+	# Keep only the transport we care about.
+	filter(transport == "snowflake") %>%
 
 	# Keep only the records within DATE_LIMITS (necessary to avoid
 	# interference with coord_cartesian(clip = "off") below.
@@ -242,6 +256,33 @@ p_users <- ggplot() +
 max_good_avg <- max(bandwidth$good_avg, na.rm = TRUE)
 
 p_bandwidth <- ggplot() +
+	# Gaps in the data.
+	geom_rect(data = GAPS,
+		aes(
+			xmin = begin,
+			xmax = end,
+			ymin = 0,
+			ymax = (max(
+				max_nearby(bandwidth$date, bandwidth$good_avg, begin, 2),
+				max_nearby(bandwidth$date, bandwidth$good_avg, end, 2)
+			) + max_good_avg * 0.05) / 1e12
+		),
+		fill = "gray",
+		alpha = 0.8
+	) +
+	geom_linerange(data = GAPS,
+		aes(
+			x = mean(c(begin, end)),
+			ymin = (max(
+				max_nearby(bandwidth$date, bandwidth$good_avg, begin, 2),
+				max_nearby(bandwidth$date, bandwidth$good_avg, end, 2)
+			) + max_good_avg * 0.10) / 1e12,
+			ymax = Inf
+		),
+		color = "#808080",
+		linewidth = 0.25
+	) +
+
 	# Event annotations.
 	geom_linerange(data = EVENTS,
 		aes(
