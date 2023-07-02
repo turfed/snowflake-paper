@@ -1198,9 +1198,9 @@ or~by smarter selection of STUN servers by the client.
 \begin{figure*}[t]
 \includegraphics{figures/users/users-global}
 \caption{
-Average simultaneous Snowflake users and bandwidth by day.
-The values at the far left,
-in early January 2021, are about~60 simultaneous users
+Estimated average simultaneous Snowflake users and bandwidth by day.
+The values at the far left of the graph,
+in~early January~2021, are about~60 users
 % > filter(filtered, abs(date - as.Date("2021-01-01")) < 3)
 % # A tibble: 5 x 3
 %   date       transport users
@@ -1420,8 +1420,8 @@ but rather the \emph{average number of concurrent clients} per day.
 For example, the value of 12,000 on \mbox{2022-05-01}
 means that, on~average, 12,000 clients were using the service
 at any point in time on that day.
-The contribution of a client is the same,
-no~matter how many temporary proxies it may use
+The contribution of a client is independent of
+the number of temporary proxies it uses
 over the course of a session.
 
 Snowflake's growth began in earnest
@@ -1448,39 +1448,42 @@ The number of users steadily increased
 over the next five months,
 reaching almost~2,000 by December~2021.
 
-Network censorship events may result in fewer
-or more users of a circumvention system:
-fewer if the system has not enough resistance to prevent
+Network censorship events may have the contrary effects
+of either increasing or decreasing the number of users
+of a circumvention system.
+The user count will decrease
+if the system does not have enough resistance to prevent
 itself being caught up in the blocking;
-more if it remains unblocked and becomes one
+but increase if it remains unblocked as one
 of a diminished number of ways to reach the outside world.
 Two such censorship events,
 one in Russia and one in Iran,
-had the effect of increases in the number of Snowflake users
+had the effect of increasing the number of Snowflake users
 by multiples.
-(Because they also threatened Snowflake itself in part,
+(Because they also, in part, threatened Snowflake itself,
 we will have more to say about them in \autoref{sec:block}.)
 
-On \mbox{2021-12-01}, a subset of ISPs in Russia suddenly began to block
-most forms of access to Tor
+On \mbox{2021-12-01}, some ISPs in Russia
+deployed measures to block
+most forms of access to Tor,
 including Snowflake~\cite{ooni-2021-russia-blocks-tor}.
-(The censor used a feature of the DTLS handshake.)
-We released workarounds within a few weeks in
-Tor Browser~11.5a1 and~11.0.3,
-and in the next two months the total number of users quadrupled,
-mostly due to new users in Russia.
-The added demand temporarily overwhelmed the bridge hardware;
+The measures varied in their effectiveness;
+in~the case of Snowflake,
+blocking was triggered by a particular feature of the DTLS handshake,
+which we were able to mitigate in new releases within a few weeks.
+Over the next two months the total number of Snowflake users quadrupled,
+with most of the new users coming from Russia.
+The sudden demand temporarily overwhelmed the bridge, and
 for a few weeks Snowflake was almost unusably slow.
 % "I really want to use snowflake, but it's extremely slow, almost unusable." https://old.reddit.com/r/TOR/comments/t49i14/hello_i_have_a_problem_with_snowflake_can_you/
-We~had to invent a new way of deploying a Tor bridge,
-using load balancing over multiple processes to permit better scaling~\cite{Fifield2023a};
+It~forced us to rearchitect the bridge for better scaling~\cite{Fifield2023a},
 % https://forum.torproject.net/t/tor-relays-how-to-reduce-tor-cpu-load-on-a-single-bridge/1483
 % "The DNS records were changed to point to the staging bridge at..." https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40095#note_2772325
-as well as migrate the bridge to more substantial server hardware
-and upgrade from a 1~Gbps to a 10~Gbps network link.
+as~well as move the bridge to a powerful dedicated server
+and upgrade its network link from 1~Gbps to 10~Gbps.
 % https://forum.torproject.net/t/tor-project-more-resources-required-for-snowflake-bridge/2353
 % "snowflake-01: Change uplink from 1G to 10G" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40138
-In~May 2022, according to Tor's IP geolocation,
+By~May 2022,
 about 70\% of Snowflake users were in Russia.
 % > library("tidyverse")
 % > WANTED_FINGERPRINTS <- c(
@@ -1511,26 +1514,28 @@ The count of users in Russia got an additional small boost,
 visible in the graph,
 starting on \mbox{2022-07-14},
 when Tor Browser~11.5 added the Connection Assist feature,
-which attempts to automatically enable circumvention options when needed.
+which automatically enables circumvention options when needed.
 % https://blog.torproject.org/new-release-tor-browser-115/
 % Graph showing boost going mostly to Russia: https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake-webext/82#note_2891387
-A~separate DTLS blocking signature had been reported on \mbox{2022-06-20};
+Another DTLS blocking signature was reported on \mbox{2022-06-20};
 we did not get to fixing it until Tor Browser~12.0.3 on \mbox{2023-02-15}.\todo{And Orbot 17 on\ldots}
 % "The 'skip Hello Verify Request' change was merged into Tor Browser..." https://gitlab.torproject.org/tpo/anti-censorship/censorship-analysis/-/issues/40030#note_2893870
+By~that time the global user count had come to be dominated by users from Iran.
 
 % "Shutdowns, intensified blocking in Iran since 2022-09-21" https://github.com/net4people/bbs/issues/125
 % "Need to increase number of tor instances on snowflake-01 bridge, increased usage since yesterday [2022-09-21]" https://lists.torproject.org/pipermail/anti-censorship-team/2022-September/000247.html
 % "Graphs of user counts from Iran since the onset of shutdowns" https://forum.torproject.net/t/graphs-of-user-counts-from-iran-since-the-onset-of-shutdowns/4843
-The second event that had a large effect on Snowflake usage
-were nationwide protests in Iran that started on \mbox{2022-09-21},
-to which the government responded by imposing periodic network shutdowns
+The next event that had a large effect on Snowflake usage
+were the nationwide protests in Iran that started on \mbox{2022-09-21}.
+The government imposed periodic network shutdowns
 and additional network blocking,
 severe even by the standards of a country already notorious
 for Internet censorship~\cite{ooni-2022-iran-blocks-social-media-mahsa-amini-protests}.
 Internet users in Iran turned to circumvention systems
 that continued working despite the new restrictions,
 Snowflake among them.
-On~\mbox{2022-09-20}, Iran accounted for only~1\% of Snowflake users;
+Adoption was rapid:
+on~\mbox{2022-09-20}, Iran accounted for only~1\% of Snowflake users;
 on~\mbox{2022-09-24} it was 67\%.
 % > library("tidyverse")
 % > WANTED_FINGERPRINTS <- c(
@@ -1559,44 +1564,39 @@ on~\mbox{2022-09-24} it was 67\%.
 % 6 2022-09-24 snowflake ir      49130. 49083. 49107.   66.0
 % 7 2022-09-25 snowflake ir      59517. 59470. 59493.   67.4
 The massive influx of users had us scrambling to test and deploy
-performance improvements over the next few days.
+performance improvements over the succeeding days.
 About two weeks later, on \mbox{2022-10-04},
-usage dropped as quickly as had risen,
-due to the censors in Iran blocking a TLS fingerprint
-used for rendezvous.
+usage dropped almost as quickly as had risen.
+The drop was caused by
+the censors in Iran blocking a TLS fingerprint
+used in rendezvous.
 % "Sudden reduction in snowflake-01 bridge bandwidth, 2022-10-04 17:15" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40207
-We will have more to say about that in \autoref{sec:block-ir}.
-After deploying fixes for the TLS fingerprint issue,
-users in Iran began to recover going into~2023.
+After we released fixes for the TLS fingerprinting issue,
+the user count in Iran began to recover going into~2023.
 One of the emergency performance optimizations we had deployed in late September
-turned out to be mistaken and actually be harmful for performance,
+turned out to be a mistake and actually harmful for performance.
 % "Weird KCP packets received by the client" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40260
-though the problem was masked, for a time, by the great demand for the service.
-The user count had declined from February~2023,
-until we reverted the erroneous change in mid-March,
+The problem was masked, for a time, by the great demand for the service,
+but starting in February~2023 the user count started to decline.
+We~reverted the erroneous change in mid-March,
 % "Deploy snowflake-server for QueuePacketConn buffer reuse fix (#40260)" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40262
-after which the count started to recover.
-Around this time, there were also short intervals during which
-the domain used for domain-fronting rendezvous
+and then the count started to recover again.
+Around this time, there was also a span of about a week,
+and irregular brief intervals thereafter, during which
+the domain used for domain fronting rendezvous
 was blocked in some ISPs in Iran,
-an evident attempt at blocking that was not sustained.
+an evident attempt at blocking that was, however, not sustained.
 
-Through most of this history,
-we had run the system's backend bridge on a single server,
+Throughout most of this history,
+we ran the backend bridge on a single server,
 upgrading and optimizing it as needed.
-Recall from \autoref{sec:mechanics} that it is not a weakness
-for the bridge to be a single entity at a well-known address,
-because a censor's target of blocking can only be the temporary proxies, not the bridge.
-But as the first bridge began to reach its hardware capacity
-and performance wins got harder to achieve,
+But as the bridge began to reach its hardware capacity,
+and performance improvements became harder to achieve,
 we deployed a second bridge to share the load.
-The challenges and design considerations of doing so are discussed in \autoref{sec:multi-bridge}.
+We discuss the challenges and design considerations of doing so in \autoref{sec:multi-bridge}.
 The second bridge was made available to users in
 Tor Browser~12.0 on \mbox{2022-12-07}.
-By~February, however, the second bridge only accounted for about~5\%
-of users---evidently the majority of Snowflake users used Orbot
-rather than Tor Browser.
-\todo{Revisit this when Orbot~17 hits the \href{https://play.google.com/store/apps/details?id=org.torproject.android}{Play Store}}
+By~May, the second bridge supported about 17\% of Snowflake users.\todo{Revisit this when Orbot~17 hits the \href{https://play.google.com/store/apps/details?id=org.torproject.android}{Play Store}}
 % > library("tidyverse")
 % > WANTED_FINGERPRINTS <- c(
 %     "7659DA0F96B156C322FBFF3ACCC9B9DC01C27C73" = "snowman",
@@ -1608,29 +1608,29 @@ rather than Tor Browser.
 %     mutate(users = users / (coverage / pmax(num_instances, coverage))) %>%
 %     mutate(instance = WANTED_FINGERPRINTS[fingerprint], fingerprint = NULL) %>%
 %     group_by(date, transport) %>% mutate (percent = 100 * users / sum(users, na.rm = TRUE)) %>% ungroup()
-% > print(userstats %>% filter("2023-02-20" <= date & date < "2023-02-28"), n = 100)
-% # A tibble: 16 x 7
+% > print(userstats %>% filter("2023-05-24" <= date & date < "2023-06-01"), n = 100)
+% # A tibble: 16 × 7
 %    date       transport  users num_instances coverage instance     percent
 %    <date>     <chr>      <dbl>         <dbl>    <dbl> <chr>          <dbl>
-%  1 2023-02-20 snowflake 79040.            12     12   snowflake-01   95.9
-%  2 2023-02-20 snowflake  3407.            12     12   snowflake-02    4.13
-%  3 2023-02-21 snowflake 76365.            12     12   snowflake-01   95.8
-%  4 2023-02-21 snowflake  3354.            12     12   snowflake-02    4.21
-%  5 2023-02-22 snowflake 72064.            12     12   snowflake-01   95.6
-%  6 2023-02-22 snowflake  3356.            12     12   snowflake-02    4.45
-%  7 2023-02-23 snowflake 71508.            12     11.1 snowflake-01   95.5
-%  8 2023-02-23 snowflake  3408.            12     12   snowflake-02    4.55
-%  9 2023-02-24 snowflake 71549.            12     11.9 snowflake-01   95.4
-% 10 2023-02-24 snowflake  3444.            12     12   snowflake-02    4.59
-% 11 2023-02-25 snowflake 70069.            12     12   snowflake-01   95.2
-% 12 2023-02-25 snowflake  3506.            12     12   snowflake-02    4.77
-% 13 2023-02-26 snowflake 70590.            12     12   snowflake-01   95.3
-% 14 2023-02-26 snowflake  3506.            12     12   snowflake-02    4.73
-% 15 2023-02-27 snowflake 69135.            12     12   snowflake-01   95.2
-% 16 2023-02-27 snowflake  3454.            12     12   snowflake-02    4.76
+%  1 2023-05-24 snowflake 66929.            12    12    snowflake-01    83.5
+%  2 2023-05-24 snowflake 13251.            12    12    snowflake-02    16.5
+%  3 2023-05-25 snowflake 66003.            12    12    snowflake-01    83.4
+%  4 2023-05-25 snowflake 13175.            12    12    snowflake-02    16.6
+%  5 2023-05-26 snowflake 65176.            12    11.6  snowflake-01    83.3
+%  6 2023-05-26 snowflake 13099.            12    12    snowflake-02    16.7
+%  7 2023-05-27 snowflake 66565.            12    11.4  snowflake-01    83.1
+%  8 2023-05-27 snowflake 13498.            12    12    snowflake-02    16.9
+%  9 2023-05-28 snowflake 66627.            12    12    snowflake-01    83.1
+% 10 2023-05-28 snowflake 13553.            12    12    snowflake-02    16.9
+% 11 2023-05-29 snowflake 65942.            12    12    snowflake-01    82.9
+% 12 2023-05-29 snowflake 13643.            12    12    snowflake-02    17.1
+% 13 2023-05-30 snowflake 65664.            12    11.6  snowflake-01    82.8
+% 14 2023-05-30 snowflake 13675.            12    12    snowflake-02    17.2
+% 15 2023-05-31 snowflake 65518.            12     7.15 snowflake-01    82.7
+% 16 2023-05-31 snowflake 13745.            12     9.19 snowflake-02    17.3
 
 As~of \mbox{2023-04-30},
-Snowflake had transferred 4.98~PB of user data.\todo{Estimate and subtract non-Snowflake (i.e.~$\langle\mathrm{OR}\rangle$) bytes, even though likely negligible.}
+Snowflake had transferred 4.98~PB of circumvention data.\todo{Estimate and subtract non-Snowflake (i.e.~$\langle\mathrm{OR}\rangle$) bytes, even though likely negligible.}
 % > library("tidyverse")
 % > options(width = 200)
 % > WANTED_FINGERPRINTS <- c(
@@ -1658,13 +1658,10 @@ Snowflake had transferred 4.98~PB of user data.\todo{Estimate and subtract non-S
 %   date       cumul_read cumul_write `cumul_dirreq-read` `cumul_dirreq-write` cumul_good_read cumul_good_write cumul_good_avg
 %   <date>     <chr>      <chr>       <chr>               <chr>                <chr>           <chr>            <chr>
 % 1 2023-04-30 5.02 PB    5.05 PB     5.51 TB             94.14 TB             5.01 PB         4.96 PB          4.98 PB
-This is goodput; that is, the amount of Tor TLS traffic inside the tunnel.
-The bandwidth at the bridges' network interfaces is
-higher than the goodput bandwidth,
-because of the overhead of WebRTC, WebSocket, and
-the internal Turbo Tunnel layer.
+By~this we mean goodput: Tor TLS traffic inside the tunnel,
+ignoring WebRTC, WebSocket, and KCP/\allowbreak smux overhead.
 At~that time, about 2.7\% of all Tor users
-(32\% when looking at just bridge users) used Snowflake to connect to Tor.
+(32\% of bridge users) used Snowflake to connect to Tor.
 \todo{Think about this slight inconsistency: we don't use
 \href{https://lists.torproject.org/pipermail/tor-dev/2022-April/014725.html}{\texttt{frac}}
 in other estimates/\allowbreak graphs, but here we effectively do.}
