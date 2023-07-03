@@ -14,7 +14,7 @@ DATE_LIMITS <- lubridate::ymd(c(
 	"2023-05-30"
 ))
 
-# TODO: date thresholds where labeling changed, notably "unknown"→"iptproxy" on 2022-06-21.
+# Timeline of events relevant to proxy type measurement.
 #
 # 2019-12-03 WebExtension version 0.2.0 is released, broker starts recording proxy types.
 # https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/31157#note_2593925
@@ -26,7 +26,8 @@ DATE_LIMITS <- lubridate::ymd(c(
 # 2022-05-03 IPtProxy 1.6.0 adds 'ProxyType: "iptproxy"'.
 # https://github.com/tladesignz/IPtProxy/commit/c6ba25ef6ce8449476f734c626eadffdf55d0519
 #
-# 2022-06-21 "unknown" disappears and "iptproxy" appears in proxy-type.csv.
+# 2022-06-21 Broker deployment; "unknown" disappears and "iptproxy" appears in proxy-type.csv.
+# https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40151
 #
 # 2022-07-05 Orbot 16.6.2 RC 1 upgrades to iPtProxy 1.6.0.
 # https://github.com/guardianproject/orbot/releases/tag/16.6.2-RC-1-tor.0.4.7.8
@@ -49,6 +50,13 @@ proxy_type <- read_csv(proxy_type_csv_path, col_types = cols(
 	# Unlike in the user graphs, here we do not compensate for days where
 	# coverage < 1.0: because of deduplication, unique_ips does not scale
 	# linearly with time like the number of concurrent users does.
+
+	# Attribute unknown proxy types before 2022-06-21 to iptproxy. This was
+	# the date of the broker deployment that first started recognizing
+	# "iptproxy" as a probe type. Before that, IPtProxy proxies reported
+	# their type as "iptproxy" but the broker ignored it.
+	# https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40151
+	mutate(type = ifelse(is.na(type) & date <= "2022-06-21", "iptproxy", type)) %>%
 
 	# Put a label on the rows with type == NA.
 	replace_na(list(type = "unknown")) %>%
