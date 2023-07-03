@@ -20,7 +20,7 @@ theme_set(
 # https://stackoverflow.com/a/48978417
 update_geom_defaults("text", aes(family = FONT_FAMILY))
 update_geom_defaults("label", aes(family = FONT_FAMILY))
-update_geom_defaults("line", aes(linewidth = 0.2))
+update_geom_defaults("line", aes(size = 0.2))
 
 # Ignore all bridges that have the snowflake transport, except these. These are
 # the ones that we, the developers, ran, and were at some point deployed.
