@@ -74,7 +74,7 @@ proxy_type <- read_csv(proxy_type_csv_path, col_types = cols(
 
 	# Make better labels for proxy types.
 	mutate(type = fct_recode(type,
-		"WebExtension" = "webext",
+		"Browser\nextension" = "webext",
 		"Orbot" = "iptproxy",
 		"Standalone" = "standalone",
 		"Web badge" = "badge",
@@ -126,6 +126,7 @@ p <- ggplot() +
 		),
 		position = position_nudge(x = 5),
 		size = 2,
+		lineheight = 0.8,
 		hjust = 0, vjust = 0.5
 	) +
 
@@ -143,6 +144,6 @@ p <- ggplot() +
 	labs(x = NULL, y = "Unique proxy IP addresses") +
 
 	# Make room for the margin labels added by geom_text above.
-	theme(plot.margin = unit(c(0, 13, 0, 0), "mm")) +
+	theme(plot.margin = unit(c(0, 10, 0, 0), "mm")) +
 	guides(color = "none")
 ggsave(output_path, p, width = DOCUMENT_LINEWIDTH, height = 1.5)

@@ -1728,11 +1728,11 @@ in other estimates/\allowbreak graphs, but here we effectively do.}
 
 Snowflake's effectiveness depends crucially on its pool of proxies,
 of which there are several types.
-The primary type is the browser WebExtension,\todo{Audit ``add-on'' vs.\ ``extension'' vs.\ ``WebExtension''.}
+The primary type is the browser extension,
 % "Creating a Snowflake WebExtension addon" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/23888
 which, once installed, runs the background of a person's web browsing sessions.
 There is a ``web badge'' version of the proxy that does not require installation;
-it is the same JavaScript code as the WebExtension, but running in a normal web page.
+it is the same JavaScript code as the browser extension, but running in a normal web page.
 Rather than install a browser extension,
 some people leave a browser tab open on a web badge proxy.
 There is also a standalone proxy that runs in the command line
@@ -1785,7 +1785,7 @@ by proxy type.
 \autoref{fig:proxy-type} shows the
 comparative counts of the different types of proxy,
 counting unique IP addresses per 24~hours.
-The WebExtension proxies clearly predominate,
+Web browser extension proxies clearly predominate,
 representing about 88\%\todo{Update percentage before submission.} of daily IP addresses.
 % > read_csv("figures/proxies/proxy-type.csv", col_types = cols()) %>% filter("2023-04-01" <= date & date < "2023-04-08") %>% group_by(type) %>% summarize(unique_ips = sum(unique_ips)) %>% mutate(percent = 100 * unique_ips / sum(unique_ips)) %>% ungroup()
 % # A tibble: 4 x 3
@@ -1823,7 +1823,7 @@ a few standalone proxies,
 run by us for the benefit of alpha testers.
 A~page with the web badge existed,
 but did not get enough traffic to produce proxies reliably.
-The WebExtension was first made available in mid-2019.
+The browser extension was first made available in mid-2019.
 % |2019-06-26|||snowflake|Deployed version 0.0.1 of the Snowflake WebExtension for Firefox.|[comment](https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/30931#note_2593598)||
 % |2019-07-03|||snowflake|Deployed version 0.0.1 of the Snowflake WebExtension for Chrome.|[comment](https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/30999#note_2593718)||
 % |2019-07-26|||flashproxy snowflake|Cupcake 2.0 is released, now working with Snowflake rather than flash proxy.|[Chrome Web Store page](https://chrome.google.com/webstore/detail/cupcake/dajjbehmbnbppjkcnpdkaniapgdppdnc)||
@@ -1853,7 +1853,7 @@ Caveat: the other bridges have supposedly better anti-enumeration defenses.}
 
 It~is worth reflecting briefly
 on the relative ineffectiveness of the web badge
-compared to the WebExtension.
+compared to the browser extension.
 The web badge had been the primary envisioned deployment model of flash proxy
 (though by the end of its run, flash proxy had also gained
 % https://www.bamsoftware.com/talks/ee380-flashproxy/index.html#s15
@@ -1889,7 +1889,7 @@ or activating a toggle on a web page.
 Our initial concerns that this decision
 would reduce the number of proxies were unfounded:
 people find an informative, interactable proxy control panel more appealing,
-and install the WebExtension in greater numbers.
+and install the browser extension in greater numbers.
 The browser-based proxies display the number of censored clients
 helped in the last 24~hours,
 which proxy operators find rewarding.
