@@ -14,23 +14,35 @@ DATE_LIMITS <- lubridate::ymd(c(
 	"2023-05-30"
 ))
 
-# Timeline of events relevant to proxy type measurement.
+# Timeline of events relevant to proxy type measurement. The tricky part is
+# Orbot (IPtProxy) types. From 2021-02-23 to 2022-01-03, Orbot reported its
+# type as "standalone" and it is not possible to separate it from actual
+# standalone command-line proxies during this time. From 2022-01-03 to
+# 2022-06-21, Orbot reported its type as "iptproxy", but the broker, not
+# recognizing the type string, recorded it as unknown. From 2022-06-21 on, the
+# broker properly records "iptproxy" as the type for Orbot proxies.
 #
 # 2019-12-03 WebExtension version 0.2.0 is released, broker starts recording proxy types.
 # https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/31157#note_2593925
 #
-# 2022-03-21 Snowflake begins to recognize "iptproxy" as a probe type.
-# https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40104
-# https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/merge_requests/82
+# 2021-02-23 Orbot 16.4.1-BETA-2 adds Snowflake proxy support, reporting its type as "standalone".
+# https://github.com/guardianproject/orbot/releases/tag/16.4.1-BETA-2-tor.0.4.4.6
 #
-# 2022-05-03 IPtProxy 1.6.0 adds 'ProxyType: "iptproxy"'.
-# https://github.com/tladesignz/IPtProxy/commit/c6ba25ef6ce8449476f734c626eadffdf55d0519
+#   2021-07-14 IPtProxy 1.1.0 changes its type from "standalone" to "iptproxy"—not released yet.
+#   https://github.com/tladesignz/IPtProxy/commit/228e9e61e285ee548a42d6bee487577e44630695
+#   2021-12-20 Orbot updates IPtProxy from 1.0.0 to 1.2.0—not released yet.
+#   https://github.com/guardianproject/orbot/commit/57add48cd904afe94363219887cd142bb5cf6696
+#   https://github.com/guardianproject/orbot/releases/tag/16.5.2-RC-1-tor.0.4.6.8
 #
-# 2022-06-21 Broker deployment; "unknown" disappears and "iptproxy" appears in proxy-type.csv.
+# 2022-01-03 Orbot 16.5.2-RC-5 is released, now reporting its type as "iptproxy".
+# https://github.com/guardianproject/orbot/releases/tag/16.5.2-RC-5-tor.0.4.6.9
+#
+#   2022-03-21 Snowflake broker begins to recognize "iptproxy" as a probe type—not deployed yet.
+#   https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40104
+#   https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/merge_requests/82
+#
+# 2022-06-21 Broker deployment; broker starts recording the "iptproxy" type.
 # https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40151
-#
-# 2022-07-05 Orbot 16.6.2 RC 1 upgrades to iPtProxy 1.6.0.
-# https://github.com/guardianproject/orbot/releases/tag/16.6.2-RC-1-tor.0.4.7.8
 
 (function() {
 	args <- commandArgs(trailingOnly = TRUE)
