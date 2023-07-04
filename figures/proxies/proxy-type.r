@@ -51,12 +51,22 @@ proxy_type <- read_csv(proxy_type_csv_path, col_types = cols(
 	# coverage < 1.0: because of deduplication, unique_ips does not scale
 	# linearly with time like the number of concurrent users does.
 
-	# Attribute unknown proxy types before 2022-06-21 to iptproxy. This was
-	# the date of the broker deployment that first started recognizing
-	# "iptproxy" as a probe type. Before that, IPtProxy proxies reported
-	# their type as "iptproxy" but the broker ignored it.
-	# https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40151
-	mutate(type = ifelse(is.na(type) & date <= "2022-06-21", "iptproxy", type)) %>%
+	mutate(type = case_when(
+		# Proxies did not report their type before 2020-12-03.
+		# Visually, the "Unknown" series before that date matches up
+		# with the "WebExtension" series after that date. There were
+		# probably a relatively small number of standalone and web
+		# bage, but go ahead and attribute all to WebExtension.
+		# https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/31157#note_2593925
+		is.na(type) & date <= "2020-12-03" ~ "webext",
+		# After that, attribute unknown proxy types until 2022-06-21 to
+		# iptproxy. IPtProxy reported its type as "iptproxy", but this
+		# value was not recognized by the broker until the deployment
+		# of 2022-06-21.
+		# https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40151
+		is.na(type) & date <= "2022-06-21" ~ "iptproxy",
+		TRUE ~ type
+	)) %>%
 
 	# Put a label on the rows with type == NA.
 	replace_na(list(type = "unknown")) %>%
