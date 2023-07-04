@@ -1723,30 +1723,32 @@ in other estimates/\allowbreak graphs, but here we effectively do.}
 % 1 bridge non-snowflake 1462005    68.4
 % 2 bridge snowflake      676189    31.6
 
-\subsection{Number and type of proxies}
+\subsection{Number and types of proxies}
 \label{sec:proxies}
 
-Snowflake's effectiveness depends crucially on its pool of proxies,
-of which there are several types.
-The primary type is the browser extension,
+Snowflake's effectiveness depends on its proxies,
+of~which there are several types.
+The primary type is the web browser extension,
 % "Creating a Snowflake WebExtension addon" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/23888
-which, once installed, runs the background of a person's web browsing sessions.
-There is a ``web badge'' version of the proxy that does not require installation;
-it is the same JavaScript code as the browser extension, but running in a normal web page.
-Rather than install a browser extension,
-some people leave a browser tab open on a web badge proxy.
-There is also a standalone proxy that runs in the command line
-and does not require a browser;
+which, once installed, works in the background
+while the browser is running.
+There is also a ``web badge'' version of the proxy that does not require installation.
+It~is the same JavaScript code as the extension, but running in an ordinary web page.
+Some people leave a browser tab idling on the web badge page,
+rather than install a browser extension.
+Apart from the web-based proxies,
+we~provide a standalone, command-line proxy
+that does not require a browser.
 % "Golang implementation of standalone snowflake proxy" https://github.com/keroserene/snowflake/pull/41
-this version is convenient to install on a rented VPS, for example.
-Running a long-term headless snowflake proxy at a fixed IP address
-is somewhat at odds with the goal of proxy address diversity,
-but these standalone proxy are valuable because
+This version is convenient to install on a rented VPS, for example.
+Running a long-term proxy at a fixed IP address
+is somewhat at odds with Snowflake's goal of proxy address diversity and agility,
+but these standalone proxies are valuable because
 they tend to have less restrictive NATs,
 making them compatible with more clients.
 Finally, Orbot, a mobile app for accessing Tor,
-in addition to being able to \emph{use} a snowflake proxy for circumvention,
-can also \emph{provide} snowflake proxy service to others,
+besides being able to \emph{use} Snowflake for circumvention,
+can also \emph{provide} Snowflake proxy service to others,
 a~feature called ``kindness mode.''
 % Only so called in Orbot v17+, which should be current by the time the paper is submitted.
 
