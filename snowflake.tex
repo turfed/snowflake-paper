@@ -1726,37 +1726,20 @@ in other estimates/\allowbreak graphs, but here we effectively do.}
 \subsection{Number and types of proxies}
 \label{sec:proxies}
 
-Snowflake's effectiveness depends on its proxies,
-of~which there are several types.
-The primary type is the web browser extension,
-% "Creating a Snowflake WebExtension addon" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/23888
-which, once installed, works in the background
-while the browser is running.
-There is also a ``web badge'' version of the proxy that does not require installation.
-It~is the same JavaScript code as the extension, but running in an ordinary web page.
-Some people leave a browser tab idling on the web badge page,
-rather than install a browser extension.
-Apart from the web-based proxies,
-we~provide a standalone, command-line proxy
-that does not require a browser.
-% "Golang implementation of standalone snowflake proxy" https://github.com/keroserene/snowflake/pull/41
-This version is convenient to install on a rented VPS, for example.
-Running a long-term proxy at a fixed IP address
-is somewhat at odds with Snowflake's goal of proxy address diversity and agility,
-but these standalone proxies are valuable because
-they tend to have less restrictive NATs,
-making them compatible with more clients.
-Finally, Orbot, a mobile app for accessing Tor,
-besides being able to \emph{use} Snowflake for circumvention,
-can also \emph{provide} Snowflake proxy service to others,
-a~feature called ``kindness mode.''
-% Only so called in Orbot v17+, which should be current by the time the paper is submitted.
-
 \begin{figure}
 \includegraphics{figures/proxies/proxy-type}
 \caption{
 Unique proxy IP addresses per day,
 by proxy type.
+The two large steps visible in the graph correspond
+to the invasion of Ukraine by Russia in late February~2022,
+% 2022-02-25 https://twitter.com/torproject/status/1497276960556429324
+% 2022-02-25 https://twitter.com/0xggus/status/1497224413829283877
+and protests in Iran beginning late September~2022,
+% 2022-09-24 https://twitter.com/torproject/status/1573670895696183303
+% 2022-10-03 https://www.eff.org/deeplinks/2022/10/snowflake-makes-it-easy-anyone-fight-censorship
+at which times there were campaigns
+to encourage people to install the browser extension.
 }
 \label{fig:proxy-type}
 \todo[inline]{Decide how to handle the small number of remaining ``Unknown'' proxy types.}
@@ -1784,10 +1767,34 @@ by proxy type.
 % "easy access to Snowflake proxy 'kindness' mode"
 \end{figure}
 
-\autoref{fig:proxy-type} shows the
-comparative counts of the different types of proxy,
-counting unique IP addresses per 24~hours.
-Web browser extension proxies clearly predominate,
+Snowflake's effectiveness depends on its proxies,
+of~which there are several types.
+The primary type is the web browser extension,
+% "Creating a Snowflake WebExtension addon" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/23888
+which, once installed, works in the background
+while the browser is running.
+There is also a ``web badge'' version of the proxy that does not require installation.
+It~uses the same JavaScript code as the extension, but runs in an ordinary web page.
+Some people leave a browser tab idling on the web badge page,
+rather than install a browser extension.
+Apart from the web-based proxies,
+we~provide a standalone, command-line proxy
+that does not require a browser.
+% "Golang implementation of standalone snowflake proxy" https://github.com/keroserene/snowflake/pull/41
+This version is convenient to install on a rented VPS, for example.
+Running a long-term proxy at a fixed IP address
+is somewhat at odds with Snowflake's goal of proxy address diversity and agility,
+but these standalone proxies are valuable because
+they tend to have less restrictive NATs,
+making them compatible with more clients.
+Finally, Orbot, a mobile app for accessing Tor,
+besides being able to \emph{use} Snowflake for circumvention,
+can also \emph{provide} Snowflake proxy service to others,
+a~feature called ``kindness mode.''
+% Only so called in Orbot v17+, which should be current by the time the paper is submitted.
+\autoref{fig:proxy-type} shows the daily counts
+of each proxy type.
+Browser extension proxies predominate,
 representing about 88\%\todo{Update percentage before submission.} of daily IP addresses.
 % > read_csv("figures/proxies/proxy-type.csv", col_types = cols()) %>% filter("2023-04-01" <= date & date < "2023-04-08") %>% group_by(type) %>% summarize(unique_ips = sum(unique_ips)) %>% mutate(percent = 100 * unique_ips / sum(unique_ips)) %>% ungroup()
 % # A tibble: 4 x 3
@@ -1797,35 +1804,21 @@ representing about 88\%\todo{Update percentage before submission.} of daily IP a
 % 2 iptproxy       63035.    7.16
 % 3 standalone     35749.    4.06
 % 4 webext        772422.   87.7
-The two large steps visible in the graph correspond
-to the invasion of Ukraine by Russia in late February~2022,
-% 2022-02-25 https://twitter.com/torproject/status/1497276960556429324
-% 2022-02-25 https://twitter.com/0xggus/status/1497224413829283877
-and protests in Iran beginning late September~2022,
-% 2022-09-24 https://twitter.com/torproject/status/1573670895696183303
-% 2022-10-03 https://www.eff.org/deeplinks/2022/10/snowflake-makes-it-easy-anyone-fight-censorship
-at which times there were campaigns
-to encourage people to install the browser extension.
 
-At the outset, it was not clear
-that it would be possible to build and sustain
-a large enough population of proxies
-to be meaningfully blocking resistant
+It~was not clear at the outset
+that it would even be possible to attract
+enough proxies to make Snowflake meaningfully blocking resistant
 and support a reasonable number of users.
-\todo{Give estimated count of flash proxies from
-\href{https://people.torproject.org/~dcf/graphs/}{fp-num-proxies-201601.png}.}
 % "Start producing snowflakes" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/20813
-While early growth in the number proxies
-was due developing new and easier ways to run one,
-later growth depended on advocacy and outreach.
+Initial growth in the number of proxies
+depended on our developing new and easier ways to run one,
+while later growth was driven by intentional advocacy and outreach.
 In~the early days, circa~2017,
 the only round-the-clock proxy support was
 a few standalone proxies,
 % 2018 "The three fallback proxy-go instances..." https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/25688
-run by us for the benefit of alpha testers.
-A~page with the web badge existed,
-but did not get enough traffic to produce proxies reliably.
-The browser extension was first made available in mid-2019.
+run by us for the benefit of alpha tester clients.
+The browser extension became available in mid-2019.
 % |2019-06-26|||snowflake|Deployed version 0.0.1 of the Snowflake WebExtension for Firefox.|[comment](https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/30931#note_2593598)||
 % |2019-07-03|||snowflake|Deployed version 0.0.1 of the Snowflake WebExtension for Chrome.|[comment](https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/30999#note_2593718)||
 % |2019-07-26|||flashproxy snowflake|Cupcake 2.0 is released, now working with Snowflake rather than flash proxy.|[Chrome Web Store page](https://chrome.google.com/webstore/detail/cupcake/dajjbehmbnbppjkcnpdkaniapgdppdnc)||
