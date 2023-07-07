@@ -1792,10 +1792,12 @@ besides being able to \emph{use} Snowflake for circumvention,
 can also \emph{provide} Snowflake proxy service to others,
 a~feature called ``kindness mode.''
 % Only so called in Orbot v17+, which should be current by the time the paper is submitted.
+
 \autoref{fig:proxy-type} shows the daily counts
 of each proxy type.
 Browser extension proxies predominate,
-representing about 88\%\todo{Update percentage before submission.} of daily IP addresses.
+representing about 88\%\todo{Update percentage before submission.}
+of 125,000 daily IP addresses.
 % > read_csv("figures/proxies/proxy-type.csv", col_types = cols()) %>% filter("2023-04-01" <= date & date < "2023-04-08") %>% group_by(type) %>% summarize(unique_ips = sum(unique_ips)) %>% mutate(percent = 100 * unique_ips / sum(unique_ips)) %>% ungroup()
 % # A tibble: 4 x 3
 %   type       unique_ips percent
@@ -1804,6 +1806,18 @@ representing about 88\%\todo{Update percentage before submission.} of daily IP a
 % 2 iptproxy       63035.    7.16
 % 3 standalone     35749.    4.06
 % 4 webext        772422.   87.7
+For comparison, there were about 2,000
+of the more traditional style of Tor bridge at this time.
+% https://metrics.torproject.org/networksize.html?start=2023-05-01&end=2023-05-31
+% date,relays,bridges
+% 2023-05-29,6702,2126
+% 2023-05-30,6712,2137
+% 2023-05-31,6750,2129
+The difference is attributable to the relative ease
+of running a Snowflake proxy versus a Tor bridge---though
+the comparison is not quite direct,
+because Tor bridges have better defenses
+against enumeration and blocking than do Snowflake proxies.
 
 It~was not clear at the outset
 that it would even be possible to attract
@@ -1821,30 +1835,22 @@ run by us for the benefit of alpha tester clients.
 The browser extension became available in mid-2019.
 % |2019-06-26|||snowflake|Deployed version 0.0.1 of the Snowflake WebExtension for Firefox.|[comment](https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/30931#note_2593598)||
 % |2019-07-03|||snowflake|Deployed version 0.0.1 of the Snowflake WebExtension for Chrome.|[comment](https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/30999#note_2593718)||
+In~the latter half of 2019,
 % |2019-07-26|||flashproxy snowflake|Cupcake 2.0 is released, now working with Snowflake rather than flash proxy.|[Chrome Web Store page](https://chrome.google.com/webstore/detail/cupcake/dajjbehmbnbppjkcnpdkaniapgdppdnc)||
-It~got early assistance when Cupcake,
+% Cupcake stopped working when we changed the proxy–broker protocol:
+% |2019-11-13 16:47:02|||snowflake|Restarted the broker with a new proxy–broker protocol.|[comment](https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/issues/29207#note_2592849)||
+additional proxy capacity came when Cupcake,
 a~browser extension for flash proxy with an existing user base,
+repurposed itself for Snowflake.
 % "Link Cupcake from snowflake.torproject.org" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/31497
 % "Snowflake integration" https://github.com/glamrock/cupcake/issues/24
-was repurposed for Snowflake, at about the same time.
-Orbot's Snowflake proxy feature was added in version 16.4.1 in February~2021,\todo{Check this timing with Guardian Project.}
+Orbot's Snowflake proxy feature was added in version 16.4.1 in February~2021.\todo{Check this timing with Guardian Project.}
 % 2021-02-23 https://github.com/guardianproject/orbot/releases/tag/16.4.1-BETA-2-tor.0.4.4.6
 % https://m.apkpure.com/orbot-tor-for-android/org.torproject.android/download/1641300201-APK has 2021-04-30,
 % but I tend to believe the 2021-02-23 because it matches up with features in the graph.
-though it was counted with the standalone proxies
-until becoming its own proxy type in January~2022.
-% 2021-07-14 https://github.com/tladesignz/IPtProxy/commit/228e9e61e285ee548a42d6bee487577e44630695
-% IPtProxy 1.1.0 changes its proxy type from "standalone" to "iptproxy"
-% 2021-12-20 https://github.com/guardianproject/orbot/releases/tag/16.5.2-RC-1-tor.0.4.6.8
-% Orbot updates IPtProxy from 1.0.0 to 1.2.0 https://github.com/guardianproject/orbot/commit/57add48cd904afe94363219887cd142bb5cf6696
-% 2022-01-03 https://github.com/guardianproject/orbot/releases/tag/16.5.2-RC-5-tor.0.4.6.9
-% Changes from "standalone" to "unknown" because the broker does not recognize "iptproxy".
-% 2022-06-21 https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40151
-% Broker deployment, starts recognizing "iptproxy".
-
-\todo{Compare the number of Snowflake proxies with the
-\href{https://metrics.torproject.org/networksize.html}{number of other kinds of bridges}.
-Caveat: the other bridges have supposedly better anti-enumeration defenses.}
+(In~\autoref{fig:proxy-type}, Orbot is counted with the standalone proxies
+until January~2022, when it got its own proxy type designation.)
+% See history in figures/proxies/proxy-type.r.
 
 It~is worth reflecting briefly
 on the relative ineffectiveness of the web badge
@@ -1881,8 +1887,8 @@ before becoming a proxy, a person would have to take a positive action
 such as installing a browser extension
 or activating a toggle on a web page.
 % "Prepare a Snowflake 'options' page, like in flashproxy" https://github.com/keroserene/snowflake/issues/21
-Our initial concerns that this decision
-would reduce the number of proxies were unfounded:
+Our initial worry that this decision
+would reduce the number of proxies turned out to be unfounded:
 people find an informative, interactable proxy control panel more appealing,
 and install the browser extension in greater numbers.
 The browser-based proxies display the number of censored clients
