@@ -1723,7 +1723,7 @@ in other estimates/\allowbreak graphs, but here we effectively do.}
 % 1 bridge non-snowflake 1462005    68.4
 % 2 bridge snowflake      676189    31.6
 
-\subsection{Number and types of proxies}
+\subsection{Number of proxies and their types}
 \label{sec:proxies}
 
 \begin{figure}
@@ -1848,27 +1848,27 @@ Orbot's Snowflake proxy feature was added in version 16.4.1 in February~2021.\to
 % 2021-02-23 https://github.com/guardianproject/orbot/releases/tag/16.4.1-BETA-2-tor.0.4.4.6
 % https://m.apkpure.com/orbot-tor-for-android/org.torproject.android/download/1641300201-APK has 2021-04-30,
 % but I tend to believe the 2021-02-23 because it matches up with features in the graph.
-(In~\autoref{fig:proxy-type}, Orbot is counted with the standalone proxies
+(In~\autoref{fig:proxy-type}, Orbot is counted among the standalone proxies
 until January~2022, when it got its own proxy type designation.)
 % See history in figures/proxies/proxy-type.r.
 
 It~is worth reflecting briefly
-on the relative ineffectiveness of the web badge
-compared to the browser extension.
-The web badge had been the primary envisioned deployment model of flash proxy
-(though by the end of its run, flash proxy had also gained
+on the greater popularity of the browser extension
+compared to the web badge.
+The latter had been envisioned
+as the primary source of proxies in flash proxy,
+% By the end of its run, flash proxy had also gained
 % https://www.bamsoftware.com/talks/ee380-flashproxy/index.html#s15
-browser extensions including Cupcake
+% browser extensions including Cupcake
 % "Chrome browser add-on" [Cupcake for flash proxy] https://bugs.torproject.org/legacy/trac/7721
 % "Tor Flashproxy Badge" [for Firefox] https://github.com/reezer/tor-flashproxy-badge/
-and a standalone proxy,
+% and a standalone proxy.
 % "Node.js standalone flash proxy" https://bugs.torproject.org/legacy/trac/7944
-much like Snowflake later would).
-The idea had been that people's browsers
+the idea being that people's browsers
 would automatically become proxies
-while they browsed sites that had the flash proxy code installed,
-unless they had checked an option to prevent~it.
-We decided, early on, that flash proxy's opt-out model had been a mistake,
+while reading sites that had the flash proxy badge installed,
+unless they checked an option to prevent~it.
+We~decided, early on, that flash proxy's opt-out permission had been a mistake,
 % Date: Tue, 6 Dec 2016 18:38:40 -0800
 % From: David Fifield <dcf@torproject.org>
 % To: Arlo Breault <arlo@torproject.org>
@@ -1882,18 +1882,17 @@ We decided, early on, that flash proxy's opt-out model had been a mistake,
 % proxy always bothered me. I think there's a good chance it would cause
 % trouble for us if Snowflake becomes popular. So I'd like to see
 % Snowflake use opt-in badges (and Cupcake) only.
-and that Snowflake would be only opt-in:
-before becoming a proxy, a person would have to take a positive action
+and that Snowflake would be only opt-in.
+In~order to run a proxy, a person must to take a positive action
 such as installing a browser extension
 or activating a toggle on a web page.
 % "Prepare a Snowflake 'options' page, like in flashproxy" https://github.com/keroserene/snowflake/issues/21
-Our initial worry that this decision
-would reduce the number of proxies turned out to be unfounded:
-people find an informative, interactable proxy control panel more appealing,
-and install the browser extension in greater numbers.
-The browser-based proxies display the number of censored clients
-helped in the last 24~hours,
-which proxy operators find rewarding.
+Our initial worry that this policy
+would reduce the number of proxies turned out to be unfounded.
+People find an informative, interactive proxy control panel more appealing
+than a nondescript badge graphic,
+and install the browser extension in greater numbers
+than ever used the web badge in flash proxy.
 
 \subsection{Proxy churn}
 \label{sec:proxy-churn}
