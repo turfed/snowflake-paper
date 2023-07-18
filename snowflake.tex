@@ -1279,7 +1279,7 @@ here we will take a look back
 at the history of our deployment
 and reflect on the experience.
 
-\subsection{Number of clients and bandwidth}
+\subsection{Client counts and bandwidth}
 \label{sec:deployment}
 
 % Excerpts from https://gitlab.torproject.org/tpo/network-health/metrics/timeline:
@@ -1721,7 +1721,7 @@ in other estimates/\allowbreak graphs, but here we effectively do.}
 % 1 bridge non-snowflake 1462005    68.4
 % 2 bridge snowflake      676189    31.6
 
-\subsection{Number of proxies and their types}
+\subsection{Number and type of proxies}
 \label{sec:proxies}
 
 \begin{figure}
@@ -1839,7 +1839,7 @@ In~the latter half of 2019,
 % |2019-11-13 16:47:02|||snowflake|Restarted the broker with a new proxy–broker protocol.|[comment](https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/issues/29207#note_2592849)||
 additional proxy capacity came when Cupcake,
 a~browser extension for flash proxy with an existing user base,
-repurposed itself for Snowflake.
+was repurposed for Snowflake.
 % "Link Cupcake from snowflake.torproject.org" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/31497
 % "Snowflake integration" https://github.com/glamrock/cupcake/issues/24
 Orbot's Snowflake proxy feature was added in version 16.4.1 in February~2021.\todo{Check this timing with Guardian Project.}
@@ -2822,7 +2822,7 @@ the Tor deployment could migrate to it.
 The Turbo Tunnel reliability layer of \autoref{sec:data-transfer}
 is indispensable for providing a continuous session abstraction
 over a sequence of unreliable proxies.
-But we could do more with it:
+But we could do more with~it:
 in~particular, it should be possible
 for one client to multiplex its traffic
 over multiple temporary proxies not just serially, but simultaneously.
