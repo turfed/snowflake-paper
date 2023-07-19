@@ -2002,27 +2002,24 @@ are ones that had been seen in the previous day.
 % "Distributed Snowflake Server Support" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40129
 % Ancient history from flash proxy: "allow the client to pick a specific relay for its registration" https://bugs.torproject.org/legacy/trac/10196
 
-The bridge in the Snowflake model (\autoref{sec:mechanics})
-is notionally a single, centralized entity.
+In the abstract architecture of \autoref{sec:mechanics}, the bridge
+is a single, centralized entity.
 It~\emph{can} be centralized
-because it is insulated from direct blocking
-by the snowflake proxies.
-Unlike traditional proxy systems,
+because it is never accessed directly,
+but only via temporary proxies.
+Unlike many other proxy systems,
 Snowflake does not benefit, in terms of blocking resistance,
-by having multiple bridges,
-since the bridge is decoupled from the means of accessing it.
-For practical performance reasons, though,
-it makes sense for ``the'' bridge to be realized as
-multiple servers, simply because the load of Snowflake traffic
-is a lot for one server to handle.
-\todo{Note fraction of total Tor traffic.}
+from having multiple bridges.
+For performance reasons, though,
+it~is useful for ``the'' bridge to be realized as
+multiple servers, each of which handles a fraction of client traffic.
 For technical reasons, though,
 the use of multiple bridges cannot be made fully transparent to clients
 without making some compromises.
 One of the reasons, relatively minor, is related to Snowflake itself;
-the other, more constraining one has to do with its interaction with Tor.
-We will explain the tradeoffs involved
-and the design we settled on.
+the other, more constraining, is an artifact of its interaction with Tor.
+We~will explain the tradeoffs involved
+and the design we settled~on.
 
 What is called the bridge is actually a pipeline of several components.
 One component terminates incoming WebSocket connections arriving from proxies,
@@ -2031,19 +2028,19 @@ and one forwards the streams to their eventual destinations
 (in~our deployment, this last component is Tor itself).
 These components are separable.
 For example, because the interface with Tor is ordinary TCP sockets,
-it is easy to run Tor on a different host with its own CPU and RAM,
+it~is easy to run Tor on a different host with its own CPU and RAM,
 % A diagram of such separation: https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/28651#note_2783541
 or even round-robin over multiple instances of Tor
 (as we in fact do~\cite{Fifield2023a}).
 
 What is not so easy to distribute
-is the Turbo Tunnel layer itself.
+is the Turbo Tunnel layer.
 Recall from \autoref{sec:data-transfer} that Snowflake
 has a notion of a long-term end-to-end session
 between the client and the bridge that is independent of
 the temporary proxies in between.
 This is made possible by extensive state stored at the bridge:
-a table of ongoing sessions, reassembly buffers,
+a~table of ongoing sessions, reassembly buffers,
 transmission queues, timers, and so on.
 % `type KCP` https://github.com/xtaci/kcp-go/blob/03b584b84eddd95cc03dbff65fc9cc5cbdf80c6b/kcp.go#L132
 % `type UDPSession` https://github.com/xtaci/kcp-go/blob/03b584b84eddd95cc03dbff65fc9cc5cbdf80c6b/sess.go#L61
@@ -2063,8 +2060,8 @@ the client will terminate the connection~\cite[\S 5.1.2]{tor-spec}\todo{Verify t
 % https://gitweb.torproject.org/torspec.git/tree/tor-spec.txt?id=33308845cec54bfc0096b8ea0339a8ff183aa1b1#n1153
 % "Extending ORs MUST check _all_ provided identity keys (if they recognize the format), and and MUST NOT extend the circuit if the target OR did not prove its ownership of any such identity key."
 There is no facility in Tor for a certificate,
-or anything like that,
-to authorize a whole set of equivalent bridge fingerprints:
+or~similar,
+to~authorize a whole set of equivalent bridge fingerprints:
 the fingerprint of every bridge a client may use
 must be configured separately at the client.
 While it is possible to copy identity keys between
@@ -2108,7 +2105,7 @@ each doing its own independent rendezvous,
 which is wasteful and makes the network fingerprint more conspicuous.
 % "Let bridge users choose to only reach their first working bridge" https://bugs.torproject.org/tpo/core/tor/40578
 Still, this is the best solution we have found, given the limitations.
-A~deployment not based on Tor would have more flexibility here.
+A~deployment not based on Tor would have more flexibility.
 The only consideration would be the Turbo Tunnel session state,
 which could be solved by hashing a client's session identifier string
 to consistently assign the same bridge during a session.
