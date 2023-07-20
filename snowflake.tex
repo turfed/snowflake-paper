@@ -931,6 +931,10 @@ Its critical function is to attach sequence numbers and acknowledgements
 to packets of data---this
 is how both ends know what parts of the data stream
 need to be retransmitted after a temporary loss of proxy connectivity.
+The client tags its traffic
+with a random session identifier string that remains
+consistent throughout a session,
+which the bridge uses to index a map of session variables.
 We~use a combination of
 KCP~\cite{kcp} and
 smux~\cite{smux}.
@@ -2002,30 +2006,32 @@ are ones that had been seen in the previous day.
 % "Distributed Snowflake Server Support" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40129
 % Ancient history from flash proxy: "allow the client to pick a specific relay for its registration" https://bugs.torproject.org/legacy/trac/10196
 
-In the abstract architecture of \autoref{sec:mechanics}, the bridge
+In the abstract model of \autoref{fig:architecture}, the bridge
 is a single, centralized entity.
 It~\emph{can} be centralized
 because it is never accessed directly,
 but only via temporary proxies.
-Unlike many other proxy systems,
+Unlike more traditional static proxy systems,
 Snowflake does not benefit, in terms of blocking resistance,
 from having multiple bridges.
-For performance reasons, though,
+For scalability reasons, though,
 it~is useful for ``the'' bridge to be realized as
-multiple servers, each of which handles a fraction of client traffic.
-For technical reasons, though,
-the use of multiple bridges cannot be made fully transparent to clients
-without making some compromises.
-One of the reasons, relatively minor, is related to Snowflake itself;
-the other, more constraining, is an artifact of its interaction with Tor.
-We~will explain the tradeoffs involved
-and the design we settled~on.
+multiple servers, each handling a fraction of client traffic.
+
+Our deployment now uses two bridges.
+Unfortunately, the fact of multiple bridges
+cannot be made fully transparent to clients,
+for technical reasons having to do with
+integration with Tor.
+Here we will discuss design considerations
+and what tradeoffs are involved in
+the design we settled~on.
 
 What is called the bridge is actually a pipeline of several components.
-One component terminates incoming WebSocket connections arriving from proxies,
-one decodes the Turbo Tunnel packets contained therein and reassembles them into streams,
-and one forwards the streams to their eventual destinations
-(in~our deployment, this last component is Tor itself).
+One component terminates WebSocket connections incoming from proxies,
+one decodes the contained Turbo Tunnel packets and reassembles them into streams,
+and one forwards the streams to their eventual destination
+(in~our deployment, this last component is Tor).
 These components are separable.
 For example, because the interface with Tor is ordinary TCP sockets,
 it~is easy to run Tor on a different host with its own CPU and RAM,
