@@ -897,7 +897,7 @@ at the DTLS layer using certificate fingerprints
 that were exchanged during rendezvous~\cite[\S 5.1]{rfc8842}.
 
 Data channels are well-suited to Snowflake's needs.
-(Circumvention is even one of the use cases listed in the specification~\cite[\S 3.2]{rfc8831}.)
+(The specification even lists circumvention as a use case~\cite[\S 3.2]{rfc8831}.)
 But data channels are not the only option:
 WebRTC also offers \firstterm{media streams}
 for unreliable transport of real-time audio and video.
@@ -905,7 +905,7 @@ Which of these is used may be a fingerprinting vector.
 We~will take up this topic in \autoref{sec:fingerprinting}.
 
 If~clients only ever used one proxy,
-the WebRTC data channel would be sufficient.
+a~WebRTC data channel alone would be sufficient.
 But a Snowflake proxy might
 disappear at any moment,
 and when that happens, its data channel goes with~it.
@@ -925,17 +925,17 @@ between the ephemeral proxy data channels
 and the client's own application streams.
 % "[anti-censorship-team] Turbo Tunnel in Snowflake" https://lists.torproject.org/pipermail/anti-censorship-team/2020-February/000059.html
 This part of the protocol stack
-outlives any single proxy---it~belongs to
+outlives any single proxy; it~belongs to
 the client and the bridge.
-Its critical function is to attach sequence numbers and acknowledgements
-to packets of data---this
-is how both ends know what parts of the data stream
+Its primary function is to attach sequence numbers and acknowledgements
+to packets of data,
+so~that both ends know what parts of the data stream
 need to be retransmitted after a temporary loss of proxy connectivity.
 The client tags its traffic
 with a random session identifier string that remains
 consistent throughout a session,
 which the bridge uses to index a map of session variables.
-We~use a combination of
+For the inner session layer we use a combination of
 KCP~\cite{kcp} and
 smux~\cite{smux}.
 KCP provides reliability,
@@ -945,8 +945,8 @@ and are easy to program,
 but there is nothing about them on which we depend essentially.
 Any other transport protocol that provides the necessary features
 and can be implemented in userspace would~do,
-such as QUIC, TCP, or (our own layer~of) SCTP.
-We~prototyped successfully with QUIC before settling on KCP/\allowbreak smux.
+such as QUIC, TCP, or (another layer~of) SCTP.
+We~prototyped successfully with QUIC before deciding on KCP/\allowbreak smux.
 
 % Not going to get into how we currently use reliable, ordered (TCP-like) data
 % channels, but plan to switch to unreliable, unordered (UDP-like) data
