@@ -2019,45 +2019,45 @@ it~is useful for ``the'' bridge to be realized as
 multiple servers, each handling a fraction of client traffic.
 
 Our deployment now uses two bridges.
+Generalizing from one bridge to two
+required changes to the messages exchanged between
+clients, proxies, and the broker.
 Unfortunately, the fact of multiple bridges
 cannot be made fully transparent to clients,
-for technical reasons having to do with
-integration with Tor.
-Here we will discuss design considerations
-and what tradeoffs are involved in
-the design we settled~on.
+for technical reasons related to Tor.
+In~our design, the client informs the broker
+of what bridge it wants to use,
+the broker conveys the choice to the proxy,
+and the proxy connects to the client's chosen bridge.
+This is in contrast to other imaginable designs
+where the choice of bridge is made
+by the broker or the proxy.
+We~will discuss design considerations and tradeoffs.
 
-What is called the bridge is actually a pipeline of several components.
-One component terminates WebSocket connections incoming from proxies,
-one decodes the contained Turbo Tunnel packets and reassembles them into streams,
-and one forwards the streams to their eventual destination
-(in~our deployment, this last component is Tor).
-These components are separable.
-For example, because the interface with Tor is ordinary TCP sockets,
-it~is easy to run Tor on a different host with its own CPU and RAM,
-% A diagram of such separation: https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/28651#note_2783541
-or even round-robin over multiple instances of Tor
-(as we in fact do~\cite{Fifield2023a}).
-
-What is not so easy to distribute
-is the Turbo Tunnel layer.
+One minor difficulty is distributing the Turbo Tunnel layer.
 Recall from \autoref{sec:data-transfer} that Snowflake
-has a notion of a long-term end-to-end session
-between the client and the bridge that is independent of
-the temporary proxies in between.
+has the notion of an end-to-end session
+between a client and the bridge,
+independent of temporary proxy connections that carry~it.
 This is made possible by extensive state stored at the bridge:
-a~table of ongoing sessions, reassembly buffers,
-transmission queues, timers, and so on.
+a~table of clients, reassembly buffers,
+transmission queues, timers, and so~on.
 % `type KCP` https://github.com/xtaci/kcp-go/blob/03b584b84eddd95cc03dbff65fc9cc5cbdf80c6b/kcp.go#L132
 % `type UDPSession` https://github.com/xtaci/kcp-go/blob/03b584b84eddd95cc03dbff65fc9cc5cbdf80c6b/sess.go#L61
-While it is certainly possible to instantiate more than one such state machine,
-a~session that is begun in one instance must remain in that instance---any
-other instance will not have the state necessary to make the packets
+While it is certainly possible to instantiate one such
+bundle of state variables per bridge,
+a~session begun in one instance must remain with that instance---no other
+has the context necessary to make the packets
 of the session meaningful.
+This difficulty might be resolved by hashing
+the client's session identifier string to index
+a consistent bridge per session,
+as~long as the set of bridges does not change too frequently.
 
-The other difficulty is a Tor bridge is identified
+There is another difficulty that is harder to work around.
+A~Tor bridge is identified
 by a \firstterm{bridge fingerprint},
-a hash of its long-term Tor identity key.
+a hash of its long-term identity public key.
 The bridge configuration interface in the Tor client
 expects a bridge fingerprint,
 and if the bridge it connects to cannot prove that
@@ -2079,7 +2079,7 @@ managed by different teams,
 and we decided that we did not want the trust boundary
 of who has access to those important keys to be quite so large.
 
-In short, the client must know in advance which bridge
+In short, the client must know in advance what bridge
 its snowflake proxy will connect (or re-connect) it to.
 If~the first connection is to a bridge other than the one the client expects,
 the Tor client will abandon the connection because the bridge fingerprint is wrong.
@@ -2111,10 +2111,9 @@ each doing its own independent rendezvous,
 which is wasteful and makes the network fingerprint more conspicuous.
 % "Let bridge users choose to only reach their first working bridge" https://bugs.torproject.org/tpo/core/tor/40578
 Still, this is the best solution we have found, given the limitations.
-A~deployment not based on Tor would have more flexibility.
-The only consideration would be the Turbo Tunnel session state,
-which could be solved by hashing a client's session identifier string
-to consistently assign the same bridge during a session.
+A~deployment not based on Tor,
+with a more centralized trust model,
+would have more flexibility.
 
 A~client-chooses design risks the possibility
 of misuse by clients, if not handled carefully.
