@@ -2056,40 +2056,33 @@ as~long as the set of bridges does not change too frequently.
 
 There is another difficulty that is harder to work around.
 A~Tor bridge is identified
-by a \firstterm{bridge fingerprint},
-a hash of its long-term identity public key.
-The bridge configuration interface in the Tor client
-expects a bridge fingerprint,
-and if the bridge it connects to cannot prove that
-its identity matches that fingerprint,
-the client will terminate the connection~\cite[\S 5.1.2]{tor-spec}\todo{Verify that this is the relevant section of the spec.}.
-% https://gitweb.torproject.org/torspec.git/tree/tor-spec.txt?id=33308845cec54bfc0096b8ea0339a8ff183aa1b1#n1153
-% "Extending ORs MUST check _all_ provided identity keys (if they recognize the format), and and MUST NOT extend the circuit if the target OR did not prove its ownership of any such identity key."
-There is no facility in Tor for a certificate,
-or~similar,
-to~authorize a whole set of equivalent bridge fingerprints:
-the fingerprint of every bridge a client may use
-must be configured separately at the client.
-While it is possible to copy identity keys between
-separate instances of Tor so they have the same fingerprint,
-and desirable to do so within one bridge installation for performance reasons,
-our vision for scaling the Snowflake backend
-involved bridge sites in different locations,
-managed by different teams,
-and we decided that we did not want the trust boundary
-of who has access to those important keys to be quite so large.
-
-In short, the client must know in advance what bridge
-its snowflake proxy will connect (or re-connect) it to.
-If~the first connection is to a bridge other than the one the client expects,
-the Tor client will abandon the connection because the bridge fingerprint is wrong.
-Subsequent re-connections in the same client session
-need to go to the same bridge,
-otherwise the Turbo Tunnel session state will be missing.
+by a long-term identity public key.
+If,~on connecting to to a bridge,
+the client finds that the bridge's identity is not the expected one,
+the client will terminate the connection~\cite[\S 4.2]{tor-spec}.
+% "As soon as it gets the CERTS cell, the initiator knows whether the responder is correctly authenticated." https://gitlab.torproject.org/tpo/core/torspec/-/blob/33308845cec54bfc0096b8ea0339a8ff183aa1b1/tor-spec.txt#L640
+% connection_or_client_learned_peer_id https://gitlab.torproject.org/tpo/core/tor/-/blob/tor-0.4.7.13/src/core/or/connection_or.c#L1897
+% [warn] Tried connecting to router at 192.0.2.3:80 ID=<none> RSA_ID=2B280B23E1107BB62ABFC40DDCC8824814F80A71, but RSA + ed25519 identity keys were not as expected: wanted 1111111111111111111111111111111111111111 + no ed25519 key but got 2B280B23E1107BB62ABFC40DDCC8824814F80A72 + 1zOHpg+FxqQfi/6jDLtCpHHqBTH8gjYmCKXkus1D5Ko.
+% [warn] Problem bootstrapping. Stuck at 14% (handshake): Handshaking with a relay. (Unexpected identity in router certificate; IDENTITY; count 1; recommendation warn; host 1111111111111111111111111111111111111111 at 192.0.2.3:80)
+The Tor client can configure at most one identity per bridge;
+there is no way to indicate (with a certificate, for example)
+that multiple identities should be considered equivalent.
+This constraint leaves two options:
+either all Snowflake bridges must share the same cryptographic identity,
+or~else it must be the client that makes the choice of what bridge to use.
+While the former option is possible to do
+(by~synchronizing identity keys across servers),
+every added bridge would increase the risk of compromising
+the all-important identity keys.
+Our vision was that different bridge sites
+would run in different locations
+with their own management teams,
+and that a compromise of one bridge site
+should affect that site only.
 
 These considerations led us to a multi-bridge design
 in which the client has awareness of (at least a subset of)
-all the bridges that exist,
+all existing bridges,
 and it is the client that chooses which bridge will be used
 for a particular session.
 The client includes a bridge fingerprint
