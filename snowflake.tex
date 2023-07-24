@@ -2181,7 +2181,9 @@ consists of finding techniques that put blocking
 farther out of reach of would-be controllers of information.
 \todo{Reflect on a good location to place this sentiment.}
 
-\begin{figure}[t!]
+\todo[inline]{Add annotations for specific events in figures, like in \autoref{fig:user-counts}.}
+
+\begin{figure}
 \includegraphics{figures/users/users-ru}
 \caption{
 Snowflake users in Russia (average concurrent).
@@ -2206,6 +2208,13 @@ and took some time to mitigate.
 }
 \label{fig:user-counts-ir}
 \bigskip
+\includegraphics{figures/users/users-cn}
+\caption{
+Snowflake users in China.
+}
+\label{fig:user-counts-cn}
+\todo[inline]{Say more.}
+\bigskip
 \includegraphics{figures/users/users-tm}
 \caption{
 Snowflake users in Turkmenistan.
@@ -2214,7 +2223,6 @@ blocking actions are evident on
 \mbox{2021-10-24} and \mbox{2022-07-28}.
 }
 \label{fig:user-counts-tm}
-\todo[inline]{Add annotations for specific events, like in \autoref{fig:user-counts}.}
 \end{figure}
 
 \subsection{Blocking in Russia}
@@ -2481,7 +2489,13 @@ of failure to connect to the front domain,
 which may have been more blocking,
 though with less intensity and not for more than a few days at a time.
 
-\todo{Add a section for China.}
+\subsection{Blocking in China}
+\label{sec:block-cn}
+
+\todo{Write a section for China.}
+
+\autoref{fig:user-counts-cn}
+
 % "Hello, in China, currently, Tor Browser 8.5a11 version can't connect to Tor network through Snowflake bridge." https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/30350
 % "Hello, currently, in China, Tor Browser 9.5a2 still can't connect to Tor network through snowflake bridge" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/32597
 %

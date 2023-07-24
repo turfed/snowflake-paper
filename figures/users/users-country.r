@@ -9,7 +9,7 @@ library("cowplot")
 
 source("../common.r")
 
-HEIGHT <- 1.5
+HEIGHT <- 1.25
 
 # Return an abbreviation for the month, followed by a year for January only.
 date_labels <- function(breaks) {
