@@ -2018,7 +2018,7 @@ For scalability reasons, though,
 it~is useful for ``the'' bridge to be realized as
 multiple servers, each handling a fraction of client traffic.
 
-Our deployment now uses two bridges.
+Our deployment now uses two bridges\todo{Update on publication.}.
 Generalizing from one bridge to two
 required changes to the messages exchanged between
 clients, proxies, and the broker.
@@ -2077,81 +2077,61 @@ the all-important identity keys.
 Our vision was that different bridge sites
 would run in different locations
 with their own management teams,
-and that a compromise of one bridge site
+and that any compromise of a bridge site
 should affect that site only.
 
 These considerations led us to a multi-bridge design
-in which the client has awareness of (at least a subset of)
-all existing bridges,
+in which clients have awareness of (at~least a subset~of) all bridges,
 and it is the client that chooses which bridge will be used
 for a particular session.
-The client includes a bridge fingerprint
-in its rendezvous message (\autoref{sec:rendezvous}) to the broker;
-the broker maps the fingerprint to a WebSocket URL,
-and conveys that URL to the proxy.
+The client includes a bridge identity string
+in its rendezvous message to the broker (\autoref{sec:rendezvous});
+then the broker maps the identity to the WebSocket URL
+of the corresponding bridge,
+and conveys that URL to the proxy
+that's chosen to serve the client.
 We~rely on clients choosing uniformly
-to equalize the load across bridges.
+to equalize load across bridges.
 A~consequence is that
-every bridge must meet some minimum performance standard:
+every bridge must meet a minimum performance standard:
 we cannot, say,
-assign 20\% of clients to one and 80\% to another
-according to their relative capabilities.
-A~further drawback is that there is no way to try connecting
-to only one of the bridges it knows about,
-short of rewriting the configuration file;
-if two bridges are configured, Tor will start two sessions through Snowflake,
-each doing its own independent rendezvous,
-which is wasteful and makes the network fingerprint more conspicuous.
+centrally assign 20\% of clients to one and 80\% to another
+according to their relative capacity.
+Another drawback is that there is currently no way to instruct Tor
+to connect to only one of the bridges it knows about
+(short of rewriting the configuration file):
 % "Let bridge users choose to only reach their first working bridge" https://bugs.torproject.org/tpo/core/tor/40578
-Still, this is the best solution we have found, given the limitations.
-A~deployment not based on Tor,
-with a more centralized trust model,
+if~two bridges are configured, Tor starts two sessions through Snowflake,
+each doing its own rendezvous,
+which is wasteful and makes for a more conspicuous network fingerprint.
+Still, this is the best solution we have found, given the constraints.
+A~deployment not based on Tor
 would have more flexibility.
 
-A~client-chooses design risks the possibility
-of misuse by clients, if not handled carefully.
-The client should be able to select
-a proxy destination from the set of known bridges,
-but not cause a proxy to connect to arbitrary destinations,
-otherwise the many proxies of \autoref{sec:proxies}
-could be used to attack third parties.
+A~client-chooses design risks
+misuse by clients, if~not handled carefully.
+Clients should only be able to select from
+a limited set of known bridges,
+not cause proxies to connect to arbitrary destinations---otherwise
+the tens of thousands of Snowflake proxies might be weaponized
+to attack third parties.
 % "Clients cannot cause a proxy to attack or even connect to an arbitrary web site or relay..." https://forum.torproject.net/t/anyone-experiencing-problems-with-snowflake-proxy/6938/15
 % An alternative vision: "(More) Distributed servers" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40248
-When the client expresses its bridge selection
-in its rendezvous message, the selection is represented
+% Flash proxy: "Remove 'facilitator', 'client', 'relay' query string parameters. ... These could be used to send unsolicited WebSocket connection attempts." https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/flashproxy/-/compare/7c7acc14638a3e9346c99defa6d4dd80b4f437aa...d518f2615d977475dabaf4a46fbbe83c5a52801c
+The client's bridge selection
+in its rendezvous message is represented
 not as an IP address or hostname,
-but as a bridge fingerprint (a~\mbox{40-digit} hexadecimal string).
-The broker maps the fingerprint to a WebSocket URL
-by consulting a local database of known Snowflake bridges.
-The broker rejects client rendezvous messages requesting an unknown fingerprint.
+but as a hash of the bridge's public identity key.
+The broker maps the identity to a WebSocket URL
+by consulting its own local database of known bridges,
+and rejects rendezvous messages that refer to an unknown bridge.
 % https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/blob/8e5ea8261110e97a8df56cfc9c83028081d902fb/broker/ipc.go#L187
-The broker then tells an incoming proxy
-what WebSocket URL to connect this particular client to,
+After the broker tells the proxy what WebSocket URL to connect~to,
 % https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/blob/8e5ea8261110e97a8df56cfc9c83028081d902fb/broker/ipc.go#L144
-but here also there is a check.
-Proxies check the hostname of the URLs
-to ensure that it is a subdomain of a known suffix reserved for Snowflake bridges.
+the proxy does its own check,
+verifying that the hostname in the URL is a subdomain of
+a known suffix reserved for Snowflake bridges.
 So~there are two independent safeguards against misuse.
-
-As~of May 2023\todo{Update on publication.},
-there are two Snowflake bridges,
-which are among the largest relays in the Tor network,
-in terms of bandwidth.\todo{Do some analysis from figures/\allowbreak onionoo.}
-% Actually head-and-shoulders the largest relays?
-% figures/onionoo$ jq -r '(.relays+.bridges)|sort_by(-.advertised_bandwidth)[]|[.nickname,.advertised_bandwidth]|@tsv' top-consensus_weight.onionoo.json | head -n 4
-% RandomRecipes	114341160
-% poiuty	109014582
-% xor	103805661
-% StayStrongRelay01	99326969
-% figures/onionoo$ jq -r '(.relays+.bridges)|sort_by(-.advertised_bandwidth)[]|[.nickname,.advertised_bandwidth*12]|@tsv' snowflake-??.onionoo.json
-% flakey6	467165892
-% crusty7	178083996
-
-% https://archive.is/aYyxR 2023-04-29 archive of https://metrics.torproject.org/rs.html#toprelays
-% https://archive.is/zOp4G 2023-04-29 archive of https://metrics.torproject.org/rs.html#aggregate/as
-% https://archive.is/GHBKE 2023-04-29 archive of https://metrics.torproject.org/rs.html#details/5481936581E23D2D178105D44DB6915AB06BFB7F (snowflake-01) (multiply by 12)
-% https://archive.is/LKFxo 2023-04-29 archive of https://metrics.torproject.org/rs.html#details/91DA221A149007D0FD9E5515F5786C3DD07E4BB0 (snowflake-02) (multiply by 12)
-% Relay bandwidth aggregated by AS: https://metrics.torproject.org/rs.html#aggregate/as; on 2023-04-29 Snowflake bridges provide about as much advertised bandwidth as Emerald Onion.
 
 % \subsection{SQL injection attempts at broker}
 % \url{https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40089}
