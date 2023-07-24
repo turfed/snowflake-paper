@@ -104,6 +104,7 @@ text_annotation <- function(data) {
 	list(
 		geom_linerange(data = data, aes(x = x, ymin = ymin, ymax = ymax),
 			color = "#808080",
+			linewidth = 0.25,
 			size = 0.25
 		),
 		geom_label(data = data,
@@ -280,6 +281,7 @@ p_bandwidth <- ggplot() +
 			ymax = Inf
 		),
 		color = "#808080",
+		linewidth = 0.25,
 		size = 0.25
 	) +
 
@@ -292,6 +294,7 @@ p_bandwidth <- ggplot() +
 			ymax = Inf
 		),
 		color = "#808080",
+		linewidth = 0.25,
 		size = 0.25
 	) +
 
