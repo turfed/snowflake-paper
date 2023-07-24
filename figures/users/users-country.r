@@ -78,6 +78,14 @@ bridge_combined <- bridge_combined_multi %>%
 
 PLOT_INFO <- list(
 	list(
+		country = "cn",
+		date_limits = lubridate::ymd(c(
+			"2021-12-15",
+			"2023-06-15"
+		)),
+		date_labels = date_labels_abbrev
+	),
+	list(
 		country = "ir",
 		date_limits = lubridate::ymd(c(
 			"2022-09-01",
