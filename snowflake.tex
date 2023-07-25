@@ -2140,28 +2140,31 @@ So~there are two independent safeguards against misuse.
 \section{Notable blocking attempts}
 \label{sec:block}
 
-We have seen Snowflake's user counts in \autoref{sec:deployment},
-and remarked on how they have at times been affected by blocking actions by censors.
-Now we take a closer look at the technical details of specific censorship events.
-The effect of these has usually been to increase rather than decrease
+In~\autoref{sec:deployment} we saw how Snowflake's user counts
+have at times been affected by the blocking actions of censors.
+Now we take a closer look at selected censorship events.
+The effect of censorship has usually been to increase rather than decrease
 the number of Snowflake users.
-Though seemingly paradoxical, this effect is easy to explain:
-as the intensity of censorship increases,
-users are displaced from less resilient systems
+This is no paradox:
+as~censorship intensifies,
+users are displaced from less resilient
 to more resilient systems.
 Snowflake's blocking resistance has not in every case been an unqualified success,
 though, and here we also reflect on missteps
 and persistent challenges.
 
-The examples are taken from
-Russia, Iran, and Turkmenistan,
+The examples of this section are taken from
+Russia, Iran, China, and Turkmenistan,
 and are selected for being significant and instructive.
-Only in Russia was the blocking action clearly targeted at Snowflake specifically;
-in~the other cases the blocking rules were broad enough
-that they may have affected Snowflake only indirectly.
-Common themes are that having a line of communication
-with affected users is invaluable in understanding and reacting to blocking;
-and that a circumvention system's blocking resistance
+Only in the case of Russia
+can we say that blocking action
+clearly targeted Snowflake specifically;
+in~the other cases the evident blocking rules were broad enough
+that they may have affected Snowflake only incidentally.
+Common lessons are that having lines of communication
+and a good working relationship
+with affected users is invaluable in quickly understanding and reacting to blocking;
+and that blocking resistance
 can only be understood in relation to a censor,
 because every censor's cost calculus is different.
 
@@ -2171,7 +2174,7 @@ Indeed, we believe that is the way circumvention systems
 should be presented:
 not to argue their unblockability in universal terms,
 but by specifying, as completely as possible,
-what actions by the censor would suffice to block it---or
+what actions by the censor would suffice to block~it---or
 more to the point,
 \emph{what sacrifices a censor would have to make}
 in order to block~it.
@@ -2187,11 +2190,10 @@ farther out of reach of would-be controllers of information.
 \includegraphics{figures/users/users-ru}
 \caption{
 Snowflake users in Russia (average concurrent).
-The blocking of Tor-related transports in December~2021
+The attempted blocking of Tor-related transports in December~2021
 led to Snowflake's first surge in usage.
 The decrease in September~2022
-coincided with an even larger influx of users from Iran,
-which may have masked another blocking rule.
+coincided with an even larger influx of users from Iran.
 }
 \label{fig:user-counts-ru}
 \bigskip
@@ -2254,13 +2256,11 @@ various blocking-resilient transports
 was less than totally successful,
 and the ultimate effect was a substantial increase in the number
 of users accessing Tor via circumvention transports,
-Snowflake among them---see the left side of \autoref{fig:user-counts-ru}.
+Snowflake among them.
+This effect is visiable at the left side of \autoref{fig:user-counts-ru}.
 % "A zoom on just the bridge transports" https://bugs.torproject.org/tpo/community/support/40050#note_2796770
 % That pluggable transports could not compensate fully
 % for the loss of relay users points to a usability gap.
-For an overview of how Tor-related transports were affected at this time,
-see an article by Ramesh, Sundara Raman, et~al.~\cite[\S 6.2]{Ramesh2023a}.
-Here, our focus is on Snowflake.
 
 We~had the benefit of established relationships
 and communication with developers and users in Russia,
