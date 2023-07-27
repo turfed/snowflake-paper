@@ -2191,7 +2191,7 @@ beyond the capabilities of more and more censors.
 Snowflake users in Russia (average concurrent).
 The attempted blocking of Tor-related transports in December~2021
 led to Snowflake's first surge in usage.
-The decrease in September~2022
+The decrease in September--October~2022
 coincided with an even larger influx of users from Iran.
 }
 \label{fig:user-counts-ru}
@@ -2240,51 +2240,46 @@ was blocked in a subset of ISPs in Russia
 % Not all providers have them. Tor is not blocked if TSPU is not present.
 % According to tor metrics graph directly connecting users decreased only by 1/3.
 % This indicates TSPU is not everywhere."
-\todo{Consider introducing TSPU? Or not?}
 on \mbox{2021-12-01}~\cite{ooni-2021-russia-blocks-tor}.
-The blocking action was clearly pre-planned and targeted,
-as it happened suddenly and affected multiple Tor-related protocols.
+The event was evidently coordinated and targeted,
+as~it happened suddenly and affected multiple Tor-related protocols.
 Besides Snowflake,
-the IP addresses of a portion
-of unobfuscated Tor relays and bridges,
-as well as some servers of
-the blocking-resistant transports meek and obfs4,
-were blocked, at least temporarily.
-As~you might expect, the attempt to block
-various blocking-resilient transports
+a~portion of Tor relays and bridges,
+as~well as some servers of
+the circumvention transports meek and obfs4,
+were blocked, at~least temporarily.
+As~might be expected, the attempt to block
+various blocking-resistant protocols
 was less than totally successful,
-and the ultimate effect was a substantial increase in the number
+and its ultimate effect was to substantially increase the number
 of users accessing Tor via circumvention transports,
 Snowflake among them.
-This effect is visiable at the left side of \autoref{fig:user-counts-ru}.
 % "A zoom on just the bridge transports" https://bugs.torproject.org/tpo/community/support/40050#note_2796770
 % That pluggable transports could not compensate fully
 % for the loss of relay users points to a usability gap.
 
-We~had the benefit of established relationships
-and communication with developers and users in Russia,
-one of whom, through manual tests, was able to
-isolate the traffic feature used to distinguish Snowflake.
+We~had the advantage of established relationships
+with developers and users in Russia,
+one of whom, through manual testing,
+found the traffic feature that was being used to distinguish Snowflake.
 It~was DTLS fingerprinting,
-of the kind cautioned about in \autoref{sec:fingerprinting}.
+of~the kind cautioned about in \autoref{sec:fingerprinting}.
 % "Russian DPI check supported_groups extension in ServerHello payload (byte 0x5a in udp packet)." https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40014#note_2765074
-Specifically, it was the presence of a
+Specifically, it~was the presence of a
 \mbox{supported\_groups} extension in the DTLS Server Hello message produced by Pion.
-The extension's presence in Server Hello was actually a bug,
+The extension being present in Server Hello was a bug in itself,
 % "Server Hello should not contain supported_groups extension (extension.SupportedEllipticCurves)" https://github.com/pion/dtls/issues/409
-but technical details of the distinguisher do not matter
-so much as the practical effect,
-which was that it provided the censor a byte pattern to match on
+but it also afforded the censor a feature to match on
 that would detect DTLS connections with a Pion implementation in the server role,
-without affecting other forms of WebRTC.
-The process of identifying the flaw, fixing it,
-and shipping new releases of Tor Browser took two or three weeks,
+without affecting other forms of DTLS.
+The process of finding the flaw, fixing it,
+and shipping new releases of Tor Browser took a few weeks,
 % "Point to a forked version of pion/dtls with fingerprinting fix" https://gitlab.torproject.org/tpo/applications/tor-browser-build/-/merge_requests/375
 % 2021-12-14 https://blog.torproject.org/new-release-tor-browser-115a1/
 % 2021-12-20 https://blog.torproject.org/new-release-tor-browser-1103/
 after which the user count rose quickly:
-between the beginning to the end of December~2021,
-the number of users in Russia grew from about 400 to about 4,000.
+from the beginning to the end of December~2021,
+the number of users in Russia grew from about 400 to about 4,000
 % > library("tidyverse")
 % > WANTED_FINGERPRINTS <- c(
 %     "7659DA0F96B156C322FBFF3ACCC9B9DC01C27C73" = "snowman",
@@ -2305,12 +2300,15 @@ the number of users in Russia grew from about 400 to about 4,000.
 %   <date>     <chr>     <chr>   <dbl> <dbl> <dbl>
 % 1 2021-12-01 snowflake ru       381.  381.  381.
 % 2 2022-01-01 snowflake ru      4381. 4380. 4380.
+(\autoref{fig:user-counts-ru}).
 Snowflake was to become a significant tool
 amid the general intensification of censorship in Russia
 following the invasion of Ukraine in February~2022.
 
-The \mbox{supported\_groups} in Server Hello distinguisher had already been
-discovered and documented by MacMillan et~al.~\cite[\S 3]{arxiv.2008.03254} in~2020.
+The Server Hello \mbox{supported\_groups} distinguisher
+used to detect Snowflake in Russia had been
+discovered and documented by MacMillan et~al.~\cite[\S 3]{arxiv.2008.03254}
+already in~2020.
 We~might have avoided this blocking event by proactively fixing
 the known distinguisher,
 but it was not necessarily the wrong call not to have done~so.
