@@ -2308,21 +2308,23 @@ used to detect Snowflake in Russia had been
 discovered and documented by MacMillan et~al.~\cite[\S 3]{arxiv.2008.03254}
 already in~2020.
 We~might have avoided this blocking event by proactively fixing
-the known distinguisher,
-but it was not necessarily the wrong call not to have done~so.
-In~a software project like Snowflake,
-there is always more to do than time to do it;
-work on one task comes at the expense of some other,
-possibly even more important task.
-In~this case, a reactive approach by us was enough.
-We~add that not only did the Snowflake block affect
-only a fraction of ISPs in Russia,
-it was not effective at blocking all Snowflake DTLS connections
-even in the ISPs in which it was present.
-If~the DTLS server role in the WebRTC data channel
-was played by a web browser proxy, which is common,
-then the specific Server Hello feature used by the censor
-would not be present.
+the known distinguisher---but
+it was not necessarily the wrong call not to have done~so.
+In~a project like Snowflake,
+there is always more to do than time to do~it;
+one must consider the opportunity cost
+of preempting specific blocking that may not come to pass.
+In~this case, a~reactive approach by us was enough:
+the loss was minor, and we were able to patch the problem quickly.
+Even in the ISPs where the blocking rule was present,
+it~did not succeed
+at blocking 100\% of Snowflake connections,
+because of the way it targeted a quirk of the Pion
+implementation of Server Hello.
+When the DTLS server role in the WebRTC data channel
+was played by a web browser proxy,
+not a standalone proxy or Snowflake client,
+the feature would not be present.
 % The Snowflake client would retry its rendezvous repeatedly,
 % until hitting on a proxy that worked.
 
@@ -2333,63 +2335,63 @@ would not be present.
 In~May 2022 we got a report of a new detection rule,
 this time keyed on not just the presence, but the \emph{contents}
 of the \mbox{supported\_groups} extension,
-at a byte offset suggesting that this time
+now at a byte offset suggesting that
 it targeted the Client Hello message,
 not Server Hello.
-The presence of \mbox{supported\_groups} in Client Hello is not at all unexpected,
+The presence of a \mbox{supported\_groups} extension in Client Hello is not at all unusual,
 but the specific groups offered by Pion's implementation
 differed from those of common browsers.
-Despite confirming the new blocking rule,
+Despite our being able to confirm the existence of the new blocking rule,
 testers reported that Snowflake continued to work---which
 % https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40030#note_2804998
 % https://ntc.party/t/a-new-snowflake-blocking-rule-offset-of-supported-groups-in-dtls-client-hello/2420/2
 may have something to do with the fact that the Snowflake client
-does not always play the client role in DTLS:
-if~the Snowflake client is the DTLS server,
+does not always play the client role in DTLS.
+If~the Snowflake client is the DTLS server,
 and the DTLS client is a browser proxy,
-then the specific byte pattern of the blocking rule never appears.
+then the byte pattern looked for by the blocking rule does not appear.
 % Hard to say at this point, but perhaps it was the cause of the sharp drop in April 2022, only reported in May?
-Nevertheless, we developed a mitigation,
-but by the time we had prepared a testing release,
+We~developed a mitigation,
+but by the time we had prepared a testing release in July~2022,
 % "Creating a version of Tor Browser with patched Snowflake client that includes supported_groups censorship countermeasure" https://bugs.torproject.org/tpo/anti-censorship/team/83
 % https://ntc.party/t/testing-invitation-for-tor-browser-with-supported-groups-patch-countermeasure-in-snowflake-to-evade-censorship-observed-in-russia/2837
-the \mbox{supported\_groups} in Client Hello rule
+the new rule
 had apparently been removed
 and replaced by another.
 We~can only speculate as to motivations,
-but it may be that the censor decided the old rule
-had too many false positives,
-or was simply not effective enough.
+but it may be that the censor found the old rule
+to have too many false positives,
+or~simply not to be effective enough.
 
 % "Блокировку Сlient Hello убрали, теперь блокируют Hello Verify Request" https://ntc.party/t/in-case-snowflake-rendezvous-gets-blocked/1857/9
 % "They removed the blocking of Client Hello, now they block Hello Verify Request" https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40030#note_2823140
 
 The detection rule that replaced \mbox{supported\_groups} in Client Hello
-looked for the presence of a DTLS Hello Verify Request message.
-Hello Verify Request is an anti-denial-of-service measure,
-in which the server sends a random cookie to the client,
-and the client repeats its Client Hello message,
-echoing the cookie~\cite[\S 5.1]{rfc9147}.
-The presence of Hello Verify Request is not an error
-(it is a ``MAY'' in the RFC),
-but because the Pion implementation used by Snowflake sent it,
+looked for the presence of a Hello Verify Request message.
+Hello Verify Request is an anti-denial-of-service feature in DTLS,
+in~which the server sends a random cookie to the client,
+and the client sends a second Client Hello message,
+this one containing a copy of the cookie~\cite[\S 5.1]{rfc9147}.
+Sending Hello Verify Request is not an error
+(it~is a ``MAY'' in the RFC),
+but because the Pion implementation in Snowflake sent~it,
 and major browsers did not,
 it was a reliable indicator of Snowflake connections.
-(Those, at least, in which the DTLS server role was played by a Pion implementation,
-whether a Snowflake client or standalone proxy.)
-The Hello Verify Request distinguisher had also been anticipated by
-MacMillan et~al.~\cite[\S 3]{arxiv.2008.03254}.
-The first reports of this blocking rule appeared in July~2022;
-as you can see from \autoref{fig:user-counts-ru},
-it had no apparent immediate effect.
+(Those, at least, in which the DTLS server role was played by
+a Snowflake client or standalone proxy.)
+This distinguisher had also been anticipated by
+MacMillan et~al.~\cite[\S 3]{arxiv.2008.03254} in~2020.
+The first reports of this blocking rule were in July~2022;
+but as you can see in \autoref{fig:user-counts-ru},
+it~had no apparent immediate effect.
 It~is hard to say whether the drastic decline in October 2022
 was a consequence of this rule,
-or some other, unidentified one:
-that was the same time as an explosion of users from Iran,
-which temporarily affected the system's usability.
+or some other, unidentified one.
+That decline coincided with an explosion of users from Iran,
+which temporarily affected the usability of the whole system.
 We deployed a mitigation to remove the Hello Verify Request message
-from Snowflake DTLS, regrettably, only in February~2023, % and only in Tor Browser, no Orbot yet
-after which the number of users began to recover.
+from Snowflake, regrettably, only in February~2023, % and only in Tor Browser, no Orbot yet
+after which the number of users in Russia began to recover.
 % "Apply Snowflake Remove HelloVerify Countermeasure" https://gitlab.torproject.org/tpo/applications/tor-browser-build/-/merge_requests/637
 % "Since the release of Tor Browser 12.0.3 on 2023-02-15 there has been an increase in users from Russia on both bridges." https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40030#note_2893870
 
