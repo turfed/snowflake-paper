@@ -2410,81 +2410,92 @@ and even such factors as which endpoint plays the DTLS server role.
 % "Sudden reduction in snowflake-01 bridge bandwidth, 2022-10-04 17:15" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40207
 % "Planning response to censorship in Iran with AC team" https://gitlab.torproject.org/tpo/team/-/wikis/Planning-response-to-censorship-in-Iran-with-AC-team
 
-We have remarked in \autoref{sec:deployment} how,
-in late September 2022,
-almost overnight Iran became the source of the majority of Snowflake users,
-and had an even more sudden drop two weeks later.
-The cause of the drop was blocking based on TLS fingerprint,
-though it took some time to diagnose this fact.
-Specifically, it was a block of one of the TLS fingerprints
-produced by the crypto/tls package in the standard library of
-the Go programming language.
+In~late September 2022,
+users from Iran became the majority of Snowflake users almost overnight,
+only to fall just as quickly two weeks later.
+See \autoref{fig:user-counts-ir}.
+The cause of the rise was
+extraordinary new network restrictions amid mass protests~\cite{ooni-2022-iran-blocks-social-media-mahsa-amini-protests};
+the cause of the decline was TLS fingerprint blocking,
+which stopped Snowflake rendezvous from working.
+Specifically, it~was a block of one of the TLS fingerprints
+of the crypto/tls package in the standard library of
+the Go programming language
+(the language in which the Snowflake client is written).
 
-We~say ``one of'' the crypto/tls fingerprints
+We~say ``one of'' the fingerprints
 because there are several the package may output.
-The fingerprint changed between Go~1.17 and Go~1.18
-as the latter dropped default support for TLS~1.0 and~1.1
-in the Client Hello message.
-% https://go.dev/doc/go1.18#tls10
+This fact prevented the user count from falling all the way to zero,
+but also complicated our efforts to identify the cause of the decline.
+We~isolated two variables that were relevant in this case:
+the version of the Go standard library,
+and the presence or absence of hardware-accelerated AES.
+Between Go~1.17 and Go~1.18,
+the crypto/tls package stopped declaring support
+for the old protocol versions TLS~1.0 and~1.1
+in the Client Hello message~\cite{go1.18-tls10}.
 % supported_versions: https://www.rfc-editor.org/rfc/rfc8446#section-4.2.1
-Furthermore, the TLS client reorders its offered ciphersuites
-according to hardware capabilities:
-if the platform has hardware-accelerated AES,
-it prioritizes AES ciphersuites;
+And if the operating environment has hardware-accelerated AES
+(common on desktop platforms, not so common on mobile),
+the crypto/tls package prioritizes AES ciphersuites;
 otherwise it prioritizes ChaCha ones.
-The combination of these two variables
-(Go~1.17 or~1.18; AES acceleration or not)
-result in four distinct TLS fingerprints;
-of these, only one was blocked, namely the one from
-the older version of Go, without AES acceleration.
+Of~the four possible TLS fingerprints
+resulting from the combination of these two variables,
+only one was blocked,
+namely the one from Go~1.17, without AES acceleration.
 % "This all gives us a good hypothesis... It includes the fingerprints of go1.17+ crypto/tls without AES acceleration" https://github.com/net4people/bbs/issues/139#issuecomment-1280243079
 % "...in native Go crypto/tls fingerprints since go1.17 is that the order of ciphersuites depends on whether the platform has support for accelerated AES-GCM" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40207#note_2844163
 % "When I tested the desktop version, I did it in a VM that did not emulate support for accelerated AES-GCM..." https://github.com/net4people/bbs/issues/131#issuecomment-1280284051
 % "There is strong evidence of an attempt to block the native Go crypto/tls fingerprint, but not all native fingerprints produced by Go programs are blocked." https://github.com/net4people/bbs/issues/125#issuecomment-1284602875
-As~it happens, only Orbot was affected
-(which is more used than Tor Browser, in Iran).
-At the time, Orbot was compiling the Snowflake client with Go~1.17
-and Tor Browser was using Go~1.18\todo{Fix this: \href{https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40207\#note_2845632}{Tor Browser also used Go~1.17.}};
-the mobile platforms on which Orbot runs are also less likely to
-have hardware-accelerated AES
-than the desktop platforms that run Tor Browser.
-We~were hampered in our investigation by the fact that
-OONI Probe\todo{Say what OONI is. Or, cut this detail.} used Go~1.18 to compile Snowflake,
-so its measurements showed everything as normal,
-even as we saw the bandwidth drop at the bridge.
+As~it happens, it~was mainly Orbot that was affected,
+because at the time it used a Snowflake client compiled with Go~1.17,
+and it runs on mobile platforms that are less likely to have AES acceleration.
+Tor Browser was relatively unaffected,
+because it either ran on desktops with AES acceleration,
+or~on mobile platforms with the newer version of the Go
+standard library whose TLS fingerprint was not being matched.
+But evidently Orbot is more used in Iran than Tor Browser,
+because the decline was so drastic.
 
-That TLS fingerprinting worked to block Snowflake
-was an oversight on our part.
-We had in fact already implemented TLS camouflage using uTLS,
-but had failed to turn it on by default.
+That simple TLS fingerprinting worked to block Snowflake rendezvous
+was negligence on our part.
+Anticipating such an event,
+we~had already implemented TLS camouflage using uTLS
+in the Snowflake client,
+but failed to turn it on by default.
 % "uTLS for broker negotiation" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40054
-Activating it took only a small configuration change,
+Activating the feature required only a small configuration change,
 % "Enable uTLS and use the full bridge line for snowflake" https://gitlab.torproject.org/tpo/applications/tor-browser-build/-/merge_requests/540
-but we had to wait out the release cycles of Tor Browser and Orbot
-to get it in the hands of users:
+but we had to wait for new releases of Tor Browser and Orbot
+to get it into the hands of users:
 see the September--November~2022 interval in \autoref{fig:user-counts-ir}.
 
-The fact that only one of Snowflake's possible TLS fingerprints was blocked
-(albeit the most common one)
-could show carelessness on the part of the censor.
-On~the other hand, it is not certain that the TLS fingerprint blocking of October 2022
-was targeted specifically at Snowflake.
+The fact that only one (albeit the most common)
+of the Snowflake client's TLS fingerprints was blocked
+could be a sign of carelessness on the part of the censor.
+On~the other hand, it~is not certain that the TLS fingerprint blocking of October 2022
+was meant to disrupt Snowflake specifically.
 Go~is a popular language for implementing circumvention systems.
 Snowflake may have been caught up in blocking that was intended for another system.
 
 % "Blocking of cdn.sstatic.net by SNI in Iran, 2023-01-16 to 2023-01-24 and sporadically thereafter" https://bugs.torproject.org/tpo/anti-censorship/team/115#note_2873040
 
+After repairing the TLS fingerprinting flaw,
+the number of users from Iran gradually recovered
+to near its former peak.
+We~are aware of only minor disruptions after this time.
 The default front domain of domain fronting rendezvous
-was blocked in some ISPs, matching on the TLS SNI field,
+was blocked (by~TLS SNI) in some ISPs in Iran
 between \mbox{2023-01-16} and \mbox{2023-01-24}.
-We~confirmed this by examining OONI measurements;
-there was also a reduction in users at this time (\autoref{fig:user-counts-ir}).
+We~confirmed the block using data from the OONI
+censorship measurement platform.
+A~reduction in users is visible at this time (\autoref{fig:user-counts-ir}).
 AMP cache rendezvous was a successful workaround while the block was in effect.
 After the block was lifted,
 OONI measurements in the following weeks showed isolated cases
-of failure to connect to the front domain,
-which may have been more blocking,
-though with less intensity and not for more than a few days at a time.
+of failure to connect to the front domain.
+These may have been further attempts at blocking.
+In~any case, they did not have much of an effect.
 
 \subsection{Blocking in China}
 \label{sec:block-cn}
