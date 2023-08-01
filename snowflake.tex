@@ -2500,6 +2500,8 @@ In~any case, they did not have much of an effect.
 \subsection{Blocking in China}
 \label{sec:block-cn}
 
+% "Investigate Snowflake blocking in China" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/32657
+
 The user count graph from China,
 \autoref{fig:user-counts-cn},
 does not show any sudden increases or decreases
@@ -2509,8 +2511,37 @@ Despite the absence of any singular, sustained events,
 we~have seen some evidence for short-term or tentative
 blocking of Snowflake in China.
 
-% "Hello, in China, currently, Tor Browser 8.5a11 version can't connect to Tor network through Snowflake bridge." https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/30350
-% "Hello, currently, in China, Tor Browser 9.5a2 still can't connect to Tor network through snowflake bridge" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/32597
+In~May 2019, when Snowflake was still only in alpha release,
+a~user in China reported a failure to connect.
+Investigation revealed that the cause was IP address blocking of
+the few Snowflake proxies that existed at the time.
+% 2019-05-01 "I'm going to say that this a proxy blocking problem" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/30350#note_2593274
+Rendezvous worked, and the STUN exchange worked,
+but client and proxy could not establish a connection.
+We~confirmed the evidence by temporarily running a new proxy
+at a different IP address:
+clients in China could connect when they happened to be assigned
+that proxy by the broker.
+This was back before the web browser extension proxy existed,
+and the only consistent proxy support was standalone proxies
+we developers ran ourselves at a static IP address.
+This problem went away as the proxy pool grew in size.
+
+Later that month, we discovered another form of blocking in China:
+% 2019-05-15 "access to stun.l.google.com:19302 was blocked" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/30368#note_2593357
+% 2019-05-17 "it looks like the initial connection to the default STUN server is being blocked" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/30350#note_2593299
+of~which there was only one configured at the time.
+% https://gitlab.torproject.org/tpo/applications/tor-browser-build/-/blob/4ff2be0b02e322716f06829e49c50f39795bf43c/projects/tor-browser/Bundle-Data/PTConfigs/linux/torrc-defaults-appendix#L5
+The solution to this problem was to add more STUN servers
+and select a subset of them to use on each rendezvous attempt.
+% 2020-07-09 "Use STUN server compatible with RFC 5780 in proxy" https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/merge_requests/5
+% 2020-07-23 "Choose a random subset from given STUN servers" https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/merge_requests/7
+% 2020-07-10 "Update version of snowflake to allow the client to perform NAT discovery" https://gitlab.torproject.org/tpo/applications/tor-browser-build/-/merge_requests/11
+% 2021-01-21 "As far as we know, setting new STUN servers unblocked Snowflake in China." https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/30350#note_2723004
+Curiously, it seems that when the STUN server was blocked,
+the standalone proxies that had been blocked earlier that month became unblocked.
+% 2019-05-27 "It seems once they blocked those stun servers, all snowflake bridges became reachable again." https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/30368#note_2593360
+
 %
 % "Run some tests to check reachability of snowflake proxies" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/30368
 %
