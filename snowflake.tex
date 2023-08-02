@@ -2541,8 +2541,24 @@ and select a subset of them to use on each rendezvous attempt.
 Curiously, it seems that when the STUN server was blocked,
 the standalone proxies that had been blocked earlier that month became unblocked.
 % 2019-05-27 "It seems once they blocked those stun servers, all snowflake bridges became reachable again." https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/30368#note_2593360
+% NB stun.l.google.com reported reachable (to ICMP at least) 2021-05-03: https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40044#note_2734125
 
-%
+% These were determined not to be GFW related, rather proxy bugs:
+% 2019-08-25 "Hello, currently, in China, I can't open any webpage in 9.0a4 version Tor browser through snowflake bridge" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/31503
+% 2019-09-22 "Hello, today after about two hours, I can't open any webpage in Tor browser through Snowflake bridge." https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/31818
+% 2019-10-02 "Hello, Currently, Tor Browser 9.0a7 can't connect to Tor network through Snowflake bridge." https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/31930
+% 2019-10-04 "Hello, currently, in China, Tor Browser 9.0a7 version can't establish a Tor network connection through snowflake bridge" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/31960
+% 2019-12-01 "Yesterday, in China, I tried to connect to Tor network through snowflake bridge for 10 times. But all of the connections failed" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/32653
+% 2019-12-21 "Hello, currently, in China, Tor Browser 9.5a3 still can't connect to Tor network through snowflake bridge." https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/32833
+% 2020-01-13 "Hello, currently, in China, Tor Browser 9.5a4 still can't connect to Tor network through snowflake bridge." https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/32930
+
+% Attributed to lack of Turbo Tunnel:
+% 2019-11-25 "Hello, currently, in China, Tor Browser 9.5a2 still can't connect to Tor network through snowflake bridge" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/32597
+% 2020-03-29 "Hello, currently, in China, Tor Browser 9.5a8 still can't connect to Tor network through snowflake bridge." https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/33756
+
+% Unresolved/needs information:
+% 2021-05-03 "Hello, currently, in China, tor-browser-linux64-10.5a15 can not connect to Tor network through Snowflake bridge" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40044
+
 % "Run some tests to check reachability of snowflake proxies" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/30368
 %
 % "Confirmed block of default Snowflake in China" https://github.com/net4people/bbs/issues/249
