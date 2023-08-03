@@ -2530,6 +2530,7 @@ This problem went away as the proxy pool grew in size.
 Later that month, we discovered another form of blocking in China:
 % 2019-05-15 "access to stun.l.google.com:19302 was blocked" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/30368#note_2593357
 % 2019-05-17 "it looks like the initial connection to the default STUN server is being blocked" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/30350#note_2593299
+that of the default STUN server,
 of~which there was only one configured at the time.
 % https://gitlab.torproject.org/tpo/applications/tor-browser-build/-/blob/4ff2be0b02e322716f06829e49c50f39795bf43c/projects/tor-browser/Bundle-Data/PTConfigs/linux/torrc-defaults-appendix#L5
 The solution to this problem was to add more STUN servers
@@ -2570,8 +2571,10 @@ We~could not get systematic measurements,
 but some reports suggested that the blocking was triggered
 by multiple (two or three) HTTPS connections
 with the same TLS SNI to certain IP addresses within a short time.
-If~this interference indeed had to do with Snowflake,
-our best guess is that aimed at the multiple rendezvous
+It is possible that Snowflake was not the main target for this change in 
+blocking behaviour and was merely collateral damage. If~this interference 
+indeed had to do with Snowflake,
+our best guess is that it was aimed at the multiple rendezvous
 mentioned in \autoref{sec:multi-bridge}---though such a
 policy would certainly affect a large number of non-Snowflake connections.
 The number of users from China was about halved during these three days.
