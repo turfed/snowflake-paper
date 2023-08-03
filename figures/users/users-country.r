@@ -81,7 +81,7 @@ PLOT_INFO <- list(
 		country = "cn",
 		date_limits = lubridate::ymd(c(
 			"2021-12-15",
-			"2023-06-15"
+			"2023-07-31"
 		)),
 		date_labels = date_labels_abbrev
 	),
@@ -89,7 +89,7 @@ PLOT_INFO <- list(
 		country = "ir",
 		date_limits = lubridate::ymd(c(
 			"2022-09-01",
-			"2023-04-30"
+			"2023-05-31"
 		)),
 		date_labels = date_labels
 	),
@@ -99,15 +99,15 @@ PLOT_INFO <- list(
 			"2021-11-01",
 			# 2021-12-01 first blocking https://bugs.torproject.org/tpo/community/support/40050
 			# 2022-02-15 release of Tor Browser 12.0.3 with altered fingerprint https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40030#note_2893870
-			"2023-03-31"
+			"2023-07-31"
 		)),
-		date_labels = date_labels
+		date_labels = date_labels_abbrev
 	),
 	list(
 		country = "tm",
 		date_limits = lubridate::ymd(c(
 			"2020-10-01",
-			"2022-09-30"
+			"2022-07-31"
 		)),
 		date_labels = date_labels_abbrev
 	)
