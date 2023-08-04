@@ -107,7 +107,7 @@ PLOT_INFO <- list(
 		country = "tm",
 		date_limits = lubridate::ymd(c(
 			"2020-10-01",
-			"2022-07-31"
+			"2022-11-30"
 		)),
 		date_labels = date_labels_abbrev
 	)
