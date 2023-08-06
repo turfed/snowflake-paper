@@ -2186,6 +2186,8 @@ consists in pushing blocking
 beyond the capabilities of more and more censors.
 
 \begin{figure}
+% Make the float take up an entire column.
+\begin{minipage}[t][\textheight][b]{\linewidth}
 \includegraphics{figures/users/users-ru}
 \caption{
 Snowflake users in Russia (average concurrent).
@@ -2193,9 +2195,9 @@ The attempted blocking of Tor-related transports in December~2021
 led to Snowflake's first surge in usage.
 The decrease in September--October~2022
 coincided with an even larger influx of users from Iran.
-}
 \label{fig:user-counts-ru}
-\bigskip
+}
+\vfill
 \includegraphics{figures/users/users-ir}
 \caption{
 Snowflake users in Iran.
@@ -2206,9 +2208,9 @@ The drop in early October 2022
 was the result of blocking based on TLS fingerprint,
 which interfered with Snowflake's rendezvous
 and took some time to mitigate.
-}
 \label{fig:user-counts-ir}
-\bigskip
+}
+\vfill
 \includegraphics{figures/users/users-cn}
 \caption{
 Snowflake users in China.
@@ -2216,17 +2218,21 @@ Though no sustained blocking is evident,
 disruption of domain fronting rendezvous
 for three days in May 2023 briefly
 depressed user numbers.
-}
 \label{fig:user-counts-cn}
-\bigskip
+}
+\vfill
 \includegraphics{figures/users/users-tm}
 \caption{
 Snowflake users in Turkmenistan.
 Though there have never been many Snowflake users in Turkmenistan,
 blocking events are evident on
 \mbox{2021-10-24} and \mbox{2022-07-28}.
-}
+% \label is inside \caption so that the baseline of the last line
+% of the caption aligns with the baseline of the other column.
+% https://tex.stackexchange.com/a/298714
 \label{fig:user-counts-tm}
+}
+\end{minipage}
 \end{figure}
 
 \subsection{Blocking in Russia}
