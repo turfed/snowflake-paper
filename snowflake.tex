@@ -2158,9 +2158,9 @@ and persistent challenges.
 The examples of this section are taken from
 Russia, Iran, China, and Turkmenistan,
 and are selected for being significant and instructive.
-Common lessons are that having lines of communication
+Common lessons are that lines of communication
 and a good working relationship
-with affected users is invaluable in quickly understanding and reacting to blocking;
+with affected users are invaluable in quickly understanding and reacting to blocking;
 and that blocking resistance
 can only be understood in relation to a censor,
 because every censor's cost calculus is different.
@@ -2490,18 +2490,18 @@ After repairing the TLS fingerprinting flaw,
 the number of users from Iran gradually recovered
 to near its former peak.
 We~are aware of only minor disruptions after this time.
-The default front domain of domain fronting rendezvous
-was blocked (by~TLS SNI) in some ISPs in Iran
+The default front domain used in rendezvous
+was blocked (by~TLS SNI) in some ISPs
 between \mbox{2023-01-16} and \mbox{2023-01-24}.
 We~confirmed the block using data from the OONI
 censorship measurement platform.
-A~reduction in users is visible at this time (\autoref{fig:user-counts-ir}).
+A~reduction in users is visible at this time.
 AMP cache rendezvous was a successful workaround while the block was in effect.
 After the block was lifted,
 OONI measurements in the following weeks showed isolated cases
 of failure to connect to the front domain.
 These may have been further attempts at blocking.
-In~any case, they did not have much of an effect.
+If~they were, they did not have much of an effect.
 
 \subsection{Blocking in China}
 \label{sec:block-cn}
@@ -2582,7 +2582,7 @@ blocking behaviour and was merely collateral damage. If~this interference
 indeed had to do with Snowflake,
 our best guess is that it was aimed at the multiple rendezvous
 mentioned in \autoref{sec:multi-bridge}---though such a
-policy would certainly affect a large number of non-Snowflake connections.
+policy would certainly also affect a large number of non-Snowflake connections.
 The number of users from China was about halved during these three days.
 On May~15, this blocking went away and user counts returned to normal.
 % Reported at the same time, perhaps coincidental:
