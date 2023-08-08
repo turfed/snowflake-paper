@@ -2220,7 +2220,48 @@ depressed user numbers.
 Snowflake users in Turkmenistan.
 Though there have never been many Snowflake users in Turkmenistan,
 blocking events are evident on
-\mbox{2021-10-24} and \mbox{2022-07-28}.
+% > library("tidyverse")
+% > WANTED_FINGERPRINTS <- c(
+%     "7659DA0F96B156C322FBFF3ACCC9B9DC01C27C73" = "snowman",
+%     "5481936581E23D2D178105D44DB6915AB06BFB7F" = "snowflake-01",
+%     "91DA221A149007D0FD9E5515F5786C3DD07E4BB0" = "snowflake-02"
+%   )
+% > userstats <- read_csv("figures/users/userstats-bridge-combined-multi.csv") %>%
+%     filter(transport == "snowflake" & fingerprint %in% names(WANTED_FINGERPRINTS)) %>%
+%     mutate(across(c(low, high), ~ .x / (coverage / pmax(num_instances, coverage)))) %>%
+%     mutate(users = (low + high) / 2) %>%
+%     # Combine the contributions of all bridges.
+%     group_by(date, transport, country) %>% summarize(across(c(low, high, users), sum), .groups = "drop") %>%
+%     # Apportion "??" to other countries (see figures/users/users-country.r).
+%     group_by(date, transport) %>% mutate(across(c(low, high, users), ~ .x * sum(.x) / sum(ifelse(country == "??", 0, .x)))) %>% ungroup() %>% filter(country != "??") %>%
+%     filter(country == "tm")
+% > userstats %>% filter("2021-10-20" <= date & date <= "2021-10-28")
+% > userstats %>% filter("2022-07-30" <= date & date <= "2022-08-07")
+% # A tibble: 9 × 6
+%   date       transport country   low  high users
+%   <date>     <chr>     <chr>   <dbl> <dbl> <dbl>
+% 1 2021-10-20 snowflake tm      33.0  33.1  33.0
+% 2 2021-10-21 snowflake tm      27.3  27.8  27.5
+% 3 2021-10-22 snowflake tm      23.1  23.6  23.4
+% 4 2021-10-23 snowflake tm      18.9  19.5  19.2
+% 5 2021-10-24 snowflake tm       5.56  6.19  5.87
+% 6 2021-10-25 snowflake tm       1.63  2.23  1.93
+% 7 2021-10-26 snowflake tm       2.12  2.64  2.38
+% 8 2021-10-27 snowflake tm       1.29  1.40  1.35
+% 9 2021-10-28 snowflake tm       1.05  1.72  1.39
+% # A tibble: 9 × 6
+%   date       transport country   low   high users
+%   <date>     <chr>     <chr>   <dbl>  <dbl> <dbl>
+% 1 2022-07-30 snowflake tm       6.29  7.92  7.11
+% 2 2022-07-31 snowflake tm       5.66  7.76  6.71
+% 3 2022-08-01 snowflake tm       8.43 10.6   9.51
+% 4 2022-08-02 snowflake tm       3.03  5.25  4.14
+% 5 2022-08-03 snowflake tm       0     1.47  0.735
+% 6 2022-08-04 snowflake tm       0     1.24  0.618
+% 7 2022-08-05 snowflake tm       0     1.32  0.659
+% 8 2022-08-06 snowflake tm       0     0.619 0.310
+% 9 2022-08-07 snowflake tm       0     0.771 0.386
+\mbox{2021-10-24} and \mbox{2022-08-03}.
 % \label is inside \caption so that the baseline of the last line
 % of the caption aligns with the baseline of the other column.
 % https://tex.stackexchange.com/a/298714
@@ -2689,7 +2730,7 @@ The workaround did not work in Turkmentelecom, the other major ISP,
 where port~3479 was blocked.
 % "So the line where we switch to port 3479 only works for some people but not others?" https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40024#note_2829235
 
-\todo{Investigate and discuss further blocking on \mbox{2022-07-28}.}
+\todo{Investigate and discuss further blocking on \mbox{2022-08-03}.}
 
 The blocking actions just described are unsophisticated,
 surely resulting in significant overblocking---but
