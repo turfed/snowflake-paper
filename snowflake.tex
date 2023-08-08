@@ -2158,11 +2158,6 @@ and persistent challenges.
 The examples of this section are taken from
 Russia, Iran, China, and Turkmenistan,
 and are selected for being significant and instructive.
-Only in the case of Russia
-can we say that blocking action
-clearly targeted Snowflake specifically;
-in~the other cases the evident blocking rules were broad enough
-that they may have affected Snowflake only incidentally.
 Common lessons are that having lines of communication
 and a good working relationship
 with affected users is invaluable in quickly understanding and reacting to blocking;
@@ -2622,79 +2617,77 @@ It~may have been a localized, ISP-specific phenomenon.
 There have never been more than a few tens of Snowflake users in Turkmenistan,
 a~country subject to even more extreme censorship
 than the others we have seen.
-Still, there have been at least two times
-when the number of users dropped suddenly to zero
+Still, it~has happened at least twice
+that the number of users dropped suddenly to zero
 and took months to recover,
 as~you can see in \autoref{fig:user-counts-tm}.
-Whether these events were targeted attacks on Snowflake is hard to say,
-because censorship in Turkmenistan is particularly
-heavy-handed---both in the sense that it is excessively harsh
-and in the sense that it is a blunt weapon wielded without precision.
 
-On~\mbox{2021-10-24} the number dropped suddenly to zero,
-Our investigation found the blocking to consist of two layers:
-the default domain fronting rendezvous domain was blocked
-by DNS injection;
+The first of these occasions was on \mbox{2021-10-24}.
+Our investigation discovered multiple layered causes:
+the default front domain used in rendezvous was blocked
+by DNS and TLS filtering,
 and certain UDP port numbers commonly used by STUN were blocked.
 We~were able to mitigate the blocking
-by providing alternative domain fronts for rendezvous
-and finding public STUN servers running on non-standard ports,
+by providing alternative domains for rendezvous
+and finding public STUN servers running on non-standard ports;
 but not for all users in all ISPs.
-Turkmenistan remains a difficult environment for circumvention.
 % There had been about 750 relay users at the time.
 % Relays dropped as well on 2021-10-29 https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40029#note_2787789
 
-Among the mechanisms used for censorship in Turkmenistan
-are DNS injection and TCP RST injection.
-DNS queries for blocked hostnames receive an injected response
-containing the localhost IP address 127.0.0.1;
-TLS handshakes with a blocked SNI receive an injected TCP RST packet
-that terminates the connection.
+Our investigation into the drop in users
+took advantage of some peculiarities of the Turkmenistan firewall.
+We~will state the essential information here;
+Nourin et~al.~\cite[\S 2]{Nourin2023a} provide more details.
+Among the censorship techniques used in Turkmenistan
+are DNS response injection and TCP RST injection.
+DNS queries for filtered hostnames receive an injected response
+containing a false IP address;
+TLS handshakes with a filtered SNI receive an injected RST packet
+that tears down the TCP connection.
 % "I did some tests to see if it would be possible to measure blocking of SNI and DNS from outside Turkmenistan" https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40029#note_2787781
 % "Bidirectional DNS, HTTPS, HTTP injection in Turkmenistan" https://github.com/net4people/bbs/issues/80
 Conveniently for analysis,
-both forms of injection are bidirectional:
-packets that \emph{enter} the country are subject to injection,
+injection in Turkmenistan is bidirectional:
+packets that \emph{enter} the country are subject to injection
 just as those that exit it are.
-We~took advantage of this fact,
-sending probes into the country,
-to find that the default front domain used to access the broker
-was blocked by both DNS injection and RST injection,
+By~sending probes into the country from outside,
+we~found that the default front domain used to access the broker
+was blocked by injection at both the DNS and TLS layers---and
 % "...the block on Snowflake is effected by (at least) DNS and SNI blocking of the broker's front domain, cdn.sstatic.net." https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40024#note_2767094
-but that some alternative domains were not blocked.
+also that some alternative domains were not blocked.
 Testers in Turkmenistan confirmed that using a different front domain
 worked to get around the block of the broker.
 (We~did not get confirmation whether AMP cache rendezvous also worked.)
 % "...there's some progress in the sense that the broker connection is working now, but it looks like the client is having trouble connecting to the proxies." https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40024#note_2829140
-But Snowflake still did not work,
-because even after contacting the broker,
-clients were not able to make a connection with a proxy.
+But this on its own was not sufficient.
+Though they could reach the broker,
+clients could not then establish a connection with a proxy.
 % "connection failed timeout waiting for DataChannel.OnOpen" https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40024#note_2829121
 
-More rounds of testing revealed a block of the default port number
-used by STUN, UDP port~3478.
+Further testing revealed blocking of the default port number
+of STUN, UDP port~3478.
 % "And port 3478 is blocked in TM" https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40024#note_2829127
-Not being able to reach a STUN server,
-a~client cannot find its own ICE candidate addresses
-(refer to \autoref{sec:ice}),
-causing the overwhelming majority of peer-to-peer connections with proxies to fail.
-Although clients without STUN candidates could theoretically connect
-to proxies without any NAT or firewall, most VPS providers are blocked
-wholesale in Turkmenistan, leaving proxies located on residential networks
-as the only option.
-As~luck would have it, the NAT discovery feature we rely on
+A~client that cannot communicate with a STUN server
+cannot find its own ICE candidate addresses
+(\autoref{sec:ice}),
+which causes most WebRTC connections to proxies to fail.
+(The exceptions are proxy that have no NAT or ingress filtering.
+While there are some such proxies,
+censorship in Turkmenistan also outright blocks
+a large fraction of the IP address space,
+including data center and VPS ranges where such proxies tend to run.)
+As~luck would have it, the NAT discovery feature we need
 for testing the NAT type of clients also requires
 STUN servers to listen on a second port other than the default~\cite[\S 6]{rfc5780}
-(commonly 3479),
-and changing the STUN server addresses to those other port numbers
+(commonly 3479).
+Changing STUN server addresses to those alternate port numbers
 let some users connect to Snowflake again.
 % "this line... :3479... Works!" https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40024#note_2829157
 % 2022-08-25 "Use stun servers on port 3479 for turkmenistan" https://gitlab.torproject.org/tpo/anti-censorship/rdsys-admin/-/merge_requests/4
 Specifically, STUN servers on port 3479 worked in AGTS,
 one of two major affected ISPs.
-\todo{Check if we can determine through our metrics how long the port 3479 bridge line worked in AGTS.}
-Port~3479 was blocked in Turkmentelecom, the other major ISP,
-and the workaround did not work there.
+The workaround did not work in Turkmentelecom, the other major ISP,
+where port~3479 was blocked.
 % "So the line where we switch to port 3479 only works for some people but not others?" https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40024#note_2829235
 
 \todo{Investigate and discuss further blocking on \mbox{2022-07-28}.}
