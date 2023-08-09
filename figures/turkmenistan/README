@@ -1,0 +1,8 @@
+This is to match Censored Planet measurements of cdn.sstatic.net
+(the default broker front domain) in Turkmenistan against the
+number of Snowflake users in Turkmenistan.
+
+These files are provided by Censored Planet:
+dns_tm_cdn-sstatic-net.csv
+https_tm_cdn-sstatic-net.csv
+http_tm_cdn-sstatic-net.csv
