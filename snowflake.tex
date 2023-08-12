@@ -601,18 +601,18 @@ A~corollary of the no-secret-information property
 is that an adversary---the censor---is
 at no special disadvantage in attacking the system.
 The censor may download the client software,
-run it, study its network connections,
-and the system must remain blocking-resistant despite this.
-This is in contrast to other systems in which,
-in~addition to the necessary software,
+run it, study its network connections---and
+the system must maintain its blocking resistance despite this.
+This stands in contrast to other systems in which,
+preliminary to making a connection,
 a~client must acquire some secret,
 such as a password or proxy IP address,
 through an out-of-band channel
-that is presumed to be unavailable to the censor,
+presumed to be unavailable to the censor,
 and the system's blocking resistance depends on
-clients keeping that information secret from the censor.
+keeping that information hidden from the censor.
 If~rendezvous has the advantage of not needing to manage secrets,
-its disadvantage is that it just one more thing to get right.
+its disadvantage is that it is just one more thing to get right.
 Not only the main circumvention channel
 but also the rendezvous must resist blocking:
 the system is only as strong as the weaker of the~two.
@@ -671,7 +671,7 @@ how its NAT maps internal IP--port combinations to external ports,
 and how its firewall filters incoming packets.
 For our purposes, it suffices
 to condense the combinations of NAT mapping and firewall filtering
-into the following well-known NAT variations:
+into the following well-known variations:
 
 % https://datatracker.ietf.org/doc/html/rfc3489#section-5
 \begin{description}
@@ -2617,9 +2617,9 @@ We~could not get systematic measurements,
 but some reports suggested that the blocking was triggered
 by multiple (two or three) HTTPS connections
 with the same TLS SNI to certain IP addresses within a short time.
-It is possible that Snowflake was not the main target for this change in 
-blocking behaviour and was merely collateral damage. If~this interference 
-indeed had to do with Snowflake,
+It~is possible that Snowflake was not the main target of this
+blocking behavior, and was affected only as a side effect.
+If~it indeed had to do with Snowflake,
 our best guess is that it was aimed at the multiple rendezvous
 mentioned in \autoref{sec:multi-bridge}---though such a
 policy would certainly also affect a large number of non-Snowflake connections.
@@ -2773,7 +2773,8 @@ they nevertheless offer greater challenges to circumvention
 than the more considered blocking of Russia and Iran.
 We~highlight this to make the point that blocking resistance
 cannot be defined in absolute terms,
-but only in relation to a particular censor.
+but only in relation to a particular censor
+and its predilections.
 Censors differ not only in resources
 (time, money, equipment, personnel),
 but also in their tolerance
