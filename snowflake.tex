@@ -2796,72 +2796,71 @@ that a richer, more capable censor cannot.
 \label{sec:future}
 
 A~natural extension of Snowflake would be
-to access systems other than Tor,
-for example ordinary VPN services.
-Tor has a number of nice qualities:
+to have it access systems other than Tor---ordinary
+VPNs, for example.
+Tor has its benefits:
 an~existing user base,
 a~standard (pluggable transports) for integrating
 circumvention modules,
-and the fact that entry nodes are separate from exit nodes,
-which means circumvention developers can focus on providing access
-and leave the worries of actually exiting that traffic
-to the destination to someone else.
-But Tor has its drawbacks,
-notably its lower speed,
-lack of support for UDP,
-and lower level of awareness among censored users.
-There is nothing that conceptually ties Snowflake to Tor,
-and it could be adapted to other systems.
-One question is whether there should be one proxy pool
-for all projects that use Snowflake,
-or if every project should deploy its own pool.
-Cultivating a healthy population of proxies
-has been a vital yet non-trivial part of Snowflake's success,
-and clearly it would be more efficient for one pool
-to be shared among many projects.
-In~fact, there is no reason why one proxy could not
-serve multiple projects at the same time,
-directing each client's traffic to an appropriate bridge
-according to the client's preference.
-But while some proxy operators may be happy to donate
-bandwidth to a project like Tor,
-they may need more incentive to help a commercial VPN.
-Having multiple cooperating projects
-working together also makes it harder
-to change the proxy protocol, for example,
-if that should become necessary.
-A~next-generation proxy pool could be built
-from the ground up with multiple cooperating projects in mind,
-and if it proved successful,
-the Tor deployment could migrate to it.
+and exit nodes separate from entry nodes,
+which relieve the circumvention developer of the concerns associated
+with actually exiting traffic to its destination.
+But Tor has drawbacks as well,
+notably its lower speed and
+a~lack of support for UDP and other non-TCP protocols.
+Nothing inherently ties Snowflake to Tor,
+and it might easily be adapted to other systems.
+One question is whether every Snowflake-like deployment
+should manage its own pool of proxies,
+or~if proxies can somehow be shared.
+Building Snowflake's population of proxies
+has been a substantial undertaking in itself---for
+every project to repeat the process from scratch
+would be a regrettable duplication of effort.
+There is no reason why one proxy might not
+serve multiple projects,
+the client expressing its preference
+in the same way it now signals which Tor bridge to use (\autoref{sec:multi-bridge}).
+But there would be design issues to work out.
+While some proxy operators may be happy to donate
+bandwidth to a free-to-use project like Tor,
+they may need more incentive than altruism to help a commercial VPN.
+A~shared deployment would impose additional friction on development
+(making it harder to alter the proxy protocol, for example).
+Rather than retrofit the current Tor-based proxies
+with support for other systems,
+a~next-generation proxy pool might be designed
+from the ground up with multiple cooperating projects in mind.
+If~it proved successful,
+the Tor deployment could migrate to~it.
 
 % "Multiplex - one client splits traffic across multiple proxies" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/25723
 % "I'm thinking of 'striping' packets across multiple snowflake proxies simultaneously." https://lists.torproject.org/pipermail/anti-censorship-team/2020-February/000059.html
 The Turbo Tunnel reliability layer of \autoref{sec:data-transfer}
-is indispensable for providing a continuous session abstraction
+necessary for providing a continuous session abstraction
 over a sequence of unreliable proxies.
-But we could do more with~it:
+But it might do even more:
 in~particular, it should be possible
-for one client to multiplex its traffic
-over multiple temporary proxies not just serially, but simultaneously.
+for a client to multiplex its traffic
+over multiple proxies not just sequentially, but in parallel.
 (Something like multipath~TCP.)
-The sequence numbers in the inner reliability layer
-would ensure a reliable stream, even when the proxies
-have different speeds and lifetimes.
+Sequence numbers in the inner reliability layer
+would ensure a reliable stream, even when proxies
+have different lifetimes and performance characteristics.
 Multiplexing could increase performance by using the sum
 of the bandwidths of the individual proxies,
-and reduce bandwidth variance by hedging against the possibility
-of the client's assigned proxy having very low bandwidth.
-Using two or more proxies at once would also
+and reduce variability by hedging against the
+the client being assigned one very slow proxy.
+Using two or more proxies at once would
 eliminate the brief pause for re-rendezvous
-between consecutive proxies that exists now.
+between consecutive proxies that now occurs.
 Our experiments with multiplexing have so far
-not shown enough improvement to justify the change,
+not shown enough benefit to justify the change,
 though it may be a matter of tuning.
 % "...the multiplexing patch in !11 makes no difference in throughput (and in some cases seems to make throughput worse)" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/25723#note_2718643
 % "at least the multiplexed version is not slower than the regular version now" https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/merge_requests/11#note_2716658
-And of course, more analysis would be required before deployment
-to know whether multiple simultaneous WebRTC connections
+And of course, analysis would be required
+to determine whether simultaneous WebRTC connections
 form a distinctive network fingerprint.
 
 \section*{Availability}
