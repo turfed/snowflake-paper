@@ -466,7 +466,7 @@ To~gather the information necessary to construct an offer or answer,
 clients and proxies communicate with third-party STUN servers
 before contacting the broker.
 We~additionally use STUN servers to identify the NAT type of clients.
-We~will say more about how this information is used in \autoref{sec:ice}.
+We~will say more about how this information is used in \autoref{sec:connection}.
 The contacting of STUN servers is a normal and expected part of WebRTC,
 though there are fingerprinting considerations
 that we discuss in \autoref{sec:fingerprinting}.
@@ -618,7 +618,7 @@ but also the rendezvous must resist blocking:
 the system is only as strong as the weaker of the~two.
 
 \subsection{Peer-to-peer connection establishment}
-\label{sec:ice}
+\label{sec:connection}
 
 Now the client and the proxy connect to each other directly.
 Even in the absence of censorship,
@@ -1048,7 +1048,7 @@ simply blocking them by IP address.
 Our deployment uses a pool of public STUN servers
 that are used in applications other than circumvention,
 filtered for those that support the NAT behavior discovery feature
-described in \autoref{sec:ice}.
+described in \autoref{sec:connection}.
 The client chooses a random subset of servers from the pool
 when it makes a connection;
 this is because not every STUN server is accessible
@@ -1271,7 +1271,7 @@ and 4~GB/day.
 % 5 2021-01-02 7.34 GB  6.56 GB 90.84 MB      822.81 MB      7.25 GB   5.74 GB    6.49 GB
 % 6 2021-01-03 8.50 GB  7.74 GB 94.69 MB      844.65 MB      8.40 GB   6.90 GB    7.65 GB
 }
-\label{fig:user-counts}
+\label{fig:client-counts}
 \end{figure*}
 
 \section{Experience}
@@ -1284,7 +1284,7 @@ at the history of our deployment
 and reflect on the experience.
 
 \subsection{Client counts and bandwidth}
-\label{sec:deployment}
+\label{sec:clients}
 
 % Excerpts from https://gitlab.torproject.org/tpo/network-health/metrics/timeline:
 % |2017-01-24|||snowflake|Tor Browser 7.0a1 released, including Snowflake for GNU/Linux only.|[blog post](https://blog.torproject.org/blog/tor-browser-70a1-released)||
@@ -1367,7 +1367,7 @@ While at this point Snowflake was available
 on every platform supported by Tor Browser,
 it was not yet comfortably usable.
 There were two important parts missing:
-no NAT type matching (\autoref{sec:ice})
+no NAT type matching (\autoref{sec:connection})
 meant that a client could not always connect to its assigned proxy;
 and a lack of persistent session state (\autoref{sec:data-transfer})
 meant that even if a proxy connection was successful,
@@ -1433,7 +1433,7 @@ and the necessary proxy support was added on \mbox{2020-11-17}.
 After these changes, Snowflake became practical for daily browsing
 and the number of users began to grow into~2021.
 
-This bring us to \autoref{fig:user-counts}, which
+This bring us to \autoref{fig:client-counts}, which
 shows the number of Snowflake users since 2021.
 The number of users is estimated using the aggregate statistics
 reported by the Tor bridge
@@ -2142,7 +2142,7 @@ So~there are two independent safeguards against misuse.
 \section{Notable blocking attempts}
 \label{sec:block}
 
-In~\autoref{sec:deployment} we saw how Snowflake's user counts
+In~\autoref{sec:clients} we saw how Snowflake's user counts
 have at times been affected by the blocking actions of censors.
 Now we take a closer look at selected censorship events.
 The effect of censorship has usually been to increase rather than decrease
@@ -2190,7 +2190,7 @@ The attempted blocking of Tor-related transports in December~2021
 led to Snowflake's first surge in usage.
 The decrease in September--October~2022
 coincided with an even larger influx of users from Iran.
-\label{fig:user-counts-ru}
+\label{fig:client-counts-ru}
 }
 \vfill
 \includegraphics{figures/users/users-ir}
@@ -2202,7 +2202,7 @@ The drop in October 2022
 was the result of TLS fingerprint blocking,
 which interfered with rendezvous
 and took some time to mitigate.
-\label{fig:user-counts-ir}
+\label{fig:client-counts-ir}
 }
 \vfill
 \includegraphics{figures/users/users-cn}
@@ -2212,7 +2212,7 @@ Though no sustained blocking is evident,
 disruption of domain fronting rendezvous
 for three days in May 2023 briefly
 depressed user numbers.
-\label{fig:user-counts-cn}
+\label{fig:client-counts-cn}
 }
 \vfill
 \includegraphics{figures/users/users-tm}
@@ -2265,7 +2265,7 @@ blocking events are evident on
 % \label is inside \caption so that the baseline of the last line
 % of the caption aligns with the baseline of the other column.
 % https://tex.stackexchange.com/a/298714
-\label{fig:user-counts-tm}
+\label{fig:client-counts-tm}
 }
 \end{minipage}
 \end{figure}
@@ -2344,7 +2344,7 @@ the number of users in Russia grew from about 400 to about 4,000
 %   <date>     <chr>     <chr>   <dbl> <dbl> <dbl>
 % 1 2021-12-01 snowflake ru       381.  381.  381.
 % 2 2022-01-01 snowflake ru      4381. 4380. 4380.
-(\autoref{fig:user-counts-ru}).
+(\autoref{fig:client-counts-ru}).
 Snowflake was to become a significant tool
 amid the general intensification of censorship in Russia
 following the invasion of Ukraine in February~2022.
@@ -2428,7 +2428,7 @@ a Snowflake client or standalone proxy.)
 This distinguisher had also been anticipated by
 MacMillan et~al.~\cite[\S 3]{arxiv.2008.03254} in~2020.
 The first reports of this blocking rule were in July~2022;
-but as you can see in \autoref{fig:user-counts-ru},
+but as you can see in \autoref{fig:client-counts-ru},
 it~had no apparent immediate effect.
 It~is hard to say whether the drastic decline in October 2022
 was a consequence of this rule,
@@ -2459,7 +2459,7 @@ and even such factors as which endpoint plays the DTLS server role.
 In~late September 2022,
 users from Iran became the majority of Snowflake users almost overnight,
 only to fall just as quickly two weeks later.
-See \autoref{fig:user-counts-ir}.
+See \autoref{fig:client-counts-ir}.
 The cause of the rise was
 extraordinary new network restrictions amid mass protests~\cite{ooni-2022-iran-blocks-social-media-mahsa-amini-protests};
 the cause of the decline was TLS fingerprint blocking,
@@ -2514,7 +2514,7 @@ Activating the feature required only a small configuration change,
 % "Enable uTLS and use the full bridge line for snowflake" https://gitlab.torproject.org/tpo/applications/tor-browser-build/-/merge_requests/540
 but we had to wait for new releases of Tor Browser and Orbot
 to get it into the hands of users:
-see the September--November~2022 interval in \autoref{fig:user-counts-ir}.
+see the September--November~2022 interval in \autoref{fig:client-counts-ir}.
 
 The fact that only one (albeit the most common)
 of the Snowflake client's TLS fingerprints was blocked
@@ -2549,7 +2549,7 @@ If~they were, they did not have much of an effect.
 % "Investigate Snowflake blocking in China" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/32657
 
 The user count graph from China,
-\autoref{fig:user-counts-cn},
+\autoref{fig:client-counts-cn},
 does not show any drastic changes
 like others we have discussed so far.
 There are a modest but respectable number of Snowflake users in China.
@@ -2610,7 +2610,7 @@ the standalone proxies that had been blocked earlier that month became unblocked
 % "Snowflake bridge does not work in China since days ago" https://forum.torproject.net/t/snowflake-bridge-does-not-work-in-china-since-days-ago/7635
 % "Blocking of Snowflake in China, 2023-05-12" https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40038
 The next incidents we are aware of did not occur until 2023,
-recent enough to be in the scope of \autoref{fig:user-counts-cn}.
+recent enough to be in the scope of \autoref{fig:client-counts-cn}.
 On May~12, 13, and~14, a~few users reported problems
 with domain fronting rendezvous.
 We~could not get systematic measurements,
@@ -2657,7 +2657,7 @@ It~may have been a localized, ISP-specific phenomenon.
 There have never been more than a few tens of Snowflake users in Turkmenistan.
 Even so, it~has happened at least twice
 that the number of users dropped suddenly to zero,
-as~you can see in \autoref{fig:user-counts-tm}.
+as~you can see in \autoref{fig:client-counts-tm}.
 We~attributed the drops to multiple causes:
 filtering of the default broker front domain
 by DNS and TCP RST injection,
@@ -2712,7 +2712,7 @@ worked to get around the block of the broker.
 % https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40029#note_2787789
 
 The increase in the number users from May to August 2022
-visible in \autoref{fig:user-counts-tm} was caused by
+visible in \autoref{fig:client-counts-tm} was caused by
 a partial unblocking of the broker front domain on \mbox{2023-05-03}.
 We~realized this only in retrospect,
 by~looking at logs from Censored Planet,\todo{Cite Censored Planet.}
@@ -2740,7 +2740,7 @@ clients could not then establish a connection with a proxy.
 Further testing revealed blocking of the default STUN port, UDP~3478.
 % "And port 3478 is blocked in TM" https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40024#note_2829127
 A~client that cannot communicate with a STUN server
-cannot find its own ICE candidate addresses (\autoref{sec:ice}),
+cannot find its own ICE candidate addresses (\autoref{sec:connection}),
 which makes most WebRTC proxy connections fail.
 (The exceptions are proxies without NAT and ingress filtering.
 While there are some such proxies,
@@ -2763,7 +2763,7 @@ where port~3479 was blocked.
 % "So the line where we switch to port 3479 only works for some people but not others?" https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40024#note_2829235
 Though do not have continuous measurements to be sure,
 we~suspect that the STUN port blocking began on \mbox{2022-08-03}
-and precipitated the drop seen there in \autoref{fig:user-counts-tm}.
+and precipitated the drop seen there in \autoref{fig:client-counts-tm}.
 % OONI stunreachability measurements cease on 2023-07-31.
 % https://explorer.ooni.org/search?since=2022-07-01&until=2022-10-31&failure=true&probe_cc=TM&test_name=stunreachability
 
