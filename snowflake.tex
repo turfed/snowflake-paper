@@ -481,7 +481,7 @@ to see if a client rendezvous message will arrive.
 If~not, the broker sends a response saying ``no clients''
 and the proxy goes to sleep until it is time for its next poll.
 If~a client does arrive,
-the broker sends SDP offer to the proxy
+the broker sends its SDP offer to the proxy
 in the response to the proxy's poll request.
 As~it is now too late for the proxy to send more information
 in the same HTTPS exchange,
@@ -513,7 +513,7 @@ used by the client to access the broker through the censor's zone of control
 
 The client needs to use an indirect channel,
 resistant to blocking,
-when communicating contacting the broker.
+when communicating with the broker.
 What is needed, essentially,
 is a miniature circumvention system
 to bootstrap into the full system.
@@ -664,7 +664,7 @@ and avoids cases that would require a fallback to TURN.
 % "Investigate Snowflake proxy failures" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/33666#note_2595319
 % "Okay here's a summary of what I've found: ..."
 
-Two factors are relevant
+Two factors are relevant to
 a Snowflake client or proxy's
 ability to make a peer-to-peer connection:
 how its NAT maps internal IP--port combinations to external ports,
