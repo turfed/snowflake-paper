@@ -763,10 +763,6 @@ Though it creates the potential for an incompatible match
 between a symmetric proxy and a port-restricted cone client,
 port-restricted cone proxies are common in practice,
 and are compatible with port-restricted cone clients.
-Our measurements show that clients with port-restricted cone NAT
-can connect to around 80\%\todo{Measure that 80\% number again.}
-of proxies considered restricted under this categorization.\todo{Does this mean 80\% of restricted proxies,
-or 80\% of the time a client eventually gets a compatible proxy after repeated retries?}
 In~case of a connection failure,
 clients re-rendezvous and try again.
 
@@ -822,8 +818,17 @@ against the ethos of Snowflake,
 it~has proved useful, as a matter of practicality,
 to~sacrifice a measure of address diversity
 for better NAT compatibility in a common case.
-Approximately one quarter of client polls
-report a restricted NAT type.\todo{Double-check this number and document how it was calculated.}
+Using the metrics collected at the broker, we can
+calculate the average number of tries a client with
+each NAT type makes before they are successfully
+matched with a snowflake proxy from the ratio of
+failed to successful matches, assuming all clients continue
+to attempt a rendezvous until they are matched
+with a proxy. Over the month
+of July 2023, it took unrestricted proxies
+an average of 1.0 tries
+to successfully match with a snowflake, and restricted
+proxies an average of 1.07 ($\pm$ 0.05) tries.
 
 At the same time as the proxy makes a connection to its assigned client,
 % "At the same time": https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40228
