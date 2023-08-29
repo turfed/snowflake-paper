@@ -2770,7 +2770,7 @@ one of two major affected ISPs.
 The workaround did not work in Turkmentelecom, the other major ISP,
 where port~3479 was blocked.
 % "So the line where we switch to port 3479 only works for some people but not others?" https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40024#note_2829235
-Though do not have continuous measurements to be sure,
+Though we do not have continuous measurements to be sure,
 we~suspect that the STUN port blocking began on \mbox{2022-08-03}
 and precipitated the drop seen there in \autoref{fig:client-counts-tm}.
 % OONI stunreachability measurements cease on 2023-07-31.
@@ -2796,7 +2796,7 @@ To paraphrase one of our collaborators:
 ``What they have in Turkmenistan can hardly be called an Internet.''
 % https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40024#note_2889792
 In~a network already heavily damaged by oppressive policy,
-the marginal harm caused by the clumsy blocking
+the marginal harm caused by the clumsy blocking of
 this or that circumvention system is relatively small.
 This explains the sense in which a resource-poor censor
 can ``afford'' certain blocking actions
@@ -2847,7 +2847,7 @@ the Tor deployment could migrate to~it.
 % "Multiplex - one client splits traffic across multiple proxies" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/25723
 % "I'm thinking of 'striping' packets across multiple snowflake proxies simultaneously." https://lists.torproject.org/pipermail/anti-censorship-team/2020-February/000059.html
 The Turbo Tunnel reliability layer of \autoref{sec:data-transfer}
-necessary for providing a continuous session abstraction
+was necessary for providing a continuous session abstraction
 over a sequence of unreliable proxies.
 But it might do even more:
 in~particular, it should be possible
@@ -2860,7 +2860,7 @@ have different lifetimes and performance characteristics.
 Multiplexing could increase performance by using the sum
 of the bandwidths of the individual proxies,
 and reduce variability by hedging against the
-the client being assigned one very slow proxy.
+client being assigned one very slow proxy.
 Using two or more proxies at once would
 eliminate the brief pause for re-rendezvous
 between consecutive proxies that now occurs.
