@@ -826,17 +826,39 @@ against the ethos of Snowflake,
 it~has proved useful, as a matter of practicality,
 to~sacrifice a measure of address diversity
 for better NAT compatibility in a common case.
-Using the metrics collected at the broker, we can
-calculate the average number of tries a client with
-each NAT type makes before they are successfully
-matched with a snowflake proxy from the ratio of
-failed to successful matches, assuming all clients continue
-to attempt a rendezvous until they are matched
-with a proxy. Over the month
-of July 2023, it took unrestricted proxies
-an average of 1.0 tries
-to successfully match with a snowflake, and restricted
-proxies an average of 1.07 ($\pm$ 0.05) tries.
+We~can estimate how many tries it takes a client
+to be matched with a proxy, on average,
+by counting failed and successful rendezvous attempts at the broker,
+under the assumption that clients repeat rendezvous attempts
+until getting a match.
+In~July 2023,
+unrestricted clients almost always got a match on the first attempt,
+while restricted clients needed an average of
+1.07 attempts (standard deviation 0.05).
+% > library(tidyverse)
+% > read_csv("figures/proxies/client-match.csv") %>%
+%     filter(date < "2023-09-01") %>%
+%     group_by(month = format(date, "%Y-%m")) %>%
+%     summarize(
+%       unrestricted_n  = mean((matched_count + unrestricted_denied_count) / matched_count),
+%       unrestricted_sd =   sd((matched_count + unrestricted_denied_count) / matched_count),
+%       restricted_n    = mean((matched_count + restricted_denied_count) / matched_count),
+%       restricted_sd   =   sd((matched_count + restricted_denied_count) / matched_count),
+%       .groups = "drop"
+%     ) %>% tail(10)
+% # A tibble: 10 × 5
+%    month   unrestricted_n unrestricted_sd restricted_n restricted_sd
+%    <chr>            <dbl>           <dbl>        <dbl>         <dbl>
+%  1 2022-11           1          0                 1.00       0.00133
+%  2 2022-12           1          0                 1.26       0.199
+%  3 2023-01           1          0                 1.64       0.225
+%  4 2023-02           1.00       0.0000131         1.94       0.154
+%  5 2023-03           1          0                 1.42       0.280
+%  6 2023-04           1          0                 1.15       0.152
+%  7 2023-05           1.00       0.00204           1.23       0.113
+%  8 2023-06           1.00       0.0000834         1.23       0.0734
+%  9 2023-07           1          0                 1.07       0.0498
+% 10 2023-08           1          0                 1.02       0.0568
 
 At the same time as the proxy makes a connection to its assigned client,
 % "At the same time": https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40228
