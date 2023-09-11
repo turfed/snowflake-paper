@@ -211,7 +211,9 @@ we decided to start Snowflake as an independent project.
 % https://serene.cx/snowflake/#note-flashproxy "...one could say that uProxy and flashproxy are the ancestors of snowflake."
 uProxy~\cite{uproxy}, in one of its early incarnations,
 % "in one of its earlier incarnations": uProxy pivoted from friend proxies to cloud servers in 2016:
-%  https://web.archive.org/web/20161211194847/https://blog.uproxy.org/2016/02/get-access-24x7-through-your-own-uproxy.html
+% https://web.archive.org/web/20161211194847/https://blog.uproxy.org/2016/02/get-access-24x7-through-your-own-uproxy.html
+% and added support for proxying through Tor in 2016:
+% https://lists.torproject.org/pipermail/tor-dev/2016-September/011489.html
 pioneered the use of WebRTC proxies for circumvention.
 uProxy's proxies were browser-based,
 but its trust and deployment models were different
@@ -240,6 +242,7 @@ Snowflake proxy are even easier to deploy.
 Like flash proxy, uProxy was active in the years
 2013--2016.
 % 2013: Serene's 30C3 lightning talk on uProxy https://events.ccc.de/congress/2013/wiki/Static:Lightning_Talks#Day_3
+% 2013–2016 contributions in uProxy-p2p: https://github.com/UWNetworksLab/uProxy-p2p/graphs/contributors
 
 Among existing circumvention systems,
 the one that is most similar to Snowflake is MassBrowser~\cite{Nasr2020a}.
@@ -741,6 +744,8 @@ using the facilities of STUN alone
 (no fallback to TURN).
 The incompatible cases are when one peer's NAT is symmetric
 and the other's is symmetric or port-restricted cone.
+Note the asymmetry in what NAT variants we consider ``restricted''
+in client and proxy.
 }
 \label{tab:nat-matching}
 \todo[inline]{Check style guide to see if caption should be before or after a table.}
@@ -814,7 +819,7 @@ testing peer that proxies use to assess their NAT type.
 \end{figure}
 
 \autoref{fig:proxy-nat-type}
-shows that unrestricted proxies are
+shows that unrestricted proxies form
 a relatively small fraction of the proxy population.
 In~absolute terms, there are enough,
 thanks in large part to the volunteers who run
@@ -2740,7 +2745,7 @@ we~found that the default broker front domain
 was blocked at both the DNS and TLS layers.
 % "...the block on Snowflake is effected by (at least) DNS and SNI blocking of the broker's front domain, cdn.sstatic.net." https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40024#note_2767094
 It~was some time---not until August 2022---before we got
-confirmation from testers that an alternate front domain
+confirmation from testers that an alternative front domain
 worked to get around the block of the broker.
 % 2022-08-18 "broker rendezvous peer received" https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40024#note_2829121
 % We~did not get confirmation whether AMP cache rendezvous also worked,
@@ -2775,7 +2780,7 @@ some users reported that RST injection was still in place for them
 
 There was yet another layer to the blocking.
 Even if they could contact the broker
-(at~the default or an alternate front domain),
+(at~the default or an alternative front domain),
 clients could not then establish a connection with a proxy.
 % "...there's some progress in the sense that the broker connection is working now, but it looks like the client is having trouble connecting to the proxies." https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40024#note_2829140
 % "connection failed timeout waiting for DataChannel.OnOpen" https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40024#note_2829121
@@ -2794,7 +2799,7 @@ As~chance would have it, the NAT discovery feature we rely on
 for testing the NAT type of clients requires
 STUN servers to open a second, functionally equivalent listener
 on a different port~\cite[\S 6]{rfc5780} (commonly port 3479).
-Changing to those alternate STUN port numbers
+Changing to those alternative STUN port numbers
 let some users connect to Snowflake again.
 % "this line... :3479... Works!" https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40024#note_2829157
 % 2022-08-25 "Use stun servers on port 3479 for turkmenistan" https://gitlab.torproject.org/tpo/anti-censorship/rdsys-admin/-/merge_requests/4
