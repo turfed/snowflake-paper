@@ -1217,14 +1217,15 @@ as in Protozoa~\cite[\S 4.4]{Barradas2020a}.
 
 \end{description}
 
-\todo{Cite \cite[\S \mbox{V-C}]{Frolov2019a},
-which analyzed snowflake-client TLS fingerprint
-before uTLS.}
-
 Fifield and Gil Epner~\cite{arxiv.1605.08805}
 studied the network traffic of WebRTC applications,
 with the goal of revealing fingerprinting pitfalls
 that might affect Snowflake, which was then in early development.
+Frolov et~al.~\cite[\S \mbox{V-C}]{Frolov2019a}
+observed that the unprotected TLS fingerprint
+of domain fronting rendezvous was distinctive,
+and introduced the uTLS package that Snowflake
+now uses to protect it.
 MacMillan et~al.~\cite{arxiv.2008.03254}
 focused on the DTLS handshake,
 comparing Snowflake to three other WebRTC applications.
