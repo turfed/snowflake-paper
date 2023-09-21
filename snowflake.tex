@@ -2230,7 +2230,12 @@ beyond the capabilities of more and more censors.
 
 \begin{figure}
 % Make the float take up an entire column.
-\begin{minipage}[t][\textheight][b]{\linewidth}
+% The \vphantom rule and \smash'ed minipage are because a plain minipage
+% would count the depth of the descenders of the final line of text.
+% See the TeXbook chapter 18, page 178.
+% The output would otherwise look right, but yield a warning: Float too large for page by 2.18pt.
+\vphantom{\rule{0pt}{\textheight}}\smash{%
+\begin{minipage}[b][\textheight][b]{\linewidth}
 \includegraphics{figures/users/users-ru}
 \caption{
 Snowflake users in Russia (average concurrent).
@@ -2315,7 +2320,7 @@ blocking events are evident on
 % https://tex.stackexchange.com/a/298714
 \label{fig:client-counts-tm}
 }
-\end{minipage}
+\end{minipage}}
 \end{figure}
 
 \subsection{Blocking in Russia}
