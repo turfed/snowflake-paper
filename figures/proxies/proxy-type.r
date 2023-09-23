@@ -68,7 +68,7 @@ proxy_type <- read_csv(proxy_type_csv_path, col_types = cols(
 		# Visually, the "Unknown" series before that date matches up
 		# with the "WebExtension" series after that date. There were
 		# probably a relatively small number of standalone and web
-		# bage, but go ahead and attribute all to WebExtension.
+		# badge, but go ahead and attribute all to WebExtension.
 		# https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/31157#note_2593925
 		is.na(type) & date <= "2020-12-03" ~ "webext",
 		# After that, attribute unknown proxy types until 2022-06-21 to
