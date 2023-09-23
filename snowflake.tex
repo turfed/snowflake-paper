@@ -719,7 +719,11 @@ packet to the same remote address.
 % \rlap is so they don't expand the horizontal size of table columns.
 \newcommand{\rot}[1]{\vphantom{\rotlabel{#1}}\rotlabel{\rlap{#1}}}
 \centering
-\begin{tabular}{@{}rccccc@{\hspace{1.5ex}}l@{~}l@{}}
+% Make normal cells taller by default.
+\renewcommand{\arraystretch}{1.25}
+% Tighten line spacing in \makecell cells.
+\renewcommand\cellset{\renewcommand\arraystretch{0.8}\setlength\extrarowheight{0pt}}
+\begin{tabular}{@{}rcccccl@{\hspace{0.5ex}}l@{}}
 & % empty
 \rot{No NAT} &
 \rot{Full cone} &
@@ -728,15 +732,15 @@ packet to the same remote address.
 \rot{Symmetric} &
 &
 \\
-No NAT               & \Y & \Y & \Y & \Y & \Y & \multirow{3}{*}{\(\left.\rule[-12pt]{0pt}{24pt}\right\}\)} & \multirow{3}{*}{\footnotesize \makecell[l]{unrestricted \\proxy}} \\
+No NAT               & \Y & \Y & \Y & \Y & \Y & \multirow{3}{*}{\kern-\tabcolsep\kern0.5ex\footnotesize\(\left.\kern-\nulldelimiterspace\rule[-19pt]{0pt}{38pt}\right\}\)} & \multirow{3}{*}{\footnotesize\makecell[l]{unrestricted\\proxy}} \\
 Full cone            & \Y & \Y & \Y & \Y & \Y & \\
 Restricted cone      & \Y & \Y & \Y & \Y & \Y & \\
-Port-restricted cone & \Y & \Y & \Y & \Y & \n & \multirow{2}{*}{\(\left.\rule[-7pt]{0pt}{14pt}\right\}\)} & \multirow{2}{*}{\footnotesize \makecell[l]{restricted \\proxy}} \\
-Symmetric            & \Y & \Y & \Y & \n & \n & \\
+Port-restricted cone & \Y & \Y & \Y & \Y & \n & \multirow{2}{*}{\kern-\tabcolsep\kern0.5ex\footnotesize\(\left.\kern-\nulldelimiterspace\rule[-12pt]{0pt}{24pt}\right\}\)} & \multirow{2}{*}{\footnotesize\makecell[l]{restricted\\proxy}} \\
+Symmetric            & \Y & \Y & \Y & \n & \n & \\[\dimexpr 0.5ex - \dimexpr 0.5\dimexpr\arraystretch\normalbaselineskip]
 % \hfill hack to make \upbracefill work with colortbl:
 % https://tex.stackexchange.com/questions/202138/upbracefill-filling-entire-tabular-cell-and-package-colortbl#comment474604_202143
-                     & \multicolumn{4}{c}{\def\hfill{\hskip 0pt plus 1filll}\upbracefill} & \multicolumn{1}{c}{\clap{\footnotesize \def\hfill{\hskip 0pt plus 1filll}\upbracefill}} & \\
-                     & \multicolumn{4}{c}{\footnotesize \makecell{unrestricted \\client}} & \multicolumn{1}{c}{\clap{\footnotesize \makecell{restricted \\client}}} \\
+                     & \multicolumn{4}{@{~}c@{~}}{\footnotesize\def\hfill{\hskip 0pt plus 1filll}\upbracefill} & \clap{\footnotesize\def\hfill{\hskip 0pt plus 1filll}\upbracefill} & \\
+                     & \multicolumn{4}{c}{\footnotesize\makecell{unrestricted\\client}} & \clap{\footnotesize\makecell{restricted\\client}} \\
 \end{tabular}
 \caption{
 Pairwise compatibility of NAT variants,
@@ -749,7 +753,6 @@ in client and proxy.
 }
 \label{tab:nat-matching}
 \todo[inline]{Check style guide to see if caption should be before or after a table.}
-\todo[inline]{Try to improve the alignment/appearance of braces.}
 \end{table}
 
 \autoref{tab:nat-matching}
