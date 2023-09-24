@@ -2,6 +2,7 @@ PDFLATEX = max_print_line=10000 pdflatex -halt-on-error -file-line-error -intera
 BIBTEX = bibtex
 
 FIGURES = \
+	figures/architecture/architecture.jpg \
 	figures/rendezvous/rendezvous.pdf \
 	figures/users/users-global.pdf \
 	figures/users/users-ru.pdf \
