@@ -756,9 +756,9 @@ in client and proxy.
 \autoref{tab:nat-matching}
 shows the pairwise compatibility of NAT variations.
 As~the incompatible cases always involve a symmetric NAT,
-we further simplify matching by categorizing the variations into the types
+we further simplify matching by categorizing the variations into the two types
 \firstterm{unrestricted} (works with most other NATs) and
-\firstterm{restricted} (works only with the more permissive NATs).
+\firstterm{restricted} (works only with more permissive NATs).
 Unrestricted proxies may be matched with any client;
 restricted proxies may be matched only with unrestricted clients.
 The broker prefers to match unrestricted clients with restricted proxies,
@@ -766,7 +766,7 @@ The broker prefers to match unrestricted clients with restricted proxies,
 in~order to conserve unrestricted proxies
 for the clients that need them.
 Symmetric NAT is always considered restricted,
-but port-restricted cone NAT is categorized differently
+but port-restricted cone NAT differs
 depending on the peer:
 for proxies it is restricted, but
 for clients it is unrestricted.
@@ -909,8 +909,8 @@ smux \\
 
 \noindent
 This is the stack for the client--proxy link,
-which is where WebRTC is used and which is
-observed by the censor.
+which is the place where WebRTC is used, and which is
+exposed to observation by the censor (\autoref{fig:architecture}).
 The stack for the proxy--bridge link is the same,
 but with WebSocket in place of the
 WebRTC data channel at the top.
@@ -2890,7 +2890,7 @@ should manage its own pool of proxies,
 or~if proxies can somehow be shared.
 Building Snowflake's population of proxies
 has been a substantial undertaking in itself---for
-every project to repeat the process from scratch
+every project to have to repeat the process from scratch
 would be a regrettable duplication of effort.
 There is no reason why one proxy might not
 serve multiple projects,
