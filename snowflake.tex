@@ -97,15 +97,15 @@ and reflect on implications for circumvention generally.
 \section{Introduction}
 \label{sec:intro}
 
-Censorship circumvention systems,
-which seek to enable network communication
-despite interference by a censor,
-may be characterized on multiple axes.
+Censorship circumvention systems---systems
+to enable network communication
+despite interference by a censor---may
+be characterized on multiple axes.
 Some systems imitate a common network protocol;
-others transform their traffic randomly, in order
+others try
 not to look like any protocol in particular.
 Some distribute connections over numerous proxy servers;
-others concentrate on just one proxy
+others concentrate on a single proxy
 that is, for one reason or another, difficult for a censor to block.
 What all circumvention systems have in common
 is that they strive to increase the \emph{cost}
@@ -303,25 +303,24 @@ We will have more to say on this point in \autoref{sec:fingerprinting}.
 % But it wasn't WebRTC, so was less like Snowflake than uProxy was.
 % I'll draw the line here, since even Tor bridges are "volunteer-operated" in a sense.
 
-There is a tendency
-in writing about circumvention research
-to disproportionately emphasize the deficiencies
-of other systems and the advantages of one's own,
-which risks giving the impression that the state of censorship circumvention
-is worse than it really~is.
-Such is not our purpose.
+It~is not our purpose to disproportionately emphasize
+the limitations of other circumvention systems
+and the advantages of Snowflake.
+Circumvention research is a cooperative enterprise,
+and we recognize and support our colleagues who are
+pursuing and maintaining their own designs.
 While challenges remain,
 today's circumvention systems by and large
 serve their intended purpose,
 and are a vital element of day-to-day Internet access for many people.
 With Snowflake, we have explored a different point in the design space,
-one with its own set of advantages and disadvantages.
+one with its own advantages and disadvantages.
 We~acknowledge that Snowflake will be a better choice in some
-censorship environments,
-worse in others;
-indeed, one of the ideas we hope to convey
+censorship environments and
+worse in others; indeed,
+one of the ideas we hope to convey
 is that blocking resistance
-can only be meaningfully understood in relation to a particular censor
+can be meaningfully understood only in relation to a particular censor
 and its resources, costs, and motivations.
 In~this paper we present the design of Snowflake,
 discuss various challenges and considerations,
