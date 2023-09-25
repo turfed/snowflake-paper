@@ -23,6 +23,7 @@ snowflake.pdf: snowflake.tex snowflake.bib snowflake.bst $(FIGURES)
 
 # Embed fonts (PDF graphics produced by R do not have embedded fonts by default)
 # https://www.usenix.org/legacy/events/samples/latex_tips.html
+# TODO: gs adds Producer, CreationDate, and ModDate metadata, undoing the reproducible PDF settings in snowflake.tex.
 %.pdf: %.tmp.pdf
 	gs -q -dSAFER -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile="$@" -dEmbedAllFonts=true "$<"
 
