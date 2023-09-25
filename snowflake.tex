@@ -63,20 +63,21 @@ Xiaokang Wang
 
 \begin{abstract}
 Snowflake is a system for circumventing Internet censorship.
-It~derives its blocking resistance from
+Its blocking resistance comes from
 the use of numerous, ultra-light, temporary proxies (``snowflakes''),
 which accept traffic from censored clients using peer-to-peer WebRTC protocols
 and forward it to a centralized bridge,
 which does the real work of directing traffic to its destination.
 The temporary proxies are lightweight enough to be implemented in JavaScript,
-in a web page or browser extension,
+in~a web page or browser extension,
 making them vastly cheaper to set up than
 a traditional proxy or VPN server.
-The proxies are not assumed to have stable network addresses
-or be online all the time,
-and even the blocking of the currently in-use proxy
-is not fatal to a circumvention session,
-as the system permits clients to switch proxies on the fly.
+The proxies do not need to have stable network addresses,
+nor be continually online---even
+the disappearance of an \mbox{in-use} proxy
+does not mean the end of a circumvention session,
+as its client will switch to another on the fly,
+invisibly to upper network layers.
 
 % Need anything about broker, centralization here?
 
