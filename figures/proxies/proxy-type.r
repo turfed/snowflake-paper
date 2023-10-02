@@ -59,10 +59,7 @@ proxy_type <- read_csv(proxy_type_csv_path, col_types = cols(
 	unique_ips = col_double(),
 	coverage = col_double()
 )) %>%
-	# Unlike in the user graphs, here we do not compensate for days where
-	# coverage < 1.0: because of deduplication, unique_ips does not scale
-	# linearly with time like the number of concurrent users does.
-
+	# Assign unknown types according to date ranges.
 	mutate(type = case_when(
 		# Proxies did not report their type before 2020-12-03.
 		# Visually, the "Unknown" series before that date matches up
@@ -78,10 +75,34 @@ proxy_type <- read_csv(proxy_type_csv_path, col_types = cols(
 		# https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40151
 		is.na(type) & date <= "2022-06-21" ~ "iptproxy",
 		TRUE ~ type
-	)) %>%
+	))
 
-	# Put a label on the rows with type == NA.
-	replace_na(list(type = "unknown")) %>%
+# After attributing proxies without a known type to "webext" or "iptproxy" for
+# certain date ranges above, there still remain a very small number of unknown
+# types after 2022-06-21. To avoid having just a few specks of data on the
+# graph, we filter the cases out and note that we have done so in the figure
+# caption. But do a sanity check here to ensure we do not accidentally remove a
+# lot of data.
+(function() {
+	num_unknown <- (
+		proxy_type %>%
+		group_by(type) %>%
+		summarize(unique_ips = sum(unique_ips, na.rm = TRUE)) %>%
+		filter(is.na(type))
+	)$unique_ips
+	if (num_unknown > 50) {
+		stop(sprintf("unexpectedly high unknown count: %d", num_unknown))
+	}
+})()
+
+
+proxy_type <- proxy_type %>%
+	# Remove unknown types.
+	filter(!is.na(type)) %>%
+
+	# Unlike in the user graphs, here we do not compensate for days where
+	# coverage < 1.0: because of deduplication, unique_ips does not scale
+	# linearly with time like the number of concurrent users does.
 
 	# Order the types by the value of unique_ips at the right side of the graph.
 	mutate(type = fct_reorder2(type, date, unique_ips)) %>%
@@ -99,8 +120,7 @@ proxy_type <- read_csv(proxy_type_csv_path, col_types = cols(
 		"Browser\nextension" = "webext",
 		"Orbot" = "iptproxy",
 		"Standalone" = "standalone",
-		"Web badge" = "badge",
-		"Unknown" = "unknown"
+		"Web badge" = "badge"
 	))
 
 # To add a "total" series:
