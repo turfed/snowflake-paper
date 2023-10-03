@@ -11,7 +11,7 @@ source("../common.r")
 DATE_LIMITS <- lubridate::ymd(c(
 	# "2019-07-01",
 	"2021-01-01",
-	"2023-07-31"
+	"2023-09-30"
 ))
 
 # Timeline of events relevant to proxy type measurement. The tricky part is

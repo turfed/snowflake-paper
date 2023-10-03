@@ -11,7 +11,7 @@ source("../common.r")
 
 DATE_LIMITS <- lubridate::ymd(c(
 	"2020-12-31",
-	"2023-07-31"
+	"2023-09-30"
 ))
 
 GAPS <- tribble(
@@ -34,7 +34,7 @@ EVENTS <- tribble(
 	# "2020-05-22 19:51:29",  1000, T, "Tor Browser 9.5a13\nadds Turbo Tunnel",       # https://blog.torproject.org/new-release-tor-browser-95a13
 	# "2020-06-02 18:09:48",  1000, T, "Tor Browser 10.0a1\nSnowflake for Android",   # https://blog.torproject.org/new-release-tor-browser-100a1
 	"2021-01-12 00:00:00", 24000, F, "Orbot 16.4.0\nincludes Snowflake",              # https://github.com/guardianproject/orbot/releases/tag/16.4.0-RC-1-tor-0.4.4.6
-	"2021-07-06 16:56:37", 32000, T, "Tor Browser 10.5\nincludes Snowflake",          # https://blog.torproject.org/new-release-tor-browser-105
+	"2021-07-06 16:56:37", 35000, T, "Tor Browser 10.5\nincludes Snowflake",          # https://blog.torproject.org/new-release-tor-browser-105
 	"2021-12-01 00:00:00", 25000, T, "Onset of Tor blocking\nin Russia",               # https://bugs.torproject.org/tpo/community/support/40050
 	"2021-12-14 00:00:00", 28000, T, "",                                              # https://blog.torproject.org/new-release-tor-browser-115a1/
 	"2021-12-20 00:00:00", 42000, T, "Tor Browser 11.5a1 and 11.0.3\nalter DTLS fingerprint", # https://blog.torproject.org/new-release-tor-browser-1103/
@@ -71,6 +71,7 @@ EVENTS <- tribble(
 	# "2023-03-14 00:00:00",  8000, T, "Domain fronting rendezvous again blocked in Iran", # https://gitlab.torproject.org/tpo/anti-censorship/team/-/issues/115#note_2892825
 	# "2023-03-19 00:00:00",  8000, T, "",                                            # https://gitlab.torproject.org/tpo/anti-censorship/team/-/issues/115#note_2892825
 	# "2023-03-20 00:00:00",  8000, T, "Domain fronting rendezvous again blocked in Iran", # https://gitlab.torproject.org/tpo/anti-censorship/team/-/issues/115#note_2892825
+	"2023-09-20 14:00:00", 98000, T, "Malfunction in\ndomain fronting rendezvous",          # https://forum.torproject.org/t/problems-with-snowflake-since-2023-09-20-broker-failure-unexpected-error-no-answer/9346
 ) %>% mutate(date = lubridate::ymd_hms(date) %>% lubridate::as_date())
 
 # Return an abbreviation for the month, followed by a year for January only.
