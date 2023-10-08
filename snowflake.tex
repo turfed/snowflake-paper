@@ -462,7 +462,7 @@ subject to considerations such as compatibility of NATs.
 
 The client's rendezvous message
 % ClientPollRequest https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/blob/9edaee65470a1483bbdbe984e5e15a885f1e95d2/common/messages/client.go#L64
-is a bundle of data that the broker users to match the client with a proxy,
+is a bundle of data that the broker user to match the client with a proxy,
 and that the proxy will need in order to make a connection with the client.
 The essential element is a
 Session Description Protocol (SDP) \firstterm{offer}~\cite{rfc8839},
@@ -571,7 +571,7 @@ AMP is a framework for web pages written in a restricted dialect of HTML.
 Part of this framework is a free-to-use
 cache server~\cite{amp-cache}.
 The cache fetches origin web pages on demand,
-which means that it is effectively as a restricted sort of HTTP proxy.
+which means that it is, effectively, a~restricted sort of HTTP proxy.
 If~rendezvous messages are encoded to conform to AMP requirements,
 they can be sent to the broker via the cache server.
 Rendezvous through the AMP cache is not easily blocked
@@ -1912,14 +1912,13 @@ the comparison is not quite direct,
 because Tor bridges have better defenses
 against enumeration and blocking than do Snowflake proxies.
 
-It~was not clear at the outset
+It~was not clear, at the outset,
 that it would even be possible to attract
 enough proxies to make Snowflake meaningfully blocking resistant
 and support a reasonable number of users.
 % "Start producing snowflakes" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/20813
-Initial growth in the number of proxies
-depended on our developing new and easier ways to run one,
-while later growth was driven by intentional advocacy and outreach.
+Lowering the technical barriers to running a proxy was only part of~it;
+getting there also took intentional advocacy and outreach.\todo{Need to give examples of outreach, e.g.\ public talks?}
 In~the early days, circa~2017,
 the only round-the-clock proxy support was
 a few standalone proxies,
@@ -2806,7 +2805,7 @@ worked to get around the block of the broker.
 % dropped from about 1,000 almost to zero.
 % https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40029#note_2787789
 
-The increase in the number users from May to August 2022
+The increase in the number of users from May to August 2022
 visible in \autoref{fig:client-counts-tm} was caused by
 a partial unblocking of the broker front domain on \mbox{2023-05-03}.
 We~realized this only in retrospect,
