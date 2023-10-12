@@ -6,8 +6,8 @@ Sys.setlocale("LC_ALL", "C")
 # \the\textwidth → 505.89pt
 DOCUMENT_TEXTWIDTH <- 505.89 / 72.27
 
-# \the\linewidth → 247.94499pt
-DOCUMENT_LINEWIDTH <- 247.94499 / 72.27
+# \the\linewidth → 241.02039pt
+DOCUMENT_LINEWIDTH <- 241.02039 / 72.27
 
 FONT_FAMILY <- "Times"
 theme_set(
