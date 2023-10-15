@@ -1262,6 +1262,19 @@ The DNS prefilter may perhaps be mitigated
 by alternative rendezvous methods (\autoref{sec:rendezvous}),
 or~by smarter selection of STUN servers by the client.
 
+Xie et~al.~\cite{Xie2023} investigated the use of machine
+learning to classify only the rendezvous step of a Snowflake
+connection. They train a decision tree using packet
+size, directionality, and timing features with the aim of
+distinguishing Snowflake rendezvous from web browsing
+traffic. They acknowledge that if the aim is to block the
+rendezvous connection before it completes, detection must occur
+as early as possible in the flow and therefore only consider the
+first 30 packets. The lowest reported false positive rate of their
+experiments is 0.25\%, however the low base rate of occurrence of Snowflake
+connections makes us believe that the collateral damage of this technique
+would be prohibitively high.
+
 \begin{figure*}[t]
 \includegraphics{figures/users/users-global}
 \caption{
