@@ -9,8 +9,6 @@
 \usepackage[hyphens]{url}
 \usepackage[table]{xcolor}
 
-\usepackage[textsize=footnotesize]{todonotes}\setlength{\marginparwidth}{1.5cm}
-
 % Better look for citations that include a section reference like \cite[\S 3]{foobar}.
 \usepackage{cite}
 \renewcommand{\citemid}{~}
@@ -1596,7 +1594,7 @@ which automatically enables circumvention options when needed.
 % https://blog.torproject.org/new-release-tor-browser-115/
 % Graph showing boost going mostly to Russia: https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake-webext/82#note_2891387
 Another DTLS blocking signature was reported on \mbox{2022-06-20};
-we did not get to fixing it until Tor Browser~12.0.3 on \mbox{2023-02-15}.\todo{And Orbot 17 on\ldots}
+we did not get to fixing it until Tor Browser~12.0.3 on \mbox{2023-02-15}.
 % "The 'skip Hello Verify Request' change was merged into Tor Browser..." https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40030#note_2893870
 By~that time the global user count had come to be dominated by users from Iran.
 
@@ -1674,7 +1672,7 @@ we deployed a second bridge to share the load.
 We discuss the challenges and design considerations of doing so in \autoref{sec:multi-bridge}.
 The second bridge was made available to users in
 Tor Browser~12.0 on \mbox{2022-12-07}.
-By~July, the second bridge supported about 18\% of Snowflake users.\todo{Revisit this when Orbot~17 hits the \href{https://play.google.com/store/apps/details?id=org.torproject.android}{Play Store}. Caveat: front domain change of \mbox{2023-09-20} \href{https://lists.torproject.org/pipermail/anti-censorship-team/2023-September/000317.html}{affected \mbox{snowflake-02} unequally}.}
+By~July, the second bridge supported about 18\% of Snowflake users.
 % > library("tidyverse")
 % > WANTED_FINGERPRINTS <- c(
 %     "7659DA0F96B156C322FBFF3ACCC9B9DC01C27C73" = "snowman",
@@ -1704,15 +1702,6 @@ By~July, the second bridge supported about 18\% of Snowflake users.\todo{Revisit
 % 12 2023-07-30 snowflake 12848.            12     12   snowflake-02    18.7
 % 13 2023-07-31 snowflake 56160.            12     11.4 snowflake-01    81.2
 % 14 2023-07-31 snowflake 13007.            12     12   snowflake-02    18.8
-
-\todo{
-Discuss \mbox{2023-09-20}
-% Problems with Snowflake since 2023-09-20: “broker failure Unexpected error, no answer.”
-\href{https://forum.torproject.org/t/problems-with-snowflake-since-2023-09-20-broker-failure-unexpected-error-no-answer/9346}{front domain change}.
-% "[anti-censorship-team] Trying to understand multi-bridge dynamics post after Fastly/Cloudflare domain front change" https://lists.torproject.org/pipermail/anti-censorship-team/2023-September/000317.html
-% "New Alpha Release: Tor Browser 13.0a5 (Android, Windows, macOS, Linux)" https://blog.torproject.org/new-alpha-release-tor-browser-130a5/
-% "Use foursquare as domain front for snowflake" https://bugs.torproject.org/tpo/applications/tor-browser/42120
-}
 
 As~of \mbox{2023-09-30},
 Snowflake had transferred 10~PB of circumvention data.
@@ -1754,10 +1743,7 @@ Snowflake had transferred 10~PB of circumvention data.
 % 1 2023-09-30 10.02 PB 10.07 PB 8.42 TB       155.77 TB      10.01 PB  9.92 PB    9.97 PB
 By~this we mean goodput: Tor TLS traffic inside the tunnel,
 ignoring WebRTC, WebSocket, and KCP/\allowbreak smux overhead.
-At~that time, about 1\% of all Tor users\todo{
-As of \mbox{2023-08-01}, relay users are currently inflated due to
-\href{https://bugs.torproject.org/tpo/network-health/analysis/59}{\#59}.
-}
+At~that time, about 1\% of all Tor users
 (26\%~of bridge users) used Snowflake to connect to Tor.
 % > library("tidyverse")
 % > WANTED_FINGERPRINTS <- c(
@@ -1871,7 +1857,7 @@ a~feature called ``kindness mode.''
 \autoref{fig:proxy-type} shows the daily counts
 of each proxy type.
 Browser extension proxies predominate,
-representing about 81\%\todo{Update percentage before submission.}
+representing about 81\%
 of 130,000 daily IP addresses.
 % > library("tidyverse")
 % > proxy_type <- read_csv("figures/proxies/proxy-type.csv", col_types = cols()) %>% filter("2023-09-24" <= date & date < "2023-10-01")
@@ -1895,10 +1881,7 @@ of 130,000 daily IP addresses.
 % 5 2023-09-29    136389.
 % 6 2023-09-30    126090.
 For comparison, there were about 1,900
-of the more traditional style of Tor bridge at this time.\todo{
-Check whether \href{https://bugs.torproject.org/tpo/network-health/team/318}{\#318}
-is lowering the estimate of running bridges.
-}
+of the more traditional style of Tor bridge at this time.
 % https://metrics.torproject.org/networksize.html?start=2023-09-01&end=2023-09-30
 % date,relays,bridges
 % 2023-09-28,8127,1886
@@ -1916,7 +1899,7 @@ enough proxies to make Snowflake meaningfully blocking resistant
 and support a reasonable number of users.
 % "Start producing snowflakes" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/20813
 Lowering the technical barriers to running a proxy was only part of~it;
-getting there also took intentional advocacy and outreach.\todo{Need to give examples of outreach, e.g.\ public talks?}
+getting there also took intentional advocacy and outreach.
 In~the early days, circa~2017,
 the only round-the-clock proxy support was
 a few standalone proxies,
@@ -2106,7 +2089,7 @@ For scalability reasons, though,
 it~is useful for ``the'' bridge to be realized as
 multiple servers, each handling a fraction of client traffic.
 
-Our deployment now uses two bridges\todo{Update on publication.}.
+Our deployment now uses two bridges.
 Generalizing from one bridge to two
 required changes to the messages exchanged between
 clients, proxies, and the broker.
@@ -2874,7 +2857,7 @@ for the social and economic harms of overblocking.
 Circumvention can only respond to and act within these constraints.
 The government of Turkmenistan has evidently chosen
 to prioritize political control
-over a functioning network, to an extreme degree.\todo{Check that this holds water with someone who knows TM politics.}
+over a functioning network, to an extreme degree.
 To paraphrase one of our collaborators:
 ``What they have in Turkmenistan can hardly be called an Internet.''
 % https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40024#note_2889792
