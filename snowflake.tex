@@ -771,16 +771,15 @@ depending on the peer:
 for proxies it is restricted, but
 for clients it is unrestricted.
 The asymmetric categorization is an approximation
-to further help conserve unrestricted proxies
+to help conserve unrestricted proxies
 for clients with symmetric NATs.
 Though it creates the potential for an incompatible match,
 we believe this to be uncommon in practice.
 In~case of a connection failure,
 clients re-rendezvous and try again.
 
-Clients and proxies self-assess their NAT type
-and send it to the broker in their rendezvous messages.
-Clients use the NAT behavior discovery feature of STUN~\cite{rfc5780}.
+To self-assess their NAT type,
+clients use the NAT behavior discovery feature of STUN~\cite{rfc5780}.
 % "Use STUN to determine NAT behaviour of peers" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/34129
 % "Add utility to help user discover their NAT type" https://github.com/pion/stun/issues/8
 Proxies cannot use the same technique,
