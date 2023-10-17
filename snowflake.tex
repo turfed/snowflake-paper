@@ -1278,7 +1278,30 @@ experiments is 0.25\%, however the low base rate of occurrence of Snowflake
 connections makes us believe that the collateral damage of this technique
 would be prohibitively high.
 
-\todo{Cite ``On precisely detecting\ldots''~\cite{Wails2024a}.}
+Wails et~al.~\cite{Wails2024a}
+criticize past research on classification of circumvention systems,
+saying that accuracy claims do not hold up
+with the low base rates of circumvention traffic in practice.
+% IV-D: "Despite the prima facie acceptable performance of these
+% classifiers ... we argue that these results *do not* accurately
+% reflect a censor's ability to detect obfs4 under realistic conditions."
+They develop classifiers based on deep learning
+that improve on the state of the art,
+applying them to Snowflake rendezvous and data transfer,
+but find them still to be prohibitively imprecise with realistic base rates.
+% V-C: "While it is the case that deep learning improves performance,
+% the false positive rates are still prohibitively high to scale to
+% realistic base rates. Fig. 5 plots Prec^λ as a function of the base
+% rate λ. For more realistic base rates, such as λ > 1 × 10^6, the
+% precision attained by any of the classifiers is near-zero."
+They propose to reduce false positives by combining
+multiple observations per IP address---classifying hosts,
+not flows---and suggest that Snowflake's lack of
+fixed proxies mitigates against this enhancement.
+% VII: "One way to mitigate the effects of host-based analysis is to
+% design circumvention systems to use multiple ephemeral bridges
+% over time rather than a few long-term static bridges, similar
+% the design of Snowflake.
 
 \begin{figure*}[t]
 \includegraphics{figures/users/users-global}
