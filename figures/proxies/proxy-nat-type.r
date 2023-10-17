@@ -11,7 +11,7 @@ source("../common.r")
 DATE_LIMITS <- lubridate::ymd(c(
 	# "2019-07-01",
 	"2021-01-01",
-	"2023-09-30"
+	"2023-10-14"
 ))
 
 # TODO: date threshold where "untested" changed to "restricted" and "unknown" in August 2020.
@@ -93,7 +93,7 @@ p <- ggplot() +
 				slice(1) %>%
 			ungroup() %>%
 			mutate(date = max(date)) %>%
-			mutate(y = place_no_overlap(unique_ips, -10000, 4000)),
+			mutate(y = place_no_overlap(unique_ips, -10000, 5500)),
 		aes(
 			x = date,
 			y = y,
@@ -116,9 +116,9 @@ p <- ggplot() +
 	) +
 	scale_color_brewer(palette = "Set1") +
 	coord_cartesian(xlim = DATE_LIMITS, ylim = c(0, NA), expand = FALSE, clip = "off") +
-	labs(x = NULL, y = "Unique proxy IP addresses") +
+	labs(x = NULL, y = "Unique IP addresses") +
 
 	# Make room for the margin labels added by geom_text above.
-	theme(plot.margin = unit(c(0, 11, 0, 0), "mm")) +
+	theme(plot.margin = unit(c(0.2, 11, 0, 0), "mm")) +
 	guides(color = "none")
-ggsave(output_path, p, width = DOCUMENT_LINEWIDTH, height = 1.5)
+ggsave(output_path, p, width = DOCUMENT_LINEWIDTH, height = 1.25)
