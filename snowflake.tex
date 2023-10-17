@@ -1279,9 +1279,8 @@ It~began to attract large numbers of users
 in~2022, following generalized
 network blocking events in Russia and Iran.
 
-Snowflake shipped in the alpha release series of Tor Browser
-before graduating to the stable series.
-It~was first released for GNU/Linux
+Snowflake
+was first released for GNU/Linux
 in Tor Browser~7.0a1 on \mbox{2017-01-24},
 % "First working bundles with Snowflake, for linux only" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/19001
 % "Add snowflake pt to alpha linux builds" https://bugs.torproject.org/tpo/applications/tor-browser/20735
@@ -1290,15 +1289,10 @@ in Tor Browser~7.5a4 on \mbox{2017-08-08}.
 % "mac reproducible build" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/19001
 % "[tbb-dev] Please check reproducibility of mac build with Snowflake (e084e83418)" https://lists.torproject.org/pipermail/tbb-dev/2017-July/000579.html
 % "Merge Snowflake for mac" https://bugs.torproject.org/tpo/applications/tor-browser/22831
-But we hit a roadblock in attempting to prepare releases for other platforms:
-the Chromium-derived WebRTC library we had used to that point
-presented major difficulties
-in Tor Browser's
-cross-compiling, reproducible build environment.
-What let us resume making progress was a switch to
-Pion WebRTC~\cite{pion-webrtc} in~2019.
-With it, we~were able to release
-Snowflake for Windows
+Switching to
+Pion WebRTC~\cite{pion-webrtc} in~2019
+let us resume making progress.
+We released Snowflake for Windows
 in Tor Browser~9.0a7 on \mbox{2019-10-01},
 % "Android reproducible build of Snowflake" https://bugs.torproject.org/tpo/applications/tor-browser/28672
 % "Integrate snowflake into mobile Tor Browser alpha" https://bugs.torproject.org/tpo/applications/tor-browser/30318
@@ -1428,8 +1422,7 @@ Two such censorship events,
 one in Russia and one in Iran,
 had the effect of increasing the number of Snowflake users
 by multiples.
-(Because they also, in part, threatened Snowflake itself,
-we will have more to say about them in \autoref{sec:block}.)
+(We will have more to say about them in \autoref{sec:block}.)
 
 On \mbox{2021-12-01}, some ISPs in Russia
 deployed measures to block
