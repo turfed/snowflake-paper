@@ -2620,42 +2620,42 @@ they did not have much of an effect.
 The user count graph from China,
 \autoref{fig:client-counts-cn},
 does not show any drastic changes
-like others we have discussed so far.
-There are a modest but respectable number of Snowflake users in China.
+like others we have seen so far.
+There is a modest but respectable number of Snowflake users in China.
 Though there have been no singular, sustained events,
 we~have seen evidence of short-term or tentative
-blocking of Snowflake in China.
+blocking attempts.
 
-In~May 2019, when Snowflake was still only in alpha release,
+In~May 2019, when Snowflake was still in alpha release,
 a~user in China reported a failure to connect.
 Investigation revealed that the cause was IP address blocking of
-the few Snowflake proxies that existed at the time.
+the few proxies that existed at the time.
 % 2019-05-01 "I'm going to say that this a proxy blocking problem" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/30350#note_2593274
-Rendezvous worked, and the STUN exchange worked,
-but client and proxy could not establish a connection.
-We~confirmed the evidence by temporarily running a new proxy
-at a different IP address:
-clients in China could connect when they happened to be assigned
+Rendezvous happened, and the STUN exchange worked,
+but the client and proxy could not establish a connection.
+We~experimented with running a proxy
+at a previously unused IP address:
+clients in China could connect when they were assigned
 that proxy by the broker.
 This was back before the web browser extension proxy existed,
-and the only consistent proxy support was standalone proxies
-we developers ran ourselves at a static IP address.
-This problem went away as the proxy pool grew in size.
+and the only consistent proxy support was a few standalone proxies
+that we, the developers, ran at a static IP address.
+It~ceased to be an issue as the proxy pool grew in size.
 
-Later that month, we discovered another form of blocking in China:
+That same month, we noticed blocking of
 % 2019-05-15 "access to stun.l.google.com:19302 was blocked" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/30368#note_2593357
 % 2019-05-17 "it looks like the initial connection to the default STUN server is being blocked" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/30350#note_2593299
-that of the default STUN server,
-of~which there was only one configured at the time.
+the default STUN server,
+of which there was only one at the time.
 % https://gitlab.torproject.org/tpo/applications/tor-browser-build/-/blob/4ff2be0b02e322716f06829e49c50f39795bf43c/projects/tor-browser/Bundle-Data/PTConfigs/linux/torrc-defaults-appendix#L5
-The solution to this problem was to add more STUN servers
-and select a subset of them to use on each rendezvous attempt.
+The solution was to add more STUN servers,
+and select a subset of them on each rendezvous attempt.
 % 2020-07-09 "Use STUN server compatible with RFC 5780 in proxy" https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/merge_requests/5
 % 2020-07-23 "Choose a random subset from given STUN servers" https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/merge_requests/7
 % 2020-07-10 "Update version of snowflake to allow the client to perform NAT discovery" https://gitlab.torproject.org/tpo/applications/tor-browser-build/-/merge_requests/11
 % 2021-01-21 "As far as we know, setting new STUN servers unblocked Snowflake in China." https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/30350#note_2723004
 Curiously, it seems that when the STUN server was blocked,
-the standalone proxies that had been blocked earlier that month became unblocked.
+the standalone proxies that had been blocked earlier in the month became unblocked.
 % 2019-05-27 "It seems once they blocked those stun servers, all snowflake bridges became reachable again." https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/30368#note_2593360
 % NB stun.l.google.com reported reachable (to ICMP at least) 2021-05-03: https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40044#note_2734125
 
@@ -2679,32 +2679,32 @@ the standalone proxies that had been blocked earlier that month became unblocked
 % "Snowflake bridge does not work in China since days ago" https://forum.torproject.net/t/snowflake-bridge-does-not-work-in-china-since-days-ago/7635
 % "Blocking of Snowflake in China, 2023-05-12" https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40038
 The next incidents we are aware of did not occur until 2023,
-recent enough to be in the scope of \autoref{fig:client-counts-cn}.
+recent enough to appear in \autoref{fig:client-counts-cn}.
 On May~12, 13, and~14, a~few users reported problems
 with domain fronting rendezvous.
 We~could not get systematic measurements,
-but some reports suggested that the blocking was triggered
-by multiple (two or three) HTTPS connections
+but it appeared that censorship was triggered
+by observing multiple (two or three) HTTPS connections
 with the same TLS SNI to certain IP addresses within a short time.
-It~is possible that Snowflake was not the main target of this
+It~is possible that Snowflake was not the target of this
 blocking behavior, and was affected only as a side effect.
 If~it indeed had to do with Snowflake,
 our best guess is that it was aimed at the multiple rendezvous
 mentioned in \autoref{sec:multi-bridge}---though such a
 policy would certainly also affect a large number of non-Snowflake connections.
-The number of users from China was about halved during these three days.
-On May~15, this blocking went away and user counts returned to normal.
+The user count from China was about halved during those three days.
+On~May~15, the blocking went away and user counts returned to normal.
 % Reported at the same time, perhaps coincidental:
 % "GFW at the Edge: Latest Development of China's Distributed Censorship System" https://github.com/net4people/bbs/issues/248
 
-Also in May 2023, one user reported evident throttling
+Also in May 2023, one user reported apparent throttling
 (artificial reduction in speed by packet dropping)
 of~TLS-in-DTLS connections,
 based on packet size and timing features.
 % "Potential TLS-over-DTLS blocking in China" https://github.com/net4people/bbs/issues/255
 Such a policy would affect Snowflake,
 because it transports Tor TLS inside DTLS data channels.
-Reportedly, adding some padding to the first few packets
+Reportedly, adding padding to the first few packets
 to disrupt the size and timing signature was enough
 to prevent throttling.
 Our own speed tests run at the time
