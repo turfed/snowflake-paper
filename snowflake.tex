@@ -265,7 +265,7 @@ what categories of content they are willing to proxy.
 An~innovation in MassBrowser not present in Snowflake is client-to-client proxying:
 clients may act as buddies for other clients,
 the logic being that what is censored for one client may not be censored for another.
-The buddy software is a standalone application,
+The buddy software is
 not constrained by a web browser environment,
 and can, like uProxy, use protocol obfuscation
 on the client--buddy link.
@@ -417,12 +417,12 @@ indicates its need for circumvention service
 and is matched with a temporary proxy.
 Rendezvous is facilitated by a central server called the broker.
 Then, there is connection establishment,
-where the client and its assigned proxy connect to each other
+where the client and its proxy connect to each other
 with WebRTC, using information exchanged during rendezvous.
 Finally, there is data transfer,
 where the proxy transports data
 between the client and the bridge.
-It~is the bridge's responsibility to direct the client's traffic
+The bridge is responsible for directing the client's traffic
 to its eventual destination
 (in~our case, by feeding it into the Tor network).
 \autoref{fig:architecture} illustrates the process.
@@ -639,37 +639,37 @@ Snowflake clients and proxies alike run in diverse networks
 with varying NATs and ingress policies.
 Fortunately for us,
 WebRTC is designed with this use case in mind,
-and has built-in support for traversing NAT, namely
+and has built-in support for traversing NAT, in~the form of
 ICE (Interactive Connectivity Establishment)~\cite{rfc8445},
 a procedure for testing candidate pairs of peer network addresses
-to find a pair that works.
-ICE~makes use of
+to find one that works.
+ICE~makes use of third-party
 STUN (Session Traversal Utilities for NAT)~\cite{rfc8489}
-and third-party STUN servers that, among other services,
-enable a host to learn its own external IP addresses.
-The first part of ICE has already taken place at the beginning of rendezvous,
+servers that, among other things,
+enable a host to learn its external IP addresses.
+The first part of ICE took place at the beginning of rendezvous,
 when the client and proxy contacted STUN servers to gather
 external address candidates and included them in their respective
 SDP offer and answer.
 
-There is no guarantee that any two hosts will be able to make
+There is no guarantee that two hosts will be able to make
 a connection using the facilities of STUN alone.
 Some address mapping and
 filtering setups are simply incompatible.
-In~the case of an incompatible pairing,
+In~such a case,
 ICE would normally fall back to using
 TURN (Traversal Using Relays around NAT)~\cite{rfc8656},
-which is a kind of UDP proxy.
+a~kind of UDP proxy.
 Such a fallback would be problematic for Snowflake,
 because the TURN relays themselves
-would become a focus of blocking by the censor.
+would become a target of blocking by the censor.
 % "Configure TURN servers for the proxy and/or client" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/25596
 But Snowflake has an advantage most WebRTC applications do not.
 Most WebRTC applications want to connect \emph{a particular} pair of peers,
 whereas we are satisfied when a client can connect to \emph{any} proxy.
-Snowflake clients and proxies self-assess their NAT type
-and report it in interactions with the broker.
-The broker takes NAT compatibility into account when matching
+Snowflake clients and proxies self-measure their NAT type
+and report it to the broker,
+which takes NAT compatibility into account
 and avoids cases that would require a fallback to TURN.
 
 % "Investigate Snowflake proxy failures" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/33666#note_2595319
@@ -789,14 +789,14 @@ Clients use the NAT behavior discovery feature of STUN~\cite{rfc5780}.
 % "Add utility to help user discover their NAT type" https://github.com/pion/stun/issues/8
 Proxies cannot use the same technique,
 because the necessary STUN features are not available
-to JavaScript code in web browsers.
+to JavaScript in web browsers.
 % "Have a remote probe service to test snowflake proxy NAT compatability" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40013
-Instead
+Instead,
 we adapt a technique from MassBrowser~\cite[\S \mbox{V-A}]{Nasr2020a}:
 we~run a centralized, always-on WebRTC testing peer
 behind a simulated symmetric NAT.
-Proxies try to connect to this peer;
-if~the connection succeeds, its type is unrestricted,
+Proxies try to connect to this peer,
+and if~the connection succeeds, the proxy's type is unrestricted,
 otherwise it is restricted.
 Clients and proxies retest their NAT type periodically,
 to account for potential changes in their local networking environment.
@@ -1261,7 +1261,7 @@ is that they do not consist of many packets,
 limiting the number of features a classifier has to work with.
 Their lowest reported false positive rate of 0.25\%~is,
 in~our opinion, unworkably high,
-given the low base rate of Snowflake rendezvous connections in real networks.
+given the low base rate of Snowflake rendezvous connections.
 
 Wails et~al.~\cite{Wails2024a}
 criticize past research on classification of circumvention systems,
@@ -2576,9 +2576,7 @@ extraordinary new network restrictions amid mass protests~\cite{ooni-2022-iran-b
 the cause of the decline was TLS fingerprint blocking,
 which stopped Snowflake rendezvous from working.
 Specifically, it~was a block of one of the TLS fingerprints
-of the crypto/tls package in the standard library of
-the Go programming language
-(in~which the Snowflake client is written).
+that may be used by the Snowflake client during rendezvous.
 
 That simple TLS fingerprinting worked to block Snowflake rendezvous
 was carelessness on our part.
