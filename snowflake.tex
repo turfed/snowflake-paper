@@ -1727,14 +1727,21 @@ By~July, the second bridge supported about 18\% of Snowflake users.\todo{Revisit
 % 13 2023-07-31 snowflake 56160.            12     11.4 snowflake-01    81.2
 % 14 2023-07-31 snowflake 13007.            12     12   snowflake-02    18.8
 
-\todo{
-Discuss \mbox{2023-09-20}
-% Problems with Snowflake since 2023-09-20: “broker failure Unexpected error, no answer.”
-\href{https://forum.torproject.org/t/problems-with-snowflake-since-2023-09-20-broker-failure-unexpected-error-no-answer/9346}{front domain change}.
+The sudden drop in users on \mbox{2023-09-20}
+was not caused by censor action:
+rather, it~was an unexpected change in the cloud
+infrastructure we used for domain fronting rendezvous.
+The front domain we had mainly used
+changed its hosting to a different CDN,
+which caused client rendezvous messages not to be delivered to the broker.
+% Problems with Snowflake since 2023-09-20: "broker failure Unexpected error, no answer." https://forum.torproject.org/t/problems-with-snowflake-since-2023-09-20-broker-failure-unexpected-error-no-answer/9346
 % "[anti-censorship-team] Trying to understand multi-bridge dynamics post after Fastly/Cloudflare domain front change" https://lists.torproject.org/pipermail/anti-censorship-team/2023-September/000317.html
+The user count dropped by about half,
+recovering slowly after we made releases
+with alternative front domains.
 % "New Alpha Release: Tor Browser 13.0a5 (Android, Windows, macOS, Linux)" https://blog.torproject.org/new-alpha-release-tor-browser-130a5/
 % "Use foursquare as domain front for snowflake" https://bugs.torproject.org/tpo/applications/tor-browser/42120
-}
+% "Randomly select front domain from comma-separated list" https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/merge_requests/182
 
 As~of \mbox{2023-10-15},
 Snowflake had transferred 10.3~PB of circumvention data.
