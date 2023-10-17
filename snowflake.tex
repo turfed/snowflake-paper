@@ -401,13 +401,14 @@ and transfers around 30~TB of circumvention traffic per day.
 \includegraphics{figures/architecture/architecture.jpg}
 \caption{
 Architecture of Snowflake.
-The client contacts the broker through a special channel with high blocking resistance.
-The broker assigns the client a compatible proxy from among those currently polling.
+The client contacts the broker through a special rendezvous channel with high blocking resistance.
+The broker matches the client with one of the proxies that are currently polling.
 The client and proxy connect to one another using WebRTC.
 The proxy connects to the bridge,
-then begins copying traffic between the client and the bridge.
-Session state is established at the client and the bridge,
-so that it may be resumed on a different proxy if interrupted.
+then begins copying traffic in both directions.
+If~the proxy disappears,
+the client does another rendezvous
+and resumes its session with a new proxy.
 }
 \label{fig:architecture}
 \end{figure*}
@@ -809,8 +810,8 @@ Proxy NAT types, in unique IP addresses per day.
 The places in 2021 and 2022
 where there is an increase in the ``unknown'' NAT type
 and a decrease in the other types
-were the result of temporary operational problems with the
-testing peer that proxies use to assess their NAT type.
+were the result of operational problems with
+NAT type testing.
 % "Increase of 'unknown' NAT assignments by probetest since 2021-10-25" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40071
 % "Move snowflake-broker to a systemd based setup" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40147
 }
@@ -1504,16 +1505,6 @@ blocking was triggered by a particular feature of the DTLS handshake,
 which we were able to mitigate in new releases within a few weeks.
 Over the next two months the total number of Snowflake users quadrupled,
 with most of the new users coming from Russia.
-The sudden demand temporarily overwhelmed the bridge, and
-for a few weeks Snowflake was almost unusably slow.
-% "I really want to use snowflake, but it's extremely slow, almost unusable." https://old.reddit.com/r/TOR/comments/t49i14/hello_i_have_a_problem_with_snowflake_can_you/
-It~forced us to rearchitect the bridge for better scaling~\cite{Fifield2023a},
-% https://forum.torproject.net/t/tor-relays-how-to-reduce-tor-cpu-load-on-a-single-bridge/1483
-% "The DNS records were changed to point to the staging bridge at..." https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40095#note_2772325
-as~well as move the bridge to a powerful dedicated server
-and upgrade its network link from 1~Gbps to 10~Gbps.
-% https://forum.torproject.net/t/tor-project-more-resources-required-for-snowflake-bridge/2353
-% "snowflake-01: Change uplink from 1G to 10G" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40138
 By~May 2022,
 about 70\% of Snowflake users were in Russia.
 % > library("tidyverse")
@@ -1746,17 +1737,16 @@ ignoring WebRTC, WebSocket, and KCP/\allowbreak smux overhead.
 \caption{
 Unique proxy IP addresses per day,
 by proxy type.
-The two large steps visible in the graph correspond
-to the invasion of Ukraine by Russia in late February~2022,
+The two steps in the graph correspond
+to the invasion of Ukraine by Russia in February~2022,
 % 2022-02-25 https://twitter.com/torproject/status/1497276960556429324
 % 2022-02-25 https://twitter.com/0xggus/status/1497224413829283877
-and protests in Iran beginning late September~2022,
+and network restrictions in Iran beginning September~2022,
 % 2022-09-24 https://twitter.com/torproject/status/1573670895696183303
 % 2022-10-03 https://www.eff.org/deeplinks/2022/10/snowflake-makes-it-easy-anyone-fight-censorship
 at which times there were campaigns
-to encourage people to install the browser extension.
-We~have omitted occurrences of an unknown proxy type,
-of~which there were fewer than~50.
+to encourage running Snowflake proxies.
+Unknown proxy types (amounting to fewer than~50) are not shown.
 }
 \label{fig:proxy-type}
 % 2021-02-23 https://github.com/guardianproject/orbot/releases/tag/16.4.1-BETA-2-tor.0.4.4.6
