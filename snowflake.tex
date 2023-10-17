@@ -1225,6 +1225,8 @@ as in Protozoa~\cite[\S 4.4]{Barradas2020a}.
 
 \end{description}
 
+Protocol fingerprinting, rather than proxy address discovery,
+is~where most research on detecting Snowflake has focused.
 Fifield and Gil Epner~\cite{arxiv.1605.08805}
 studied the network traffic of WebRTC applications,
 with the goal of revealing fingerprinting pitfalls
@@ -1620,11 +1622,11 @@ By~that time the global user count had come to be dominated by users from Iran.
 % "Shutdowns, intensified blocking in Iran since 2022-09-21" https://github.com/net4people/bbs/issues/125
 % "Need to increase number of tor instances on snowflake-01 bridge, increased usage since yesterday [2022-09-21]" https://lists.torproject.org/pipermail/anti-censorship-team/2022-September/000247.html
 % "Graphs of user counts from Iran since the onset of shutdowns" https://forum.torproject.net/t/graphs-of-user-counts-from-iran-since-the-onset-of-shutdowns/4843
-The next event that had a large effect on Snowflake usage
-was the nationwide protests in Iran that started on \mbox{2022-09-16}.
+The next event that had a major effect on Snowflake usage
+was nationwide protests in Iran that started on \mbox{2022-09-16}.
 The government imposed periodic network shutdowns
 and additional network blocking,
-severe even by the standards of a country already notorious
+which were severe even by the standards of a country already notorious
 for Internet censorship~\cite{ooni-2022-iran-blocks-social-media-mahsa-amini-protests}.
 Internet users in Iran turned to circumvention systems
 that continued working despite the new restrictions,
@@ -2613,7 +2615,7 @@ But evidently Orbot is more used in Iran than Tor Browser,
 because the decline was so drastic.
 
 That simple TLS fingerprinting worked to block Snowflake rendezvous
-was negligence on our part.
+was simple carelessness on our part.
 Anticipating such an event,
 we~had already implemented TLS camouflage using uTLS
 in the Snowflake client,
