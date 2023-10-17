@@ -789,15 +789,15 @@ Clients use the NAT behavior discovery feature of STUN~\cite{rfc5780}.
 % "Use STUN to determine NAT behaviour of peers" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/34129
 % "Add utility to help user discover their NAT type" https://github.com/pion/stun/issues/8
 Proxies cannot use the same technique,
-because the necessary STUN features are not available
-to JavaScript in web browsers.
+because the necessary STUN features are not exposed
+to JavaScript.
 % "Have a remote probe service to test snowflake proxy NAT compatability" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40013
 Instead,
 we adapt a technique from MassBrowser~\cite[\S \mbox{V-A}]{Nasr2020a}:
 we~run a centralized, always-on WebRTC testing peer
 behind a simulated symmetric NAT.
-Proxies try to connect to this peer,
-and if~the connection succeeds, the proxy's type is unrestricted,
+Proxies try connecting to this peer:
+if~the connection succeeds, the proxy's type is unrestricted;
 otherwise it is restricted.
 Clients and proxies retest their NAT type periodically,
 to account for potential changes in their local networking environment.
@@ -829,7 +829,7 @@ the command-line
 version of the Snowflake proxy
 on networks unencumbered by NAT.
 Though stable, long-term proxies go
-against the ethos of Snowflake,
+somewhat against the ethos of Snowflake,
 it~has proved useful, as a matter of practicality,
 to~sacrifice a measure of address diversity
 for better NAT compatibility in a common case.
@@ -867,19 +867,19 @@ while restricted clients needed an average of
 %  9 2023-09           1          0                 1.00        0.0148
 % 10 2023-10           1          0                 1.00        0.0119
 
-At the same time as the proxy makes a connection to its assigned client,
-% "At the same time": https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40228
+While the proxy is connecting to its client,
+% "While": https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40228
 it also connects to the bridge.
-For this connection we
-use the WebSocket protocol~\cite{rfc6455}, which
-offers a TCP-like, point-to-point, client--server connection
+This connection
+uses WebSocket~\cite{rfc6455}, which
+offers a TCP-like, client--server connection
 layered on HTTPS.
 The choice of protocol for the proxy--bridge link is arbitrary,
 and could be changed
 without affecting the rest of the system.
-The protocol does not need to be blocking-resistant;
+It does not need to be resist blocking,
 it~just needs to be available to JavaScript code in web browsers.
-WebRTC would serve for this link too.
+WebRTC, for example, would work for this link too.
 
 \subsection{Data transfer}
 \label{sec:data-transfer}
