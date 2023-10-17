@@ -1226,12 +1226,12 @@ as in Protozoa~\cite[\S 4.4]{Barradas2020a}.
 
 \end{description}
 
-Protocol fingerprinting, rather than proxy address discovery,
+Protocol fingerprinting
 is~where most research on detecting Snowflake has focused.
 Fifield and Gil Epner~\cite{arxiv.1605.08805}
 studied the network traffic of WebRTC applications,
-with the goal of revealing fingerprinting pitfalls
-that might affect Snowflake, which was then in early development.
+with the goal of finding fingerprinting pitfalls
+that might affect Snowflake, at~that time in early development.
 Frolov et~al.~\cite[\S \mbox{V-C}]{Frolov2019a}
 observed that the unprotected TLS fingerprint
 of domain fronting rendezvous was distinctive,
@@ -1250,33 +1250,27 @@ Chen et~al.~\cite{Chen2023a}
 combined features
 of rendezvous and DTLS
 in order to reduce false positives.
-Their classifier first prefilters
+Their classifier begins
 by looking for DNS queries for
-STUN servers in the Snowflake client's default pool
-and the default front domain used in
-domain fronting rendezvous.
-While a single DNS query is not strong evidence of Snowflake,
-several related queries sent within a short time
-are more deserving of attention.
+STUN servers and front domains typically used by Snowflake clients.
 They then apply a machine learning classifier
-to features of any subsequent DTLS handshake.
+to features of a subsequent DTLS handshake.
 The authors acknowledge that DTLS fingerprinting
-is fragile, as the DTLS fingerprint is, in principle,
+is fragile, as~the DTLS fingerprint is, in~principle,
 controllable by the application.
 The DNS prefilter may perhaps be mitigated
 by alternative rendezvous methods (\autoref{sec:rendezvous}),
-or~by smarter selection of STUN servers by the client.
-
-Xie et~al.~\cite{Xie2023a} trained a decision tree using packet
-size, directionality, and timing features with the aim of
-distinguishing Snowflake rendezvous from web browsing
-traffic. They acknowledge that if the aim is to block the
-rendezvous connection before it completes, detection must occur
-as early as possible in the flow and therefore only consider the
-first 30 packets. The lowest reported false positive rate of their
-experiments is 0.25\%, however the low base rate of occurrence of Snowflake
-connections makes us believe that the collateral damage of this technique
-would be prohibitively high.
+or~by smarter selection of STUN servers.
+Xie et~al.~\cite{Xie2023a} trained a decision tree on
+packet size, direction, latency, and bandwidth features, with the aim of
+distinguishing Snowflake's domain fronting rendezvous
+from other forms of HTTPS.
+A~challenge in classifying rendezvous flows
+is that they do not consist of many packets,
+limiting the number of features a classifier has to work with.
+Their lowest reported false positive rate of 0.25\%~is,
+in~our opinion, unworkably high,
+given the low base rate of Snowflake rendezvous connections in real networks.
 
 Wails et~al.~\cite{Wails2024a}
 criticize past research on classification of circumvention systems,
