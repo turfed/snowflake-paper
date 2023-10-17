@@ -789,11 +789,6 @@ behind a simulated symmetric NAT.
 Proxies try to connect to this peer,
 and if~the connection succeeds, the proxy's type is unrestricted,
 otherwise it is restricted.
-Clients and proxies retest their NAT type periodically,
-to account for potential changes in their local networking environment.
-If~a client or proxy is unable to determine its NAT type for some reason,
-it reports the type ``unknown,''
-which the broker conservatively treats as if it were restricted.
 
 Unrestricted proxies form
 a relatively small fraction of the proxy population.
