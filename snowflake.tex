@@ -427,26 +427,27 @@ Then, there is connection establishment,
 where the client and its assigned proxy connect to each other
 with WebRTC, using information exchanged during rendezvous.
 Finally, there is data transfer,
-where the proxy ferries data
+where the proxy transports data
 between the client and the bridge.
-The bridge takes responsibility for directing the client's traffic
+It~is the bridge's responsibility to direct the client's traffic
 to its eventual destination
-(in our case, by feeding it into the Tor network).
+(in~our case, by feeding it into the Tor network).
 \autoref{fig:architecture} illustrates the process.
 
-These phases repeat as needed, as temporary proxies go offline.
-A~circumvention session is not tied to any single proxy.
-A~client builds a session over
-a series of proxies, switching to a new one
+These phases repeat as needed, as temporary proxies come and~go.
+Proxy failure is not an abnormal condition---it~happens whenever
+a proxy is running in a browser that is closed, for example.
+A~client builds a circumvention session over
+a sequence of proxies, switching to a new one
 whenever the current one stops working.
 State variables stored at the client and the bridge
-ensure the session can pick up where it left off.
+let the session can pick up where it left off.
 The change of proxies is invisible to the applications using Snowflake
-(except, perhaps, for a brief delay while rendezvous takes place again):
+(except for a brief delay while rendezvous happens):
 the Snowflake client presents an abstraction of a single, uninterrupted connection.
 
 It~does not avail a censor to block the broker or bridge,
-because Snowflake clients never contact either directly.
+because Snowflake clients never contact either one directly.
 Clients reach the broker over an indirect rendezvous channel.
 Access to the bridge is always mediated by a temporary proxy.
 
