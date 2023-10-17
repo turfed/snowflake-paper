@@ -62,7 +62,7 @@ p <- ggplot() +
 	) +
 	annotate("text",
 		x = lubridate::ymd_hms("2023-01-02 06:00:00"),
-		y = 140000,
+		y = 142000,
 		label = "Unique proxy IP addresses over the preceding 24 hours",
 		size = 3, lineheight = 0.7, hjust = 0, vjust = 0) +
 	annotate("text",
@@ -73,7 +73,8 @@ p <- ggplot() +
 		color = DECAY_COLOR,
 		size = 3, lineheight = 0.7, hjust = 0, vjust = 1) +
 	scale_y_continuous(
-		limits = c(0, 155000),
+		limits = c(0, 157000),
+		breaks = 50000*(0:3),
 		minor_breaks = NULL,
 		labels = scales::comma
 	) +
