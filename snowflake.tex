@@ -2430,23 +2430,6 @@ On May~15, this blocking went away and user counts returned to normal.
 % Reported at the same time, perhaps coincidental:
 % "GFW at the Edge: Latest Development of China's Distributed Censorship System" https://github.com/net4people/bbs/issues/248
 
-Also in May 2023, one user reported evident throttling
-(artificial reduction in speed by packet dropping)
-of~TLS-in-DTLS connections,
-based on packet size and timing features.
-% "Potential TLS-over-DTLS blocking in China" https://github.com/net4people/bbs/issues/255
-Such a policy would affect Snowflake,
-because it transports Tor TLS inside DTLS data channels.
-Reportedly, adding some padding to the first few packets
-to disrupt the size and timing signature was enough
-to prevent throttling.
-Our own speed tests run at the time
-did not show evidence of throttling,
-with or without added padding.
-% "Analysis of speed deficiency of Snowflake in China, 2023 Q1" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40251#note_2906723
-There was no obvious reduction in the number of users.
-It~may have been a localized, ISP-specific phenomenon.
-
 % Slowness, great bottleneck?
 % "Analysis of speed deficiency of Snowflake in China, 2023 Q1" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40251
 
