@@ -636,7 +636,7 @@ Even in the absence of censorship,
 making a direct connection between two Internet peers is not always easy,
 because of NAT (network address translation) and firewalls.
 Snowflake clients and proxies alike run in diverse networks
-that have varying NATs and ingress policies.
+with varying NATs and ingress policies.
 Fortunately for us,
 WebRTC is designed with this use case in mind,
 and has built-in support for traversing NAT, namely
@@ -787,8 +787,6 @@ and send it to the broker in their rendezvous messages.
 Clients use the NAT behavior discovery feature of STUN~\cite{rfc5780}.
 % "Use STUN to determine NAT behaviour of peers" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/34129
 % "Add utility to help user discover their NAT type" https://github.com/pion/stun/issues/8
-Not all STUN servers support NAT behavior discovery,
-but those whose addresses we ship with the Snowflake client~do.
 Proxies cannot use the same technique,
 because the necessary STUN features are not available
 to JavaScript code in web browsers.
@@ -829,7 +827,7 @@ thanks in large part to the volunteers who run
 the command-line
 version of the Snowflake proxy
 on networks unencumbered by NAT.
-Though stable, long-term proxies are
+Though stable, long-term proxies go
 against the ethos of Snowflake,
 it~has proved useful, as a matter of practicality,
 to~sacrifice a measure of address diversity
