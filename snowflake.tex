@@ -2493,20 +2493,12 @@ blocking of the default broker front domain.
 We~determined this by
 taking advantage of a feature of the Turkmenistan firewall,
 namely its bidirectionality.
-Nourin et~al.~\cite[\S 2]{Nourin2023a} provide more details;
-we~will state just the essential information here.
-Among the censorship techniques used in Turkmenistan
-are DNS response injection and TCP RST injection.
-DNS queries for filtered hostnames receive an injected response
-containing a false IP address;
-TLS handshakes with a filtered SNI receive an injected TCP RST packet
-that tears down the connection.
 % "I did some tests to see if it would be possible to measure blocking of SNI and DNS from outside Turkmenistan" https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40029#note_2787781
 % "Bidirectional DNS, HTTPS, HTTP injection in Turkmenistan" https://github.com/net4people/bbs/issues/80
 Conveniently for analysis,
-it~works in both directions:
+the firewall works in both directions:
 packets that \emph{enter} the country are subject to injection
-just as those that exit it are.
+just as those that exit it are~\cite[\S 2]{Nourin2023a}.
 By~sending probes into the country from outside,
 we~found that the default broker front domain
 was blocked at both the DNS and TLS layers.
