@@ -1962,47 +1962,6 @@ are ones that had been seen in the previous day.
 \section{Notable blocking attempts}
 \label{sec:block}
 
-In~\autoref{sec:clients} we saw how Snowflake's user counts
-have at times been affected by the blocking actions of censors.
-Now we take a closer look at selected censorship events.
-The effect of censorship has usually been to increase rather than decrease
-the number of Snowflake users.
-This is no paradox:
-as~censorship intensifies,
-users are displaced from less resilient
-to more resilient systems.
-Snowflake's blocking resistance has not in every case been an unqualified success,
-though, and here we also reflect on missteps
-and persistent challenges.
-
-The examples of this section are taken from
-Russia, Iran, China, and Turkmenistan,
-and are selected for being significant and instructive.
-Common lessons are that lines of communication
-and a good working relationship
-with affected users are invaluable in quickly understanding and reacting to blocking;
-and that blocking resistance
-can only be understood in relation to a censor,
-because every censor's cost calculus is different.
-
-Snowflake is blockable by any censor that is willing to block WebRTC.
-We~would not claim otherwise.
-Indeed, we~believe this is how circumvention systems
-should be presented:
-not by arguing their unblockability in absolute terms,
-but by laying out
-what actions by the censor would suffice to block~it---or~more
-to the point,
-\emph{what sacrifices a censor would have to make}
-in order to block~it.
-Some censors may be able to make those sacrifices; others may not.
-Advancing the state of the art of censorship circumvention
-consists in pushing blocking
-beyond the capabilities of more and more censors.
-
-\subsection{Blocking in Russia}
-\label{sec:block-ru}
-
 % "[Russia] Some ISPs are blocking Tor" https://bugs.torproject.org/tpo/community/support/40050
 % "OONI reports of Tor blocking in certain ISPs since 2021-12-01" https://ntc.party/t/ooni-reports-of-tor-blocking-in-certain-isps-since-2021-12-01/1477
 % "Responding to Tor censorship in Russia" https://blog.torproject.org/tor-censorship-in-russia/
@@ -2017,35 +1976,35 @@ was blocked in a subset of ISPs in Russia
 % This indicates TSPU is not everywhere."
 on \mbox{2021-12-01}~\cite{ooni-2021-russia-blocks-tor}.
 The event was evidently coordinated and targeted,
-as~it happened suddenly and affected multiple Tor-related protocols.
+as~it happened suddenly and affected man Tor-related protocols at once.
 Besides Snowflake,
 a~portion of Tor relays and bridges,
 as~well as some servers of
 the circumvention transports meek and obfs4,
 were blocked, at~least temporarily.
-The blocking attempts were
-less than totally successful,
-and the effect was to substantially increase the number
+The blocking campaign was
+less than totally successful---one
+of its effects was to substantially increase the number
 of users accessing Tor via circumvention transports,
 Snowflake among them.
 % "A zoom on just the bridge transports" https://bugs.torproject.org/tpo/community/support/40050#note_2796770
 % That pluggable transports could not compensate fully
 % for the loss of relay users points to a usability gap.
 
-We~had the advantage of established relationships
+We~benefited from established relationships
 with developers and users in Russia,
 one of whom, through manual testing,
-found the traffic feature that was being used to distinguish Snowflake.
+found what traffic feature was being used to distinguish Snowflake.
 It~was DTLS fingerprinting,
 of~the kind cautioned about in \autoref{sec:fingerprinting}.
 % "Russian DPI check supported_groups extension in ServerHello payload (byte 0x5a in udp packet)." https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40014#note_2765074
 Specifically, it~was the presence of a
 \mbox{supported\_groups} extension in the DTLS Server Hello message produced by Pion.
-The extension being present in Server Hello was a bug in itself,
+The extension being present in Server Hello was a bug---but
 % "Server Hello should not contain supported_groups extension (extension.SupportedEllipticCurves)" https://github.com/pion/dtls/issues/409
-but it also afforded the censor a feature to match on
-that would detect DTLS connections with a Pion implementation in the server role,
-without affecting other forms of DTLS.
+one that afforded the censor a feature
+to distinguish DTLS connections with a Pion implementation in the server role
+from other forms of DTLS.
 The process of finding the flaw, fixing it,
 and shipping new releases of Tor Browser took a few weeks,
 % "Point to a forked version of pion/dtls with fingerprinting fix" https://gitlab.torproject.org/tpo/applications/tor-browser-build/-/merge_requests/375
@@ -2053,7 +2012,7 @@ and shipping new releases of Tor Browser took a few weeks,
 % 2021-12-20 https://blog.torproject.org/new-release-tor-browser-1103/
 after which the user count rose quickly:
 from the beginning to the end of December~2021,
-the number of users in Russia grew from about 400 to about 4,000
+the number of users in Russia grew from about 400 to over 4,000
 % > library("tidyverse")
 % > WANTED_FINGERPRINTS <- c(
 %     "7659DA0F96B156C322FBFF3ACCC9B9DC01C27C73" = "snowman",
@@ -2078,6 +2037,43 @@ the number of users in Russia grew from about 400 to about 4,000
 Snowflake was to become a significant tool
 amid the general intensification of censorship in Russia
 following the invasion of Ukraine in February~2022.
+
+In~\autoref{sec:clients} we saw how Snowflake's user counts
+have at times been affected by the blocking actions of censors.
+Now we take a closer look at selected censorship events.
+The effect of censorship has usually been to increase, rather than decrease,
+the number of Snowflake users.
+This is no paradox:
+as~censorship intensifies,
+users are displaced from less resilient
+to more resilient systems.
+Snowflake's blocking resistance has not in every case been a success,
+though, and here we also reflect on missteps
+and persistent challenges.
+The examples are taken from
+Russia, Iran, China, and Turkmenistan,
+and are selected for being significant and instructive.
+Common lessons are that communication
+with affected users is invaluable in quickly understanding and reacting to blocking;
+and that blocking resistance is relative to a given censor,
+because every censor's cost calculus is different.
+
+Snowflake is blockable by a censor that is willing to block WebRTC.
+We~would not argue otherwise.
+Indeed, we~believe this is how a circumvention system
+should be presented:
+not by arguing its unblockability in absolute terms,
+but by laying out
+what actions by a censor would suffice to block~it---or~more
+to the point,
+\emph{what sacrifices a censor would have to make}
+in order to block~it.
+Advancing the state of the art of censorship circumvention
+consists in pushing blocking
+beyond the capabilities of more and more censors.
+
+\subsection{Blocking in Russia}
+\label{sec:block-ru}
 
 \begin{figure}
 % Make the float take up an entire column.
@@ -2175,27 +2171,25 @@ blocking events are evident on
 \end{figure}
 
 The Server Hello \mbox{supported\_groups} distinguisher
-used to detect Snowflake in Russia had been
+had been
 discovered and documented by MacMillan et~al.~\cite[\S 3]{arxiv.2008.03254}
 already in~2020.
 We~might have avoided this blocking event by proactively fixing
 the known distinguisher---but
 it was not necessarily the wrong call not to have done~so.
-In~a project like Snowflake,
-there is always more to do than time to do~it;
+There is always more to do than time to do~it;
 one must consider the opportunity cost
 of preempting specific blocking that may not come to pass.
 In~this case, a~reactive approach by us was enough:
 the loss was minor, and we were able to patch the problem quickly.
-Even in the ISPs where the blocking rule was present,
-it~did not succeed
-at blocking 100\% of Snowflake connections,
-because of the way it targeted a quirk of the Pion
-implementation of Server Hello.
+Even in ISPs where the blocking rule was present,
+it~did not block 100\% of Snowflake connections,
+because of the how it targeted a quirk in Pion,
+and only in Server Hello.
 When the DTLS server role in the WebRTC data channel
-was played by a web browser proxy,
-not a standalone proxy or Snowflake client,
-the feature would not be present.
+was played by a non-Pion peer,
+such as a web browser proxy,
+the feature was not present.
 % The Snowflake client would retry its rendezvous repeatedly,
 % until hitting on a proxy that worked.
 
@@ -2204,15 +2198,15 @@ the feature would not be present.
 % "A new Snowflake blocking rule (offset of supported_groups in DTLS Client Hello)" https://ntc.party/t/a-new-snowflake-blocking-rule-offset-of-supported-groups-in-dtls-client-hello/2420
 
 In~May 2022 we got a report of a new detection rule,
-this time keyed on not just the presence, but the \emph{contents}
+this time keying on not just the presence, but the \emph{contents}
 of the \mbox{supported\_groups} extension,
-now at a byte offset suggesting that
+at~a byte offset suggesting that
 it targeted the Client Hello message,
 not Server Hello.
 The presence of a \mbox{supported\_groups} extension in Client Hello is not at all unusual,
 but the specific groups offered by Pion's implementation
 differed from those of common browsers.
-Despite our being able to confirm the existence of the new blocking rule,
+Though we confirmed the existence of the blocking rule,
 testers reported that Snowflake continued to work---which
 % https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40030#note_2804998
 % https://ntc.party/t/a-new-snowflake-blocking-rule-offset-of-supported-groups-in-dtls-client-hello/2420/2
@@ -2223,7 +2217,7 @@ and the DTLS client is a browser proxy,
 then the byte pattern looked for by the blocking rule does not appear.
 % Hard to say at this point, but perhaps it was the cause of the sharp drop in April 2022, only reported in May?
 We~developed a mitigation,
-but by the time we had prepared a testing release in July~2022,
+but by the time we prepared a testing release in July~2022,
 % "Creating a version of Tor Browser with patched Snowflake client that includes supported_groups censorship countermeasure" https://bugs.torproject.org/tpo/anti-censorship/team/83
 % https://ntc.party/t/testing-invitation-for-tor-browser-with-supported-groups-patch-countermeasure-in-snowflake-to-evade-censorship-observed-in-russia/2837
 the new rule
@@ -2232,7 +2226,7 @@ and replaced by another.
 We~can only speculate as to motivations,
 but it may be that the censor found the old rule
 to have too many false positives,
-or~simply not to be effective enough.
+or~just to lack effectiveness.
 
 % "Блокировку Сlient Hello убрали, теперь блокируют Hello Verify Request" https://ntc.party/t/in-case-snowflake-rendezvous-gets-blocked/1857/9
 % "They removed the blocking of Client Hello, now they block Hello Verify Request" https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40030#note_2823140
@@ -2243,16 +2237,16 @@ Hello Verify Request is an anti-denial-of-service feature in DTLS,
 in~which the server sends a random cookie to the client,
 and the client sends a second Client Hello message,
 this one containing a copy of the cookie~\cite[\S 5.1]{rfc9147}.
-Sending Hello Verify Request is not an error
+It~is not an error to send Hello Verify Request
 (it~is a ``MAY'' in the RFC),
 but because the Pion implementation in Snowflake sent~it,
 and major browsers did not,
 it was a reliable indicator of Snowflake connections.
 (Those, at least, in which the DTLS server role was played by
 a Snowflake client or standalone proxy.)
-This distinguisher had also been anticipated by
+This distinguisher, too, had been anticipated by
 MacMillan et~al.~\cite[\S 3]{arxiv.2008.03254} in~2020.
-The first reports of this blocking rule were in July~2022;
+The first reports of the blocking rule arrived in July~2022;
 but as you can see in \autoref{fig:client-counts-ru},
 it~had no apparent immediate effect.
 It~is hard to say whether the drastic decline in October 2022
@@ -2260,14 +2254,14 @@ was a consequence of this rule,
 or some other, unidentified one.
 That decline coincided with an explosion of users from Iran,
 which temporarily affected the usability of the whole system.
-We deployed a mitigation to remove the Hello Verify Request message
+We~deployed a mitigation to remove the Hello Verify Request message
 from Snowflake, regrettably, only in February~2023, % and only in Tor Browser, no Orbot yet
 after which the number of users in Russia began to recover.
 % "Apply Snowflake Remove HelloVerify Countermeasure" https://gitlab.torproject.org/tpo/applications/tor-browser-build/-/merge_requests/637
 % "Since the release of Tor Browser 12.0.3 on 2023-02-15 there has been an increase in users from Russia on both bridges." https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40030#note_2893870
 
-The example of Snowflake in Russia
-demonstrates some of the difficulty of censorship measurement.
+The case of Snowflake in Russia illustrates
+some of the complexity of censorship measurement.
 The~answer to a question like ``Does Snowflake work in Russia?''
 is not a simple yes or~no.
 It~may depend on the date, the ISP,
