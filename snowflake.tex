@@ -1203,7 +1203,7 @@ fixed proxies mitigates against this enhancement.
 % VII: "One way to mitigate the effects of host-based analysis is to
 % design circumvention systems to use multiple ephemeral bridges
 % over time rather than a few long-term static bridges, similar
-% the design of Snowflake.
+% the design of Snowflake."
 
 \begin{figure*}[t]
 \includegraphics{figures/users/users-global}
@@ -2288,12 +2288,28 @@ The cause of the rise was
 extraordinary new network restrictions amid mass protests~\cite{ooni-2022-iran-blocks-social-media-mahsa-amini-protests};
 the cause of the decline was TLS fingerprint blocking,
 which stopped Snowflake rendezvous from working.
-Specifically, it~was a block of one of the TLS fingerprints
-that may be used by the Snowflake client during rendezvous.
+The crypto/tls package of the Go programming language
+(in~which the Snowflake client is written)
+may produce several slightly different TLS fingerprints,
+depending on hardware capabilities and how it was compiled.
+% "...in native Go crypto/tls fingerprints since go1.17 is that the order of ciphersuites depends on whether the platform has support for accelerated AES-GCM" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40207#note_2844163
+% % "There is strong evidence of an attempt to block the native Go crypto/tls fingerprint, but not all native fingerprints produced by Go programs are blocked." https://github.com/net4people/bbs/issues/125#issuecomment-1284602875
+It~was one of these fingerprints that was blocked.
+Because the blocking rule was so specific,
+some users were affected and others were not.
+% "This all gives us a good hypothesis... It includes the fingerprints of go1.17+ crypto/tls without AES acceleration" https://github.com/net4people/bbs/issues/139#issuecomment-1280243079
+% "When I tested the desktop version, I did it in a VM that did not emulate support for accelerated AES-GCM..." https://github.com/net4people/bbs/issues/131#issuecomment-1280284051
+Why would a censor block only one (even if the most common)
+TLS fingerprint?
+It~may have been a simple oversight.
+On~the other hand, it~is not certain that the blocking
+was meant for Snowflake specifically.
+Go~is a popular language for implementing circumvention systems;
+Snowflake may have been caught up in blocking that was intended for another system.
 
-That simple TLS fingerprinting worked to block Snowflake rendezvous
+The fact that simple TLS fingerprinting worked to block Snowflake rendezvous
 was carelessness on our part.
-Having anticipating such an event,
+Aware of the possibility,
 we~had already implemented TLS camouflage using uTLS
 in the Snowflake client,
 but failed to turn it on by default.
@@ -2304,32 +2320,22 @@ but we had to wait for new releases of Tor Browser and Orbot
 to get it into the hands of users:
 see the September--November~2022 interval in \autoref{fig:client-counts-ir}.
 
-The fact that only one (albeit the most common)
-of the Snowflake client's TLS fingerprints was blocked
-could be a sign of carelessness on the part of the censor.
-On~the other hand, it~is not certain that the TLS fingerprint blocking of October 2022
-was meant to disrupt Snowflake specifically.
-Go~is a popular language for implementing circumvention systems.
-Snowflake may have been caught up in blocking that was intended for another system.
-
 % "Blocking of cdn.sstatic.net by SNI in Iran, 2023-01-16 to 2023-01-24 and sporadically thereafter" https://bugs.torproject.org/tpo/anti-censorship/team/115#note_2873040
 
 After repairing the TLS fingerprinting flaw,
 the number of users from Iran gradually recovered
 to near its former peak.
 We~are aware of only minor disruptions after this time.
-The default front domain used in rendezvous
+The default rendezvous front domain
 was blocked (by~TLS SNI) in some ISPs
-between \mbox{2023-01-16} and \mbox{2023-01-24}.
-We~confirmed the block using data from the OONI
-censorship measurement platform.
+between \mbox{2023-01-16} and \mbox{2023-01-24},
+which we confirmed using data from the censorship measurement platform OONI.
 A~reduction in users is visible at this time.
-AMP cache rendezvous was a successful workaround while the block was in effect.
-After the block was lifted,
-OONI measurements in the following weeks showed isolated cases
-of failure to connect to the front domain.
-These may have been further attempts at blocking.
-If~they were, they did not have much of an effect.
+AMP cache rendezvous continued to work.
+OONI measurements in the weeks after the block was lifted showed sporadic
+failures to connect to the front domain.
+If~these were further attempts at blocking,
+they did not have much of an effect.
 
 \subsection{Blocking in China}
 \label{sec:block-cn}
