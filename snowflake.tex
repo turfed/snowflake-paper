@@ -2507,12 +2507,6 @@ Testing revealed blocking of the default STUN port, UDP~3478.
 A~client that cannot communicate with a STUN server
 cannot find its ICE candidate addresses (\autoref{sec:connection}),
 without which most WebRTC proxy connections will fail.
-(The exceptions are proxies without NAT or ingress filtering.
-While there are some such proxies,
-censorship in Turkmenistan also outright blocks
-large parts of IP address space,
-including data center address ranges where those proxies tend to run.)
-% "Even if the user is unable to connect to any STUN servers and sends an SDP offer with no candidates, they should still be able to connect to proxies that are not behind a NAT or behind a full cone NAT" https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40024#note_2889789
 As~chance would have it, the NAT discovery feature we rely on
 for testing the NAT type of clients requires
 STUN servers to open a second, functionally equivalent listener
