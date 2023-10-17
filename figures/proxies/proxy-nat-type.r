@@ -11,7 +11,7 @@ source("../common.r")
 DATE_LIMITS <- lubridate::ymd(c(
 	# "2019-07-01",
 	"2021-01-01",
-	"2023-09-30"
+	"2023-10-14"
 ))
 
 # TODO: date threshold where "untested" changed to "restricted" and "unknown" in August 2020.
