@@ -1570,16 +1570,6 @@ blocking was triggered by a particular feature of the DTLS handshake,
 which we were able to mitigate in new releases within a few weeks.
 Over the next two months the total number of Snowflake users quadrupled,
 with most of the new users coming from Russia.
-The sudden demand temporarily overwhelmed the bridge, and
-for a few weeks Snowflake was almost unusably slow.
-% "I really want to use snowflake, but it's extremely slow, almost unusable." https://old.reddit.com/r/TOR/comments/t49i14/hello_i_have_a_problem_with_snowflake_can_you/
-It~forced us to rearchitect the bridge for better scaling~\cite{Fifield2023a},
-% https://forum.torproject.net/t/tor-relays-how-to-reduce-tor-cpu-load-on-a-single-bridge/1483
-% "The DNS records were changed to point to the staging bridge at..." https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40095#note_2772325
-as~well as move the bridge to a powerful dedicated server
-and upgrade its network link from 1~Gbps to 10~Gbps.
-% https://forum.torproject.net/t/tor-project-more-resources-required-for-snowflake-bridge/2353
-% "snowflake-01: Change uplink from 1G to 10G" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40138
 By~May 2022,
 about 70\% of Snowflake users were in Russia.
 % > library("tidyverse")
