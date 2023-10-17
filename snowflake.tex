@@ -327,7 +327,7 @@ and its resources, costs, and motivations.
 In~this paper we present the design of Snowflake,
 discuss various challenges and considerations,
 and reflect on over three years of deployment.
-As~of October 2023, Snowflake supports an estimated average 35,000 concurrent users
+As~of October 2023, Snowflake supports an estimated 35,000 average concurrent users
 % > library("tidyverse")
 % > WANTED_FINGERPRINTS <- c(
 %     "7659DA0F96B156C322FBFF3ACCC9B9DC01C27C73" = "snowman",
@@ -547,7 +547,7 @@ We~currently support two rendezvous methods in Snowflake:
 \begin{description}
 \item[Domain fronting]
 In~this method, the client does an HTTPS exchange with the broker
-by an intermediary web service such as a CDN,
+by an intermediary web service such as a content delivery network (CDN),
 taking care to change the externally visible hostname
 (the TLS Server Name Indication, or SNI)
 from that of the broker to some other ``front domain''~\cite{Fifield2015a}.
@@ -889,7 +889,7 @@ Having provided that,
 the proxy assumes a role of pure data transfer.
 
 Snowflake uses a stack of nested protocol layers.
-We~will walk though each layer and describe its purpose.
+We~will walk though the layers and describe the purpose of each.
 
 \bigskip
 
@@ -996,25 +996,24 @@ We~prototyped successfully with QUIC before deciding on KCP/\allowbreak smux.
 % "turn off reliable mode for WebRTC DataChannel" https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/merge_requests/109
 % "Snowflake is currently using network resource in a so suboptimal way..." https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40251#note_2891751
 
-Finally,
-we must specify some concrete protocol
-so that the client can tell the bridge
-what remote destination to access on its behalf.
-In~our deployment, this role is played by the Tor protocol.
-After stripping away the WebRTC and Turbo Tunnel containers,
-the Snowflake bridge feeds the client's data stream
-into a local Tor bridge.
-Almost anything would work here, with the caveat
-that it should be end-to-end secure between the client and bridge,
-to prevent inspection or tampering
-by curious or malicious proxies---Snowflake proxies are ``untrusted messengers''
-in the sense of
-Feamster et~al.~\cite[\S 3]{Feamster2003a}.
-Integration with Tor has the nice feature that
-not even the Snowflake bridge is trusted
-to see the plaintext or destination of client traffic,
-let alone the temporary proxies.
-Using Tor also has some drawbacks,
+Snowflake can be seen as an instance of the
+``untrusted messengers'' model of Feamster et~al.~\cite[\S 3]{Feamster2003a},
+with our \firstterm{proxies} and \firstterm{bridge} corresponding to their
+\firstterm{messengers} and \firstterm{portal}.
+Proxies are tasked with delivering the client's data to the bridge,
+but are not permitted to tamper with or inspect~it,
+which necessitates an inner,
+end-to-end secure protocol between the client and the bridge.
+In~our deployment, this is Tor protocol.
+After removing the WebSocket and Turbo Tunnel layers,
+the Snowflake bridge feeds the client's Tor streams
+into a Tor bridge running on the same host.
+The use of Tor is an implementation choice, not a requirement---many
+other protocols would work in its place.
+Tor has the nice quality that
+not even the bridge
+sees the plaintext of client streams.
+But Tor also has certain drawbacks,
 which we will comment on in
 \autoref{sec:multi-bridge}
 and
@@ -1217,12 +1216,12 @@ as in Protozoa~\cite[\S 4.4]{Barradas2020a}.
 
 \end{description}
 
-Protocol fingerprinting, rather than proxy address discovery,
+Protocol fingerprinting
 is~where most research on detecting Snowflake has focused.
 Fifield and Gil Epner~\cite{arxiv.1605.08805}
 studied the network traffic of WebRTC applications,
-with the goal of revealing fingerprinting pitfalls
-that might affect Snowflake, which was then in early development.
+with the goal of finding fingerprinting pitfalls
+that might affect Snowflake, at~that time in early development.
 Frolov et~al.~\cite[\S \mbox{V-C}]{Frolov2019a}
 observed that the unprotected TLS fingerprint
 of domain fronting rendezvous was distinctive,
@@ -1241,33 +1240,52 @@ Chen et~al.~\cite{Chen2023a}
 combined features
 of rendezvous and DTLS
 in order to reduce false positives.
-Their classifier first prefilters
+Their classifier begins
 by looking for DNS queries for
-STUN servers in the Snowflake client's default pool
-and the default front domain used in
-domain fronting rendezvous.
-While a single DNS query is not strong evidence of Snowflake,
-several related queries sent within a short time
-are more deserving of attention.
+STUN servers and front domains typically used by Snowflake clients.
 They then apply a machine learning classifier
-to features of any subsequent DTLS handshake.
+to features of a subsequent DTLS handshake.
 The authors acknowledge that DTLS fingerprinting
-is fragile, as the DTLS fingerprint is, in principle,
+is fragile, as~the DTLS fingerprint is, in~principle,
 controllable by the application.
 The DNS prefilter may perhaps be mitigated
 by alternative rendezvous methods (\autoref{sec:rendezvous}),
-or~by smarter selection of STUN servers by the client.
+or~by smarter selection of STUN servers.
+Xie et~al.~\cite{Xie2023a} trained a decision tree on
+packet size, direction, latency, and bandwidth features, with the aim of
+distinguishing Snowflake's domain fronting rendezvous
+from other forms of HTTPS.
+A~challenge in classifying rendezvous flows
+is that they do not consist of many packets,
+limiting the number of features a classifier has to work with.
+Their lowest reported false positive rate of 0.25\%~is,
+in~our opinion, unworkably high,
+given the low base rate of Snowflake rendezvous connections in real networks.
 
-Xie et~al.~\cite{Xie2023a} trained a decision tree using packet
-size, directionality, and timing features with the aim of
-distinguishing Snowflake rendezvous from web browsing
-traffic. They acknowledge that if the aim is to block the
-rendezvous connection before it completes, detection must occur
-as early as possible in the flow and therefore only consider the
-first 30 packets. The lowest reported false positive rate of their
-experiments is 0.25\%, however the low base rate of occurrence of Snowflake
-connections makes us believe that the collateral damage of this technique
-would be prohibitively high.
+Wails et~al.~\cite{Wails2024a}
+criticize past research on classification of circumvention systems,
+saying that accuracy claims do not hold up
+with the low base rates of circumvention traffic in practice.
+% IV-D: "Despite the prima facie acceptable performance of these
+% classifiers ... we argue that these results *do not* accurately
+% reflect a censor's ability to detect obfs4 under realistic conditions."
+They develop classifiers based on deep learning
+that improve on the state of the art,
+applying them to Snowflake rendezvous and data transfer,
+but find them still to be prohibitively imprecise with realistic base rates.
+% V-C: "While it is the case that deep learning improves performance,
+% the false positive rates are still prohibitively high to scale to
+% realistic base rates. Fig. 5 plots Prec^λ as a function of the base
+% rate λ. For more realistic base rates, such as λ > 1 × 10^6, the
+% precision attained by any of the classifiers is near-zero."
+They propose to reduce false positives by combining
+multiple observations per IP address---classifying hosts,
+not flows---and suggest that Snowflake's lack of
+fixed proxies mitigates against this enhancement.
+% VII: "One way to mitigate the effects of host-based analysis is to
+% design circumvention systems to use multiple ephemeral bridges
+% over time rather than a few long-term static bridges, similar
+% the design of Snowflake.
 
 \begin{figure*}[t]
 \includegraphics{figures/users/users-global}
@@ -1282,7 +1300,7 @@ Estimated average simultaneous Snowflake users and bandwidth by day.
 
 Snowflake has now been in operation for a few years.
 In~lieu of a forward-looking evaluation,
-here we will take a look back
+here we take a look back
 at the history of our deployment
 and reflect on the experience.
 
@@ -1547,18 +1565,18 @@ By~that time the global user count had come to be dominated by users from Iran.
 % "Shutdowns, intensified blocking in Iran since 2022-09-21" https://github.com/net4people/bbs/issues/125
 % "Need to increase number of tor instances on snowflake-01 bridge, increased usage since yesterday [2022-09-21]" https://lists.torproject.org/pipermail/anti-censorship-team/2022-September/000247.html
 % "Graphs of user counts from Iran since the onset of shutdowns" https://forum.torproject.net/t/graphs-of-user-counts-from-iran-since-the-onset-of-shutdowns/4843
-The next event that had a major effect on Snowflake usage
-was nationwide protests in Iran that started on \mbox{2022-09-16}.
-The government imposed periodic network shutdowns
+The next event to have a major effect on Snowflake usage
+was the nationwide protests that started in Iran on \mbox{2022-09-16}.
+The government imposed network shutdowns
 and additional network blocking,
-which were severe even by the standards of a country already notorious
-for Internet censorship~\cite{ooni-2022-iran-blocks-social-media-mahsa-amini-protests}.
-Internet users in Iran turned to circumvention systems
+severe even by the standards of a country already notorious
+for its censorship~\cite{ooni-2022-iran-blocks-social-media-mahsa-amini-protests}.
+Users turned to circumvention systems
 that continued working despite the new restrictions,
-Snowflake among them.
+one of which was Snowflake.
 Adoption was rapid:
 on~\mbox{2022-09-20}, Iran accounted for only~1\% of Snowflake users;
-on~\mbox{2022-09-24} it was 67\%.
+by~\mbox{2022-09-24} it was 67\%.
 % > library("tidyverse")
 % > WANTED_FINGERPRINTS <- c(
 %     "7659DA0F96B156C322FBFF3ACCC9B9DC01C27C73" = "snowman",
@@ -1585,40 +1603,36 @@ on~\mbox{2022-09-24} it was 67\%.
 % 5 2022-09-23 snowflake ir      48467. 48427. 48447.   62.8
 % 6 2022-09-24 snowflake ir      49130. 49083. 49107.   66.0
 % 7 2022-09-25 snowflake ir      59517. 59470. 59493.   67.4
-The massive influx of users had us scrambling to test and deploy
-performance improvements over the succeeding days.
-About two weeks later, on \mbox{2022-10-04},
-usage dropped almost as quickly as it had risen.
-The drop was caused by
-the censors in Iran blocking a TLS fingerprint
-used in rendezvous.
+The influx of users had us scrambling for a few days
+to implement performance improvements.
+Two weeks later, on \mbox{2022-10-04},
+usage dropped almost as quickly as it had risen---the
+cause was the blocking of a TLS fingerprint
+used by the Snowflake client.
 % "Sudden reduction in snowflake-01 bridge bandwidth, 2022-10-04 17:15" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40207
 After we released fixes for the TLS fingerprinting issue,
-the user count in Iran began to recover going into~2023.
-One of the emergency performance optimizations we had deployed in late September
-turned out to be a mistake and actually harmful for performance.
+the user count began to recover going into 2023.
+But in our haste to deploy optimizations in September,
+we~had introduced a bug that harmed performance,
+getting worse with more users,
 % "Weird KCP packets received by the client" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40260
-The problem was masked, for a time, by the great demand for the service,
-but starting in February~2023 the user count started to decline.
-We~reverted the erroneous change in mid-March,
+which dragged the count down again,
+until the bug was fixed in mid-March.
 % "Deploy snowflake-server for QueuePacketConn buffer reuse fix (#40260)" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40262
-and then the count started to recover again.
-Around this time, there was also a span of about a week,
-and irregular brief intervals thereafter, during which
-the domain used for domain fronting rendezvous
-was blocked in some ISPs in Iran,
-an evident attempt at blocking that was, however, not sustained.
+Around this time, we~noticed some evident attempts to block the default
+rendezvous front domain in some network in Iran,
+but they were not sustained.
 
-Throughout most of this history,
+For most of this history,
 we ran the backend bridge on a single server,
 upgrading and optimizing it as needed.
-But as the bridge began to reach its hardware capacity,
-and performance improvements became harder to achieve,
+But as the bridge reached its hardware capacity,
+and performance improvements got harder to achieve,
 we deployed a second bridge to share the load.
 We discuss the challenges and design considerations of doing so in \autoref{sec:multi-bridge}.
-The second bridge was made available to users in
+The new bridge was made available in
 Tor Browser~12.0 on \mbox{2022-12-07}.
-By~July, the second bridge supported about 18\% of Snowflake users.
+By~July, it~supported about 18\% of Snowflake users.
 % > library("tidyverse")
 % > WANTED_FINGERPRINTS <- c(
 %     "7659DA0F96B156C322FBFF3ACCC9B9DC01C27C73" = "snowman",
@@ -1648,6 +1662,22 @@ By~July, the second bridge supported about 18\% of Snowflake users.
 % 12 2023-07-30 snowflake 12848.            12     12   snowflake-02    18.7
 % 13 2023-07-31 snowflake 56160.            12     11.4 snowflake-01    81.2
 % 14 2023-07-31 snowflake 13007.            12     12   snowflake-02    18.8
+
+The sudden drop in users on \mbox{2023-09-20}
+was not caused by censor action:
+rather, it~was an unexpected change in the cloud
+infrastructure we used for domain fronting rendezvous.
+The front domain we had mainly used
+changed its hosting to a different CDN,
+which caused client rendezvous messages not to be delivered to the broker.
+% Problems with Snowflake since 2023-09-20: "broker failure Unexpected error, no answer." https://forum.torproject.org/t/problems-with-snowflake-since-2023-09-20-broker-failure-unexpected-error-no-answer/9346
+% "[anti-censorship-team] Trying to understand multi-bridge dynamics post after Fastly/Cloudflare domain front change" https://lists.torproject.org/pipermail/anti-censorship-team/2023-September/000317.html
+The user count dropped by about half,
+recovering slowly after we made releases
+with alternative front domains.
+% "New Alpha Release: Tor Browser 13.0a5 (Android, Windows, macOS, Linux)" https://blog.torproject.org/new-alpha-release-tor-browser-130a5/
+% "Use foursquare as domain front for snowflake" https://bugs.torproject.org/tpo/applications/tor-browser/42120
+% "Randomly select front domain from comma-separated list" https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/merge_requests/182
 
 As~of \mbox{2023-10-15},
 Snowflake had transferred 10.3~PB of circumvention data.
@@ -1872,7 +1902,7 @@ Orbot's Snowflake proxy feature was added in version 16.4.1 in February~2021.
 until January~2022, when it got its own proxy type designation.)
 % See history in figures/proxies/proxy-type.r.
 
-It~is worth reflecting briefly
+It~is worth reflecting
 on the greater popularity of the browser extension
 compared to the web badge.
 The latter had been envisioned
@@ -1902,7 +1932,7 @@ We~decided, early on, that flash proxy's opt-out permission had been a mistake,
 % proxy always bothered me. I think there's a good chance it would cause
 % trouble for us if Snowflake becomes popular. So I'd like to see
 % Snowflake use opt-in badges (and Cupcake) only.
-and that Snowflake would be only opt-in.
+and that Snowflake would be opt-in.
 In~order to run a proxy, a person must take a positive action
 such as installing a browser extension
 or activating a toggle on a web page.
@@ -2486,45 +2516,11 @@ which stopped Snowflake rendezvous from working.
 Specifically, it~was a block of one of the TLS fingerprints
 of the crypto/tls package in the standard library of
 the Go programming language
-(the language in which the Snowflake client is written).
-
-We~say ``one of'' the fingerprints
-because there are several the package may output.
-This fact prevented the user count from falling all the way to zero,
-but also complicated our efforts to identify the cause of the decline.
-We~isolated two variables that were relevant in this case:
-the version of the Go standard library,
-and the presence or absence of hardware-accelerated AES.
-Between Go~1.17 and Go~1.18,
-the crypto/tls package stopped declaring support
-for the old protocol versions TLS~1.0 and~1.1
-in the Client Hello message~\cite{go1.18-tls10}.
-% supported_versions: https://www.rfc-editor.org/rfc/rfc8446#section-4.2.1
-And if the operating environment has hardware-accelerated AES
-(common on desktop platforms, not so common on mobile),
-the crypto/tls package prioritizes AES ciphersuites;
-otherwise it prioritizes ChaCha ones.
-Of~the four possible TLS fingerprints
-resulting from the combination of these two variables,
-only one was blocked,
-namely the one from Go~1.17, without AES acceleration.
-% "This all gives us a good hypothesis... It includes the fingerprints of go1.17+ crypto/tls without AES acceleration" https://github.com/net4people/bbs/issues/139#issuecomment-1280243079
-% "...in native Go crypto/tls fingerprints since go1.17 is that the order of ciphersuites depends on whether the platform has support for accelerated AES-GCM" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40207#note_2844163
-% "When I tested the desktop version, I did it in a VM that did not emulate support for accelerated AES-GCM..." https://github.com/net4people/bbs/issues/131#issuecomment-1280284051
-% "There is strong evidence of an attempt to block the native Go crypto/tls fingerprint, but not all native fingerprints produced by Go programs are blocked." https://github.com/net4people/bbs/issues/125#issuecomment-1284602875
-As~it happens, it~was mainly Orbot that was affected,
-because at the time it used a Snowflake client compiled with Go~1.17,
-and it runs on mobile platforms that are less likely to have AES acceleration.
-Tor Browser was relatively unaffected,
-because it either ran on desktops with AES acceleration,
-or~on mobile platforms with the newer version of the Go
-standard library whose TLS fingerprint was not being matched.
-But evidently Orbot is more used in Iran than Tor Browser,
-because the decline was so drastic.
+(in~which the Snowflake client is written).
 
 That simple TLS fingerprinting worked to block Snowflake rendezvous
-was simple carelessness on our part.
-Anticipating such an event,
+was carelessness on our part.
+Having anticipating such an event,
 we~had already implemented TLS camouflage using uTLS
 in the Snowflake client,
 but failed to turn it on by default.
