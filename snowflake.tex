@@ -1629,18 +1629,18 @@ By~that time the global user count had come to be dominated by users from Iran.
 % "Shutdowns, intensified blocking in Iran since 2022-09-21" https://github.com/net4people/bbs/issues/125
 % "Need to increase number of tor instances on snowflake-01 bridge, increased usage since yesterday [2022-09-21]" https://lists.torproject.org/pipermail/anti-censorship-team/2022-September/000247.html
 % "Graphs of user counts from Iran since the onset of shutdowns" https://forum.torproject.net/t/graphs-of-user-counts-from-iran-since-the-onset-of-shutdowns/4843
-The next event that had a major effect on Snowflake usage
-was nationwide protests in Iran that started on \mbox{2022-09-16}.
-The government imposed periodic network shutdowns
+The next event to have a major effect on Snowflake usage
+was the nationwide protests that started in Iran on \mbox{2022-09-16}.
+The government imposed network shutdowns
 and additional network blocking,
-which were severe even by the standards of a country already notorious
-for Internet censorship~\cite{ooni-2022-iran-blocks-social-media-mahsa-amini-protests}.
-Internet users in Iran turned to circumvention systems
+severe even by the standards of a country already notorious
+for its censorship~\cite{ooni-2022-iran-blocks-social-media-mahsa-amini-protests}.
+Users turned to circumvention systems
 that continued working despite the new restrictions,
-Snowflake among them.
+one of which was Snowflake.
 Adoption was rapid:
 on~\mbox{2022-09-20}, Iran accounted for only~1\% of Snowflake users;
-on~\mbox{2022-09-24} it was 67\%.
+by~\mbox{2022-09-24} it was 67\%.
 % > library("tidyverse")
 % > WANTED_FINGERPRINTS <- c(
 %     "7659DA0F96B156C322FBFF3ACCC9B9DC01C27C73" = "snowman",
@@ -1667,29 +1667,25 @@ on~\mbox{2022-09-24} it was 67\%.
 % 5 2022-09-23 snowflake ir      48467. 48427. 48447.   62.8
 % 6 2022-09-24 snowflake ir      49130. 49083. 49107.   66.0
 % 7 2022-09-25 snowflake ir      59517. 59470. 59493.   67.4
-The massive influx of users had us scrambling to test and deploy
-performance improvements over the succeeding days.
-About two weeks later, on \mbox{2022-10-04},
-usage dropped almost as quickly as it had risen.
-The drop was caused by
-the censors in Iran blocking a TLS fingerprint
-used in rendezvous.
+The influx of users had us scrambling for a few days
+to implement performance improvements.
+Two weeks later, on \mbox{2022-10-04},
+usage dropped almost as quickly as it had risen---the
+cause was the blocking of a TLS fingerprint
+used by the Snowflake client.
 % "Sudden reduction in snowflake-01 bridge bandwidth, 2022-10-04 17:15" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40207
 After we released fixes for the TLS fingerprinting issue,
-the user count in Iran began to recover going into~2023.
-One of the emergency performance optimizations we had deployed in late September
-turned out to be a mistake and actually harmful for performance.
+the user count began to recover going into 2023.
+But in our haste to deploy optimizations in September,
+we~had introduced a bug that harmed performance,
+getting worse with more users,
 % "Weird KCP packets received by the client" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40260
-The problem was masked, for a time, by the great demand for the service,
-but starting in February~2023 the user count started to decline.
-We~reverted the erroneous change in mid-March,
+which dragged the count down again,
+until the bug was fixed in mid-March.
 % "Deploy snowflake-server for QueuePacketConn buffer reuse fix (#40260)" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40262
-and then the count started to recover again.
-Around this time, there was also a span of about a week,
-and irregular brief intervals thereafter, during which
-the domain used for domain fronting rendezvous
-was blocked in some ISPs in Iran,
-an evident attempt at blocking that was, however, not sustained.
+Around this time, we~noticed some evident attempts to block the default
+rendezvous front domain in some network in Iran,
+but they were not sustained.
 
 Throughout most of this history,
 we ran the backend bridge on a single server,
