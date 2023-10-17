@@ -795,23 +795,7 @@ If~a client or proxy is unable to determine its NAT type for some reason,
 it reports the type ``unknown,''
 which the broker conservatively treats as if it were restricted.
 
-\begin{figure}
-\includegraphics{figures/proxies/proxy-nat-type}
-\caption{
-Proxy NAT types, in unique IP addresses per day.
-The places in 2021 and 2022
-where there is an increase in the ``unknown'' NAT type
-and a decrease in the other types
-were the result of operational problems with
-NAT type testing.
-% "Increase of 'unknown' NAT assignments by probetest since 2021-10-25" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40071
-% "Move snowflake-broker to a systemd based setup" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40147
-}
-\label{fig:proxy-nat-type}
-\end{figure}
-
-\autoref{fig:proxy-nat-type}
-shows that unrestricted proxies form
+Unrestricted proxies form
 a relatively small fraction of the proxy population.
 In~absolute terms, there are enough,
 thanks in large part to the volunteers who run
@@ -823,39 +807,6 @@ against the ethos of Snowflake,
 it~has proved useful, as a matter of practicality,
 to~sacrifice a measure of address diversity
 for better NAT compatibility in a common case.
-We~can estimate how many tries it takes a client
-to be matched with a proxy, on average,
-by counting failed and successful rendezvous attempts at the broker,
-under the assumption that clients repeat rendezvous attempts
-until getting a match.
-In~July 2023,
-unrestricted clients almost always got a match on the first attempt,
-while restricted clients needed an average of
-1.07 attempts (standard deviation 0.05).
-% > library(tidyverse)
-% > read_csv("figures/proxies/client-match.csv") %>%
-%     filter(date < "2023-10-15") %>%
-%     group_by(month = format(date, "%Y-%m")) %>%
-%     summarize(
-%       unrestricted_n  = mean((matched_count + unrestricted_denied_count) / matched_count),
-%       unrestricted_sd =   sd((matched_count + unrestricted_denied_count) / matched_count),
-%       restricted_n    = mean((matched_count + restricted_denied_count) / matched_count),
-%       restricted_sd   =   sd((matched_count + restricted_denied_count) / matched_count),
-%       .groups = "drop"
-%     ) %>% tail(10)
-% # A tibble: 10 × 5
-%    month   unrestricted_n unrestricted_sd restricted_n restricted_sd
-%    <chr>            <dbl>           <dbl>        <dbl>         <dbl>
-%  1 2023-01           1          0                 1.64        0.225
-%  2 2023-02           1.00       0.0000131         1.94        0.154
-%  3 2023-03           1          0                 1.42        0.280
-%  4 2023-04           1          0                 1.15        0.152
-%  5 2023-05           1.00       0.00204           1.23        0.113
-%  6 2023-06           1.00       0.0000834         1.23        0.0734
-%  7 2023-07           1          0                 1.07        0.0498
-%  8 2023-08           1          0                 1.02        0.0568
-%  9 2023-09           1          0                 1.00        0.0148
-% 10 2023-10           1          0                 1.00        0.0119
 
 At the same time as the proxy makes a connection to its assigned client,
 % "At the same time": https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40228
