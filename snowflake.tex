@@ -499,19 +499,6 @@ at~the same time sending an acknowledgement to the proxy.
 At~this point rendezvous is finished,
 and the client and the proxy may connect to one another.
 
-\begin{figure}
-\includegraphics{figures/rendezvous/rendezvous}
-\caption{
-The long-polling communication model of Snowflake rendezvous.
-Proxies poll periodically to check for new clients.
-When the broker makes a match,
-the proxy gets the client's SDP offer,
-then immediately re-connects to send back its SDP answer.
-It~all happens during one round trip from the client's perspective.
-}
-\label{fig:rendezvous}
-\end{figure}
-
 The client must use an indirect,
 blocking-resistant channel
 when communicating with the broker.
@@ -535,6 +522,19 @@ to the circumvention techniques of the main system.
 While the assumption of WebRTC permeates Snowflake's design,
 its rendezvous modules are independent.
 We~currently support two rendezvous methods in Snowflake:
+
+\begin{figure}
+\includegraphics{figures/rendezvous/rendezvous}
+\caption{
+The long-polling communication model of Snowflake rendezvous.
+Proxies poll periodically to check for new clients.
+When the broker makes a match,
+the proxy gets the client's SDP offer,
+then immediately re-connects to send back its SDP answer.
+It~all happens during one round trip from the client's perspective.
+}
+\label{fig:rendezvous}
+\end{figure}
 
 \begin{description}
 \item[Domain fronting]
@@ -1155,6 +1155,14 @@ that would later actually be used
 to block Snowflake in Russia;
 see more details in \autoref{sec:block-ru}.
 
+\begin{figure*}[t]
+\includegraphics{figures/users/users-global}
+\caption{
+Estimated average simultaneous Snowflake users and bandwidth by day.
+}
+\label{fig:client-counts}
+\end{figure*}
+
 Chen et~al.~\cite{Chen2023a}
 combined features
 of rendezvous and DTLS
@@ -1205,14 +1213,6 @@ fixed proxies mitigates against this enhancement.
 % design circumvention systems to use multiple ephemeral bridges
 % over time rather than a few long-term static bridges, similar
 % the design of Snowflake."
-
-\begin{figure*}[t]
-\includegraphics{figures/users/users-global}
-\caption{
-Estimated average simultaneous Snowflake users and bandwidth by day.
-}
-\label{fig:client-counts}
-\end{figure*}
 
 \section{Experience}
 \label{sec:experience}
