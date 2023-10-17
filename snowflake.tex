@@ -676,13 +676,10 @@ and avoids cases that would require a fallback to TURN.
 % "Investigate Snowflake proxy failures" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/33666#note_2595319
 % "Okay here's a summary of what I've found: ..."
 
-Two factors are relevant to
+We condense the possible combinations of NAT and firewall features
+that impact
 a Snowflake client or proxy's
-ability to make a peer-to-peer connection:
-how its NAT maps internal IP--port combinations to external ports,
-and how its firewall filters incoming packets.
-For our purposes, it suffices
-to condense the combinations of NAT mapping and firewall filtering
+ability to make a peer-to-peer connection
 into the following well-known variations:
 
 % https://datatracker.ietf.org/doc/html/rfc3489#section-5
@@ -776,10 +773,8 @@ for clients it is unrestricted.
 The asymmetric categorization is an approximation
 to further help conserve unrestricted proxies
 for clients with symmetric NATs.
-Though it creates the potential for an incompatible match
-between a symmetric proxy and a port-restricted cone client,
-port-restricted cone proxies are common in practice,
-and are compatible with port-restricted cone clients.
+Though it creates the potential for an incompatible match,
+we believe this to be uncommon in practice.
 In~case of a connection failure,
 clients re-rendezvous and try again.
 
