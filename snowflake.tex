@@ -2586,41 +2586,7 @@ which stopped Snowflake rendezvous from working.
 Specifically, it~was a block of one of the TLS fingerprints
 of the crypto/tls package in the standard library of
 the Go programming language
-(the language in which the Snowflake client is written).
-
-We~say ``one of'' the fingerprints
-because there are several the package may output.
-This fact prevented the user count from falling all the way to zero,
-but also complicated our efforts to identify the cause of the decline.
-We~isolated two variables that were relevant in this case:
-the version of the Go standard library,
-and the presence or absence of hardware-accelerated AES.
-Between Go~1.17 and Go~1.18,
-the crypto/tls package stopped declaring support
-for the old protocol versions TLS~1.0 and~1.1
-in the Client Hello message~\cite{go1.18-tls10}.
-% supported_versions: https://www.rfc-editor.org/rfc/rfc8446#section-4.2.1
-And if the operating environment has hardware-accelerated AES
-(common on desktop platforms, not so common on mobile),
-the crypto/tls package prioritizes AES ciphersuites;
-otherwise it prioritizes ChaCha ones.
-Of~the four possible TLS fingerprints
-resulting from the combination of these two variables,
-only one was blocked,
-namely the one from Go~1.17, without AES acceleration.
-% "This all gives us a good hypothesis... It includes the fingerprints of go1.17+ crypto/tls without AES acceleration" https://github.com/net4people/bbs/issues/139#issuecomment-1280243079
-% "...in native Go crypto/tls fingerprints since go1.17 is that the order of ciphersuites depends on whether the platform has support for accelerated AES-GCM" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40207#note_2844163
-% "When I tested the desktop version, I did it in a VM that did not emulate support for accelerated AES-GCM..." https://github.com/net4people/bbs/issues/131#issuecomment-1280284051
-% "There is strong evidence of an attempt to block the native Go crypto/tls fingerprint, but not all native fingerprints produced by Go programs are blocked." https://github.com/net4people/bbs/issues/125#issuecomment-1284602875
-As~it happens, it~was mainly Orbot that was affected,
-because at the time it used a Snowflake client compiled with Go~1.17,
-and it runs on mobile platforms that are less likely to have AES acceleration.
-Tor Browser was relatively unaffected,
-because it either ran on desktops with AES acceleration,
-or~on mobile platforms with the newer version of the Go
-standard library whose TLS fingerprint was not being matched.
-But evidently Orbot is more used in Iran than Tor Browser,
-because the decline was so drastic.
+(in~which the Snowflake client is written).
 
 That simple TLS fingerprinting worked to block Snowflake rendezvous
 was carelessness on our part.
