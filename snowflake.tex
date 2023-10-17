@@ -332,7 +332,7 @@ and its resources, costs, and motivations.
 In~this paper we present the design of Snowflake,
 discuss various challenges and considerations,
 and reflect on over three years of deployment.
-As~of October 2023, Snowflake supports an estimated average 35,000 concurrent users
+As~of October 2023, Snowflake supports an estimated 35,000 average concurrent users
 % > library("tidyverse")
 % > WANTED_FINGERPRINTS <- c(
 %     "7659DA0F96B156C322FBFF3ACCC9B9DC01C27C73" = "snowman",
@@ -555,7 +555,7 @@ We~currently support two rendezvous methods in Snowflake:
 \begin{description}
 \item[Domain fronting]
 In~this method, the client does an HTTPS exchange with the broker
-by an intermediary web service such as a CDN,
+by an intermediary web service such as a content delivery network (CDN),
 taking care to change the externally visible hostname
 (the TLS Server Name Indication, or SNI)
 from that of the broker to some other ``front domain''~\cite{Fifield2015a}.
@@ -898,7 +898,7 @@ Having provided that,
 the proxy assumes a role of pure data transfer.
 
 Snowflake uses a stack of nested protocol layers.
-We~will walk though each layer and describe its purpose.
+We~will walk though the layers and describe the purpose of each.
 
 \bigskip
 
@@ -1300,7 +1300,7 @@ fixed proxies mitigates against this enhancement.
 \includegraphics{figures/users/users-global}
 \caption{
 Estimated average simultaneous Snowflake users and bandwidth by day.
-The values at the far left of the graph,
+The values at the far left end of the graph,
 in~early January~2021, are about~60 users
 % > filter(filtered, abs(date - as.Date("2021-01-01")) < 3)
 % # A tibble: 5 x 3
@@ -1364,7 +1364,7 @@ and 4~GB/day.
 
 Snowflake has now been in operation for a few years.
 In~lieu of a forward-looking evaluation,
-here we will take a look back
+here we take a look back
 at the history of our deployment
 and reflect on the experience.
 
@@ -1687,16 +1687,16 @@ Around this time, we~noticed some evident attempts to block the default
 rendezvous front domain in some network in Iran,
 but they were not sustained.
 
-Throughout most of this history,
+For most of this history,
 we ran the backend bridge on a single server,
 upgrading and optimizing it as needed.
-But as the bridge began to reach its hardware capacity,
-and performance improvements became harder to achieve,
+But as the bridge reached its hardware capacity,
+and performance improvements got harder to achieve,
 we deployed a second bridge to share the load.
 We discuss the challenges and design considerations of doing so in \autoref{sec:multi-bridge}.
-The second bridge was made available to users in
+The new bridge was made available in
 Tor Browser~12.0 on \mbox{2022-12-07}.
-By~July, the second bridge supported about 18\% of Snowflake users.\todo{Revisit this when Orbot~17 hits the \href{https://play.google.com/store/apps/details?id=org.torproject.android}{Play Store}. Caveat: front domain change of \mbox{2023-09-20} \href{https://lists.torproject.org/pipermail/anti-censorship-team/2023-September/000317.html}{affected \mbox{snowflake-02} unequally}.}
+By~July, it~supported about 18\% of Snowflake users.\todo{Revisit this when Orbot~17 hits the \href{https://play.google.com/store/apps/details?id=org.torproject.android}{Play Store}. Caveat: front domain change of \mbox{2023-09-20} \href{https://lists.torproject.org/pipermail/anti-censorship-team/2023-September/000317.html}{affected \mbox{snowflake-02} unequally}.}
 % > library("tidyverse")
 % > WANTED_FINGERPRINTS <- c(
 %     "7659DA0F96B156C322FBFF3ACCC9B9DC01C27C73" = "snowman",
@@ -1972,7 +1972,7 @@ Orbot's Snowflake proxy feature was added in version 16.4.1 in February~2021.
 until January~2022, when it got its own proxy type designation.)
 % See history in figures/proxies/proxy-type.r.
 
-It~is worth reflecting briefly
+It~is worth reflecting
 on the greater popularity of the browser extension
 compared to the web badge.
 The latter had been envisioned
@@ -2002,7 +2002,7 @@ We~decided, early on, that flash proxy's opt-out permission had been a mistake,
 % proxy always bothered me. I think there's a good chance it would cause
 % trouble for us if Snowflake becomes popular. So I'd like to see
 % Snowflake use opt-in badges (and Cupcake) only.
-and that Snowflake would be only opt-in.
+and that Snowflake would be opt-in.
 In~order to run a proxy, a person must take a positive action
 such as installing a browser extension
 or activating a toggle on a web page.
@@ -2623,8 +2623,8 @@ But evidently Orbot is more used in Iran than Tor Browser,
 because the decline was so drastic.
 
 That simple TLS fingerprinting worked to block Snowflake rendezvous
-was simple carelessness on our part.
-Anticipating such an event,
+was carelessness on our part.
+Having anticipating such an event,
 we~had already implemented TLS camouflage using uTLS
 in the Snowflake client,
 but failed to turn it on by default.
@@ -3034,7 +3034,7 @@ the Open Technology Fund, % Serene's ICFP fellowship, rapid response bridge fund
 Pion,
 the Tor Project,
 financial donors,
-and volunteers everywhere who run Snowflake proxies.
+and the volunteers who run Snowflake proxies.
 
 {
 \raggedright
