@@ -1023,8 +1023,8 @@ and
 Snowflake leans heavily into the ``address blocking'' side of circumvention,
 but the ``content blocking'' part matters too.
 The goal, as~always, is to make circumvention traffic
-difficult to distinguish from other traffic the censor cares not to block.
-Snowflake is inherently tied to WebRTC,
+difficult to distinguish from traffic the censor prefers not to block.
+Snowflake is tied to WebRTC,
 and can only be effective against a censor
 that is not willing to block WebRTC protocols wholesale.
 But even within that scope,
@@ -1035,9 +1035,9 @@ to selectively block only Snowflake,
 while leaving other uses of WebRTC undisturbed.
 Unfortunately for the circumvention developer,
 the richness of WebRTC protocols
-affords a large attack surface for fingerprinting.
+creates a large attack surface for fingerprinting.
 Not only that, WebRTC leaves the details of
-signaling---in~which peers exchange information
+signaling---the process by which peers exchange the information
 needed to set up a connection,
 corresponding to Snowflake rendezvous---unspecified~\cite[\S 3]{rfc8825},
 leaving every application to invent its own mechanism.
@@ -1051,26 +1051,25 @@ Snowflake originally used a WebRTC library extracted from Chromium,
 but that eventually proved unworkable for cross-platform deployment.
 Since~2019, Snowflake has used Pion~\cite{pion-webrtc},
 % "Evaluate pion WebRTC" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/28942
-an independent implementation of WebRTC
-not tied to any browser.
-This is both good and bad.
+an independent implementation of WebRTC.
+It~is not tied to any browser,
+which is both good and bad.
 The good is greater agility and less development friction,
 and a working relationship with upstream developers
-that enables us to get fingerprinting-related changes made;
-we~would not be where we are today without~it.
-The bad is that the WebRTC fingerprint of Pion
-does not automatically match that of the mainly browser-originated
+that enables us to get fingerprinting-related changes made.
+The bad is that the protocol fingerprints of Pion
+do not automatically match the mostly browser-originated
 WebRTC that Snowflake aims to blend in with.
 
 The following is a list of fingerprinting concerns
-that bear on Snowflake, together with
+that bear on Snowflake, and
 how we have tried to address them.
 The existence of a fingerprinting vulnerability
 does not automatically invalidate a circumvention system:
-censorship and circumvention are a dialog,
-and even among demonstrable vulnerabilities,
+the question is whether the vulnerability is reparable.
+Even among demonstrable vulnerabilities,
 some are more and some are less practical for a censor to take advantage~of.
-The important thing is to have a solid foundation;
+The important thing is to build on a solid foundation;
 minor flaws may be patched up as necessary.
 
 \begin{description}
@@ -1079,11 +1078,11 @@ It~is not unusual for a WebRTC application to use STUN,
 but the choice of what STUN servers to use is up to the application.
 Running dedicated STUN servers just for Snowflake would not work,
 because a censor would experience no collateral harm in
-simply blocking them by IP address.
+blocking them.
 Our deployment uses a pool of public STUN servers
-that are used in applications other than circumvention,
+that are used for applications other than circumvention,
 filtered for those that support the NAT behavior discovery feature
-described in \autoref{sec:connection}.
+of \autoref{sec:connection}.
 The client chooses a random subset of servers from the pool
 when it makes a connection;
 this is because not every STUN server is accessible
@@ -1094,7 +1093,7 @@ under every censor.
 
 \item[Format of STUN messages]
 STUN is most often deployed over plaintext UDP,
-which leaves its messages open to inspection
+which leaves the formatting of messages open to inspection
 and potential fingerprinting.
 STUN messages consist of a fixed header
 followed by a variable-length list of ordered
@@ -1118,46 +1117,46 @@ does not stick out on its own.
 Because the rendezvous methods of
 \autoref{sec:rendezvous}
 are modular,
-each one needs a separate justification
+each one needs its own justification
 as to why it should be difficult to block.
-Besides that, they must be implemented in a way
+In~addition, they must be implemented in a way
 that does not expose accidental distinguishers.
 For example, the domain fronting and AMP cache rendezvous methods
 use HTTPS, which is TLS,
-which means TLS fingerprinting is a concern~\cite[\S 5.1]{Fifield2015a}.
-Snowflake, like many circumvention systems,
+which means that TLS fingerprinting is a concern~\cite[\S 5.1]{Fifield2015a}.
+Snowflake, like many other circumvention systems,
 uses the uTLS package~\cite[\S VII]{Frolov2019a}
-to get a client TLS fingerprint that is randomized or that imitates common browsers.
+for a client TLS fingerprint that is randomized or that imitates common browsers.
 See \autoref{sec:block-ir} for an account of when
 domain fronting rendezvous was briefly blocked in Iran,
 because we were slow in activating uTLS.
 
 Though each rendezvous method may be difficult to block in itself,
 a~censor might combine a low-confidence detection of rendezvous
-with features from other phases of the Snowflake data exchange
+with features from other phases of Snowflake data exchange
 to strengthen its guess.
 
 \item[DTLS]
 The outermost layer of a WebRTC data connection,
-the protocol directly exposed to a censor,
+directly exposed to a censor,
 is DTLS (Datagram TLS) over UDP.
 DTLS is an adaptation of TLS~\cite[\S 1]{rfc9147} to the datagram setting,
 and therefore inherits the fingerprinting concerns of TLS~\cite{Frolov2019a}.
 TLS/DTLS fingerprinting may involve, for example,
-inspecting ClientHello messages to see what
-ciphersuites and extensions are used,
-and their order. It~may be that a certain combination
+inspecting the ciphersuites and extensions of Client Hello messages,
+and their order.
+If~a combination
 is specific to a particular implementation of a circumvention system,
-and may therefore be blocked at low cost.
+it~may be blocked at low cost.
 
 Due to practical considerations,
 Snowflake's defenses to DTLS fingerprinting are not very robust,
 and are reactive rather than proactive.
 In~the realm of TLS one may use uTLS,
-but there is as yet no equivalent of uTLS for DTLS.
+but there is as yet no equivalent for DTLS.
 The present way of altering DTLS fingerprints in Snowflake
 is to submit a pull request upstream to Pion
-whenever a fingerprint feature used for blocking is identified.
+when a fingerprint feature used for blocking is identified.
 \autoref{sec:block-ru} documents how this has happened twice already,
 in response to blocking in Russia.
 
@@ -1184,13 +1183,13 @@ in response to blocking in Russia.
 
 \item[Data channel or media stream]
 Besides data channels, WebRTC offers \firstterm{media streams},
-in line with its intended purpose of enabling real-time
+serving the purpose of real-time
 audio and video communication.
 Though both are encrypted,
 data channels and media streams are externally distinguishable
 because they use different containers.
 Data channels use DTLS,
-and media streams use DTLS-SRTP;
+while media streams use DTLS-SRTP;
 that is, the Secure Real-Time Transport Protocol
 with a DTLS key exchange~\cite[\S 4.3]{rfc8827}.
 
@@ -1198,15 +1197,15 @@ Data channels are a closer match to Snowflake's communication model:
 media streams are meant to contain encoded audio and video,
 not arbitrary binary data.
 But the use of DTLS rather than DTLS-SRTP could become
-a significant feature if most other WebRTC applications use media streams.
+a significant feature if other WebRTC applications mainly use media streams.
 Although it would be less convenient,
 it would be possible to adapt the WebRTC link between
-the client and its proxy
+client and proxy
 to use a media stream rather than a data channel,
 either by modulating binary data into a well-formed encoded
 audio or video signal in the manner~of, say,
 Stegozoa~\cite[\S 3.3]{Figueira2022a},
-or by directly replacing the ciphertext of SRTP packets,
+or by replacing media codec content within SRTP packets,
 as in Protozoa~\cite[\S 4.4]{Barradas2020a}.
 % See idea about WebRTC Encoded Transform: https://lists.torproject.org/pipermail/anti-censorship-team/2023-February/000284.html
 
@@ -1228,9 +1227,9 @@ focused on the DTLS handshake,
 comparing Snowflake to three other WebRTC applications.
 They correctly anticipated features
 of the Pion DTLS handshake
-that would later actually be used
+that would later be used
 to block Snowflake in Russia;
-see more details in \autoref{sec:block-ru}.
+see details in \autoref{sec:block-ru}.
 
 Chen et~al.~\cite{Chen2023a}
 combined features
@@ -1253,22 +1252,22 @@ distinguishing Snowflake's domain fronting rendezvous
 from other forms of HTTPS.
 A~challenge in classifying rendezvous flows
 is that they do not consist of many packets,
-limiting the number of features a classifier has to work with.
+which limits the features a classifier has to work with.
 Their lowest reported false positive rate of 0.25\%~is,
 in~our opinion, unworkably high,
 given the low base rate of Snowflake rendezvous connections.
 
 Wails et~al.~\cite{Wails2024a}
-criticize past research on classification of circumvention systems,
+criticize past research on detecting circumvention systems,
 saying that accuracy claims do not hold up
 with the low base rates of circumvention traffic in practice.
 % IV-D: "Despite the prima facie acceptable performance of these
 % classifiers ... we argue that these results *do not* accurately
 % reflect a censor's ability to detect obfs4 under realistic conditions."
-They develop classifiers based on deep learning
+They develop deep learning--based classifiers
 that improve on the state of the art,
-applying them to Snowflake rendezvous and data transfer,
-but find them still to be prohibitively imprecise with realistic base rates.
+and apply them to Snowflake rendezvous and data transfer,
+but find them still to be prohibitively imprecise at realistic base rates.
 % V-C: "While it is the case that deep learning improves performance,
 % the false positive rates are still prohibitively high to scale to
 % realistic base rates. Fig. 5 plots Prec^λ as a function of the base
