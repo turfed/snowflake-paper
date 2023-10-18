@@ -125,16 +125,16 @@ uses thousands of temporary proxies
 and makes switching between them easy and fast.
 On~the spectrum of imitation to randomization,
 Snowflake falls on the side of imitation;
-on the scale from diffuse to concentrated, it is diffuse.
-What most sets Snowflake apart is that
+on the scale of diffuse to concentrated, it is diffuse.
+What characterizes Snowflake the most is that
 it pushes the idea of distributed, disposable
 proxies to an extreme:
-its~proxies can run in a web browser
+its~proxies can run in a web browser,
 and censored clients communicate with them using WebRTC.
 
 WebRTC is a suite of protocols
 intended for real-time communication applications
-in web browsers~\cite{rfc8825}.
+on the web~\cite{rfc8825}.
 Video and voice chat are typical examples
 of WebRTC applications.
 Snowflake exchanges WebRTC data formats
@@ -173,16 +173,16 @@ can reliably reach any proxy,
 because a proxy, being outside the censor's control,
 can then forward the client's communication to any destination.
 (In Snowflake, we separate the roles of temporary \firstterm{proxies}
-and a stable long-term \firstterm{bridge}, but the goal is the same.)
+and a stable long-term \firstterm{bridge}, but the idea is the same.)
 The censor is presumed to derive benefit
 from permitting some forms of network access:
 the censor cannot trivially ``win''
 by shutting down all communication,
-but must be selective in its blocking decisions
+but must be selective in its blocking decisions,
 in order to optimize some objective of its own.
 The art of censorship circumvention is
 forcing the censor into a dilemma
-of overblocking or underblocking,
+of~overblocking or underblocking,
 by making circumvention traffic difficult to distinguish
 from traffic that the censor prefers not to block.
 
@@ -227,20 +227,20 @@ to run a proxy in their browser.
 % uProxy v1.2.5 Design Doc: https://docs.google.com/document/d/1t_30vX7RcrEGuWwcg0Jub-HiNI0Ko3kBOyqXgrQN3Kw
 % "uProxy depends on leveraging existing trust relationships to to find and use a proxy."
 A~personal trust relationship was necessary to prevent misuse,
-since browser proxies fetched destination content directly,
-which means the client's activity would be attributed to the proxy,
+since browser proxies fetched destination content directly---meaning
+the client's activity would be attributed to the proxy,
 and the proxy could inspect the client's traffic.
 Clients did not change proxies on the fly.
 uProxy supported protocol obfuscation:
 the communications protocol was fundamentally WebRTC,
-but the contents of packets could be transformed to look different.
+but packets could be transformed to resemble something else.
 % https://github.com/uProxy/uproxy-obfuscators
 This obfuscation was possible because of
 uProxy's implementation as a privileged browser extension,
 with access to real sockets.
 Because Snowflake uses ordinary unprivileged browser APIs,
 its WebRTC can only look like WebRTC;
-on the other hand, for that same reason,
+on the other hand, for the same reason,
 Snowflake proxies are easier to deploy.
 Like flash proxy, uProxy was active in the years
 2013--2016.
@@ -250,7 +250,7 @@ Like flash proxy, uProxy was active in the years
 Among existing circumvention systems,
 the one that is most similar to Snowflake is MassBrowser~\cite{Nasr2020a},
 % reading group summary of MassBrowser https://github.com/net4people/bbs/issues/32
-one of whose features is
+which offers
 proxying though volunteer proxies, called buddies.
 MassBrowser's architecture is similar to Snowflake's:
 there is a centralized component that coordinates
@@ -303,25 +303,27 @@ We will say more on this point in \autoref{sec:fingerprinting}.
 % But it wasn't WebRTC, so was less like Snowflake than uProxy was.
 % I'll draw the line here, since even Tor bridges are "volunteer-operated" in a sense.
 
-It~is not our purpose to disproportionately emphasize
-the limitations of other circumvention systems
-and the advantages of Snowflake.
+Our goal in this paper
+is not to exaggerate the advantages of Snowflake,
+nor disproportionately emphasize the limitations
+of other circumvention systems.
 Circumvention research is a cooperative enterprise,
-and we recognize and support our colleagues who are
-pursuing and maintaining their own designs.
+and we recognize and support our colleagues who
+pursue and maintain their own designs.
 While challenges remain,
 today's circumvention systems by and large
-serve their intended purpose,
+accomplish their intended purpose,
 and are a vital element of day-to-day Internet access for many people.
-With Snowflake, we have explored a different point in the design space,
-one with its own advantages and disadvantages.
+With Snowflake, we have explored a different point in the design space---a~fruitful
+one to be sure---but one with its own tradeoffs.
 We~acknowledge that Snowflake will be a better choice in some
 censorship environments and
 worse in others; indeed,
 one of the ideas we hope to convey
 is that blocking resistance
-can be meaningfully understood only in relation to a particular censor
+can be meaningfully understood only in relation to particular censor
 and its resources, costs, and motivations.
+
 In~this paper we present the design of Snowflake,
 discuss various challenges and considerations,
 and reflect on over three years of deployment.
@@ -1206,7 +1208,7 @@ to use a media stream rather than a data channel,
 either by modulating binary data into a well-formed encoded
 audio or video signal in the manner~of, say,
 Stegozoa~\cite[\S 3.3]{Figueira2022a},
-or by replacing media codec content within SRTP packets,
+or by replacing encoded media content within SRTP packets,
 as in Protozoa~\cite[\S 4.4]{Barradas2020a}.
 % See idea about WebRTC Encoded Transform: https://lists.torproject.org/pipermail/anti-censorship-team/2023-February/000284.html
 
@@ -1911,7 +1913,7 @@ The difference is attributable to the relative ease
 of running a Snowflake proxy versus a Tor bridge---though
 the comparison is not quite direct,
 because Tor bridges have better defenses
-against enumeration and blocking than do Snowflake proxies.
+against enumeration than do Snowflake proxies.
 
 It~was not clear, at the outset,
 that it would even be possible to attract
