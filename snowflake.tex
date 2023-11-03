@@ -1057,7 +1057,9 @@ Since~2019, Snowflake has used Pion~\cite{pion-webrtc},
 an independent implementation of WebRTC.
 It~is not tied to any browser,
 which is both good and bad.
-The good is greater agility and less development friction,
+The good is less development friction,
+better memory safety
+(Pion is written in Go, while Chromium WebRTC is C++),
 and a working relationship with upstream developers
 that enables us to get fingerprinting-related changes made.
 The bad is that the protocol fingerprints of Pion
