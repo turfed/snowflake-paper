@@ -551,7 +551,7 @@ We~currently support two rendezvous methods in Snowflake:
 In~this method, the client does an HTTPS exchange with the broker
 through an intermediary web service such as a content delivery network (CDN),
 setting the externally visible hostname
-(the TLS Server Name Indication, or SNI)
+(the TLS Server Name Indication, or SNI~\cite[\S 3]{rfc6066})
 to a ``front domain'' different from the broker's.
 The CDN routes the HTTPS request to the broker not according to the TLS SNI
 but rather the HTTP Host header, which, under TLS encryption,
