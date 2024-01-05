@@ -11,7 +11,7 @@ source("../common.r")
 
 DATE_LIMITS <- lubridate::ymd(c(
 	"2020-12-31",
-	"2023-10-31"
+	"2024-01-01"
 ))
 
 GAPS <- tribble(
@@ -72,6 +72,7 @@ EVENTS <- tribble(
 	# "2023-03-19 00:00:00",  8000, T, "",                                            # https://gitlab.torproject.org/tpo/anti-censorship/team/-/issues/115#note_2892825
 	# "2023-03-20 00:00:00",  8000, T, "Domain fronting rendezvous again blocked in Iran", # https://gitlab.torproject.org/tpo/anti-censorship/team/-/issues/115#note_2892825
 	"2023-09-20 14:00:00",102000, T, "Malfunction in\ndomain fronting rendezvous",          # https://forum.torproject.org/t/problems-with-snowflake-since-2023-09-20-broker-failure-unexpected-error-no-answer/9346
+	# "2023-11-21 04:10:46", 60000, T, "encapsulation.ReadData performance improvement",      # https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/merge_requests/154#note_2967886
 ) %>% mutate(date = lubridate::ymd_hms(date) %>% lubridate::as_date())
 
 # Return an abbreviation for the month, followed by a year for January only.
