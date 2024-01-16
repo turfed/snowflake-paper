@@ -1221,12 +1221,14 @@ is~where most research on detecting Snowflake has focused.
 Fifield and Gil Epner~\cite{arxiv.1605.08805}
 studied the network traffic of WebRTC applications,
 with the goal of finding fingerprinting pitfalls
-that might affect Snowflake, at~that time in early development.
+that might affect Snowflake,
+which was then in early development.
 Frolov et~al.~\cite[\S \mbox{V-C}]{Frolov2019a}
-observed that the unprotected TLS fingerprint
+observed that the undisguised TLS fingerprint
 of domain fronting rendezvous was distinctive,
 and introduced the uTLS package that Snowflake
-now uses to protect it.
+now uses to protect~it.
+
 MacMillan et~al.~\cite{arxiv.2008.03254}
 focused on the DTLS handshake,
 comparing Snowflake to three other WebRTC applications.
@@ -1235,13 +1237,13 @@ of the Pion DTLS handshake
 that would later be used
 to block Snowflake in Russia;
 see details in \autoref{sec:block-ru}.
-Holland et~al.~\cite[\S 5.3]{Holland2021a}
+Holland et~al.~\cite[\S 5.3]{Holland2021a},
+using the bits of UDP datagrams directly as features,
 demonstrated approximately equal performance
-on the same DTLS handshake data set,
-without handcrafted features.
-Their automatic classifier assigned high feature importance
-to packet length fields,
-and in fact did fairly well even without DTLS payload features.
+on the same DTLS handshake data set.
+Their automatically derived classifier assigned high feature importance
+to length fields in packets,
+and in fact did well even when deprived of DTLS payload features.
 
 Chen et~al.~\cite{Chen2023a}
 combined features
@@ -1276,18 +1278,18 @@ with the low base rates of circumvention traffic in practice.
 % IV-D: "Despite the prima facie acceptable performance of these
 % classifiers ... we argue that these results *do not* accurately
 % reflect a censor's ability to detect obfs4 under realistic conditions."
-They develop deep learning--based classifiers
+They develop classifiers
+for Snowflake and other circumvention protocols
 that improve on the state of the art,
-and apply them to Snowflake rendezvous and data transfer,
-but find them still to be prohibitively imprecise at realistic base rates.
+but find them still prohibitively imprecise at realistic base rates.
 % V-C: "While it is the case that deep learning improves performance,
 % the false positive rates are still prohibitively high to scale to
 % realistic base rates. Fig. 5 plots Prec^λ as a function of the base
 % rate λ. For more realistic base rates, such as λ > 1 × 10^6, the
 % precision attained by any of the classifiers is near-zero."
 They propose to reduce false positives by combining
-multiple observations per IP address---classifying hosts,
-not flows---and suggest that Snowflake's lack of
+multiple observations per IP address---classifying hosts
+rather than flows---and suggest that Snowflake's lack of
 fixed proxies mitigates against this enhancement.
 % VII: "One way to mitigate the effects of host-based analysis is to
 % design circumvention systems to use multiple ephemeral bridges
