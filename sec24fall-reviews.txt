@@ -338,3 +338,51 @@ Confidence in recommended decision
 ----------------------------------
 2. Fairly confident
 
+===========================================================================
+
+Thank you for your reviews. We are glad to see this kind of work find a receptive audience.
+
+## A
+
+The broker and bridges are managed centrally by us, the authors. Proxies are run by volunteers with whom we have no relationship.
+
+We can say more about proxy metrics. See the comment about measurements under B.
+
+The risks to proxy operators are treated briefly in Section 2.3 (and somewhat implicitly in Section 1, about the trust models of flash proxy and uProxy). What is not so clear in the current draft is that the "untrusted messenger" model protects proxies from clients, as well as clients from proxies. Since proxies never transmit plaintext and may only forward to known bridges, the ways either peer may misbehave are limited. We will make it clearer. We do not think a separate ethics section is warranted.
+
+## B
+
+About centralization: we had to cut, for reasons of space, a subsection on distributed bridges and a few comments on non-Tor deployments, which we will restore in the final version. To summarize, it is difficult to do otherwise than have fairly centralized bridges for technical reasons relating to the interface with Tor; other systems could offer more flexibility and different tradeoffs. You have understood the crucial point, though, which is that distributed bridges help with QoS and availability, but are not critical for blocking resistance.
+
+About the poolsize of domain fronting and AMP cache, the idea is not to have so many domains the censor cannot discover them all, but to select a domain which the censor knows but is reluctant to block. That said, the client supports multiple front domains, and we have changed the defaults on occasion (such as after the event of 2023-09-20 in Section 4.1). For non–domain fronting rendezvous, see the response to C.
+
+We cut a paragraph from the draft about traffic shaping/padding, which we will consider re-adding, thanks to your comments. We will caution that academic audiences tend to give this aspect of traffic distinguishability undue emphasis, out of proportion with its real importance. Snowflake has a feature for traffic shaping of the client–proxy link, but it is currently disabled, as it has not yet proved necessary.
+
+An attacker may try to impose excessive costs – the [2015 DDoS against GreatFire](https://en.greatfire.org/blog/2015/mar/we-are-under-attack) being a notable example – though the problem is really no more acute for Snowflake than for other systems. The [original 2015 paper on domain fronting](https://www.bamsoftware.com/papers/fronting/#sec:discussion) briefly discusses "financial DoS".
+
+Additional measurement methodology is a good idea. We will say more about how users and proxies are counted (at the bridge and broker respectively), and how measurements are made safe to publish.
+
+"I would argue that it is relatively straight forward for an individual entity to accidentally collect ~1% of all Snowflake traffic…"
+We aren't sure what this means – what is "collect" in this context? Are you proposing a proxy or client enumeration attack? By an attacker in what network position? Counting bytes or IP addresses?
+
+Gbit/s is a reasonable suggestion.
+
+## C
+
+Finding alternatives to domain fronting is becoming more and more urgent, not only for Snowflake. We do not expect domain fronting to remain usable indefinitely. Since submission, we have worked on integrating a new rendezvous method using [Amazon Simple Queue Service](https://aws.amazon.com/sqs/). Developing new rendezvous methods is non-trivial, but luckily Snowflake is not the only project innovating in this space.
+
+Apart from the minor incident in 2019 in China noted in Section 5.3, we are not aware of proxy enumeration attacks by censors. There is a vigilante effort that has (from unclear motives) been posting partial lists of Snowflake and other proxies, but we have not seen that it has had any effect on the availability of circumvention systems. (See also the research question about enumeration resistance under D.)
+
+The idea of STUN spoofing is intriguing – thank you for suggesting it. To guarantee a failed connection, a censor would have to make a restricted client think it is unrestricted. Making unrestricted clients think they are restricted would put more pressure on unrestricted proxies, but the majority of client polls already pull from that pool. STUN over DTLS (RFC 7350), if feasible, would obviate STUN spoofing and fingerprinting concerns. The NAT type matching algorithm is in Table 1.
+
+Browser proxies support one client at a time, though in principle they could support more. The command-line proxies have an operator-configurable limit.
+
+## D
+
+Thanks for comments on Figure 1, Figure 3, Section 1, and Section 2.3 – we will take them into account while making revisions.
+
+Your perspective on presentation is appreciated. The composition of the paper, though really not all that radical, is a conscious choice, and informed by the comments of other readers. We will take your comments to heart, particularly as they regard early context and overview. We believe, however, that to ask for a particular sectionization is outside the purview of a reviewer or shepherd. We, the authors, care about the quality of the manuscript even more than the committee; we will make responsible choices.
+
+We like the suggestion to pose research questions. Some possibilities:
+- (Related to B's comment on traffic shaping.) What is a good (family of) traffic shapes for Snowflake/WebRTC or other protocols?
+- Other than address agility, how might proxy enumeration attacks be inhibited?
