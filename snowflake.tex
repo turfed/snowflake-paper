@@ -1096,9 +1096,10 @@ The client chooses a random subset of servers from the pool
 when it makes a connection;
 this is because not every STUN server is accessible
 under every censor.
-% I went to check stun.l.google.com for blocking in China,
-% but OONI Probe does not measure that server as of v3.17.1:
-% https://github.com/ooni/probe/issues/2417#issuecomment-1468478811
+% I thought about using stun.l.google.com as an example here.
+% As of 2024-01-31, stun.l.google.com seems to work in China.
+% It was DNS-blocked on 2022-10-01, but must have been unblocked since.
+% https://github.com/net4people/bbs/issues/128#issuecomment-1920113565
 
 \item[Format of STUN messages]
 STUN is most often deployed over plaintext UDP,
