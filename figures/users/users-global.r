@@ -316,7 +316,12 @@ p_bandwidth <- ggplot() +
 	theme(plot.margin = unit(c(1, 0, 1, 0), "mm")) +
 	labs(x = NULL, y = "TB/day")
 
-p <- plot_grid(plotlist = align_plots(p_users, p_bandwidth, align = "v", axis = "lr"),
-	ncol = 1, rel_heights = c(4.8, 1.0))
+desired_heights <- c(
+	1.74,
+	0.36
+)
 
-ggsave(output_path, p, width = DOCUMENT_TEXTWIDTH, height = 2.1)
+p <- plot_grid(plotlist = align_plots(p_users, p_bandwidth, align = "v", axis = "lr"),
+	ncol = 1, rel_heights = desired_heights)
+
+ggsave(output_path, p, width = DOCUMENT_TEXTWIDTH, height = sum(desired_heights))
