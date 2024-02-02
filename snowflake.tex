@@ -9,7 +9,7 @@
 \usepackage{newtxmath}
 \usepackage{pifont} % For checkmarks in tab:nat-matching.
 \usepackage{titling}
-\usepackage[hyphens]{url}
+\usepackage{url}
 \usepackage[table]{xcolor}
 
 \usepackage[textsize=footnotesize]{todonotes}\setlength{\marginparwidth}{1.5cm}
@@ -32,6 +32,24 @@
 \pdftrailerid{}
 \pdfsuppressptexinfo=-1
 \fi
+
+% Change URL line breaking preferences.
+% http://mirrors.ctan.org/macros/latex/contrib/url/url.pdf §5.2 Changing linebreaks
+% The considerations here are:
+% 1. We must be able to break the URLs for Nasr2020a and uproxy-design-doc,
+%    which have a path component that is longer than the line width but which
+%    contains hyphens.
+% 2. The URL for Barradas2020a looks much better if it is broken after a slash,
+%    rather than after the hyphen in the hostname.
+% 3. GitLab URLs in footnotes that end in #note_XXXXXXX look bad if broken
+%    immediately after the '#'.
+% \UrlBreaks have a lower penalty than \UrlBigBreaks; i.e., TeX will prefer to
+% break lines at \UrlBreaks if possible, and only break at \UrlBigBreaks if
+% necessary. We prefer to break at slashes only (which takes care of
+% considerations 2 and 3), but will break at a hyphen when there is no slash
+% available (which does consideration 1).
+\def\UrlBreaks{\do-}
+\def\UrlBigBreaks{\do/}
 
 \hyphenation{Web-RTC}
 \hyphenation{Web-Exten-sion}
@@ -2275,7 +2293,7 @@ in which clients have awareness of (at~least a subset~of) all bridges,
 and it is the client that chooses which bridge will be used
 for a particular session.\urlfootnote{
 https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/28651\#note_2786323
-}\todo{Break URLs (in footnotes) after `\#', not before.}
+}
 The client includes a bridge identity string
 in its rendezvous message to the broker (\autoref{sec:rendezvous});
 then the broker maps the identity to the WebSocket URL
