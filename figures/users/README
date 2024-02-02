@@ -6,5 +6,5 @@ https://gitlab.torproject.org/dcf/snowflake-graphs
 "userstats-relay-country.csv" and
 "userstats-bridge-transport.csv" and
 are from, respectively:
-	https://metrics.torproject.org/userstats-relay-country.csv?start=2023-01-04&end=2023-10-15&country=all&events=off
-	https://metrics.torproject.org/userstats-bridge-transport.csv?start=2023-01-04&end=2023-10-15&transport=!%3COR%3E&transport=snowflake&transport=%3COR%3E
+	https://metrics.torproject.org/userstats-relay-country.csv?start=2023-01-04&end=2024-01-04&country=all&events=off
+	https://metrics.torproject.org/userstats-bridge-transport.csv?start=2023-01-04&end=2024-01-04&transport=!%3COR%3E&transport=snowflake&transport=%3COR%3E

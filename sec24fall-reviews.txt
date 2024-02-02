@@ -1,0 +1,388 @@
+Review #1998A
+===========================================================================
+
+Paper summary
+-------------
+This paper provides a detailed description of Snowflake, a system for circumventing Internet censorship. It provides a description of the tool, how it was built and how it interacts with other components of the anti-censorship ecosystem.
+
+Detailed comments for authors
+-----------------------------
+Thank you for submitting your work to USENIX SEC. First of all, the paper is well-written and has a nice flow from start to end. It provides a complete picture of Snowflake, the building blocks, and how it in interacts with other technical components of the circumvention system, using different protocols.
+
+I believe this work merits the attention of the academic community as it is an important tool that provides important anti-censorship capabilities to many Internet users living in countries with limited access to the Internet. It also provides some longitudinal analysis of the number of users between 2021 and 2023 and highlights some important events (e.g. Russia-Ukraine invasion, Iran protests, etc).
+
+Some comments for authors to improve on their work:
+1. No proper information has been provided regarding the internals of the Snowflake system itself. It would be interesting to understand the internal mechanics and to know how it is built, the protocols used, and some sort of activity diagram to show the interactions will all the other systems of the network.
+
+2. It is not very clear from the paper who manages the different components (bridge, proxies, etc). Also, some analysis on their availability, prevalence and location (geographical and topological), would have been nice.
+
+3. A section missing in this paper is about ethics and how owner of proxies are protected? What are the different level of risks, what are the risk mitigating measures put in place to protect users.
+
+Ethics consideration
+--------------------
+3. Yes: submission may not appropriately mitigate potential risks or harms
+
+Comments for ethics consideration
+---------------------------------
+In the paper, no information is provided about the risk to proxies and bridges and how the risks are mitigated.
+
+Required changes
+----------------
+* More details about the internal mechanics of Snowflake
+* Add a strong ethics section
+
+Reasons to accept the paper
+---------------------------
+* Well-written paper on a tool widely deployed
+* Details analysis of the interactions of snowflakes
+
+Reasons to not accept the paper
+-------------------------------
+* No section on ethics and risks when using Snowflakes
+
+Recommended decision
+--------------------
+3. Accept Conditional on Major Revision
+
+Writing quality
+---------------
+2. Well-written
+
+Confidence in recommended decision
+----------------------------------
+2. Fairly confident
+
+
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+
+Review #1998B
+===========================================================================
+
+Paper summary
+-------------
+This paper presents Snowflake and provides some collected experiences on the first years of operation.
+
+Detailed comments for authors
+-----------------------------
+Dear Authors,
+
+thank you for submitting this work. Below, you can find several comments i had while reading the paper.
+
+# Traffic reporting / Network centralization resilience
+
+As a general nit, the paper reports traffic in "TB per Day", which let's the traffic numbers appear bigger than they (comparatively) are, i.e., 30TB/day evaluate to ~= 2.85gbit/s, a moderate amount of traffic.
+
+Given this traffic pattern and experience with snowflake related traffic, I would argue that it is relatively straight forward for an individual entity to accidentally collect ~1% of all Snowflake traffic, while it is like even easier for an entity doing so intentionally.
+
+Therefore, I'd argue that the paper should discuss this aspect.
+
+# Broker Connections
+
+The introduction to Sec.2 causes the impression that the broker connections are 'a secret sauce'; This obviously is not the case, as the implemented mechanics are described in Sec. 2.1; However, it might enhance readability if this forward reference were more clear, even if just with a (for details, see Sec. 2.1).
+
+Furthermore, the system currently seems to be restricted to two rendezvous methods, AMP caches and domainfronting. The poolsize for either is not described in the paper. Especially given the major share of clients using domain fronting (see Fig. 3.), I personally wonder how large such a pool could be. Specifically, whether a determined attacker could enumerate/extract all fronting domains for subsequent blocking, or if common domains (technically, by leveraging the host header, any site hosted on the CDN could be amended to support fronting) are included in the set.
+
+# Adding overlay traffic
+
+The paper currently does not discuss adding (organic, contrary to simple padding, e.g., using generated audio from a LLM) overlay traffic/noise between the client/bridge which would be discarded by the client/snowflake correspondingly. I was wondering whether this would be a sensible way to improve traffic pattern based fingerprinting resistance.
+
+# Bridge SPOF
+
+At the moment the 2(!) bridges seem to form single-point-of-failure instances, especially given that these bridges seem to be hard-coded within clients (given the statement that the second bridge only started picking up traffic after it was 'added' to a new client release.) Given that localized failure may take down a bridge for a lengthy amount of time (see, e.g., the OVH data center issue), I am not convinced that this is an ideal design choice (also see scaling).
+
+# Scaling/Bridge trust level
+
+>From the paper i was so far unable to understand whether snowflake bridges require a higher trust level than 'normal' (bridge/relay/exit-node) TOR components. If this is the case, it would be good to read more about it; If not, the SPOF related design choices may hamper other operators' ability to also contribute bridges to lessen the load on individual instances currently supporting the snowflake setup.
+
+# Scaling/Bridge performance
+
+As outlined in the paper, the project encountered performance issues related to the use of a single bridge. Given that this set in with a comparatively low number of users, it raises the question whether a determined state level attacker could simply start creating Snowflake clients effectively running speed-tests 24/7 to exhaust the capacity of the two currently available bridges.
+
+If so, the scaling issue mentioned above would attain additional criticality w.r.t. censorship resilience.
+
+# Scaling/Monetary
+
+The paper notes the technically associated costs of Domain fronting, and that these are significantly lower given that the project only uses the fronting services for rendezvous, which reduces traffic (and thereby cost) going through the fronting.
+
+Similar to the above, this raises the question whether a determined state level attacker could not simply start creating requests (either by starting legitimate clients or by manufacturing corresponding requests), for example by including corresponding javascript in government websites to enlist all citizens visiting these sites into a 'botnet', to significantly increase traffic (and thereby costs).
+
+This attack seems to not be discussed in the paper, and I would argue that it is a feasible threat for the system.
+
+# Measurement methodology
+
+The paper presents metrics of the deployed system at several points. However, these are usually given in a factual way without further information on how they were measured. While I acknowledge that the space in a paper is limited, I would argue that a more detailed measurement methodology description is necessary, if not in the main body of the paper, then at least in the appendix.
+
+# Nits
+The figures in the paper lack readability, especially due to the absence of grid lines (all), a to narrow y axis (Fig 3), comparative presentation of data with different scales (Fig 5-9), and use of indistinguishable colors (red/green Fig 4).
+
+I'd argue that grids should be added, the y axis of the lower figure in fig3 be enlarged, (at least) the x-scales of Fig. 5-9 be aligned, i.e., 1in of "fig5-x-axis" should correspond to the same amount of time as 1in of "fig6 x-axis", despite the timeframes/cut-out slots differing), and the colors in Fig4 should be supported by, e.g., dotting/dashing some lines.
+
+# Summary
+
+Overall, I believe that this paper provides reasonable documentation for a valuable community project. Despite some limitations and a heavy implementation focus it forms a reasonable overall picture.
+
+Ethics consideration
+--------------------
+1. No
+
+Required changes
+----------------
+- Discuss additional attack vectors and scaling issues
+- Change TB/d to Gbit/s
+- Discuss bridge decentralization
+- Add (appendix with) measurement methodology
+
+Reasons to accept the paper
+---------------------------
+- Well... Snowflake.
+
+Reasons to not accept the paper
+-------------------------------
+- Improvements can be made w.r.t. rigor in terms of methodology description/possible attacks/...
+- The paper is more a practical experience report
+
+Recommended decision
+--------------------
+2. Accept on Shepherd Approval
+
+Questions for authors' response
+-------------------------------
+Please reply to the required changes, i.e., communicate whether you (dis)agree with them and if possible, start a discussion w.r.t. the feasibility of these suggestions.
+
+Writing quality
+---------------
+2. Well-written
+
+Confidence in recommended decision
+----------------------------------
+3. Highly confident (would try to convince others)
+
+
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+
+Review #1998C
+===========================================================================
+
+Paper summary
+-------------
+This paper is essentially an experience report on the design and deployment of
+Snowflake, a censorship circumvention system that uses ephemeral proxies to
+connect clients in a censored region to the Tor network.  The paper steps
+through the design components of Snowflake, provides some details of the
+protocols employed, and reports on the evolution of anti-fingerprinting in
+Snowflake, the growth in the number of proxies, users, and the churn rate of
+proxies, and the effects of several blocking events in a variety of locales.
+
+Detailed comments for authors
+-----------------------------
+I enjoyed reading this paper and found it to be very thought-provoking.  I think
+it would make for an interesting presentation at USENIX Sec and that the
+research community would greatly benefit from the experiences reported in the
+paper.  My primary concern over the paper is that it is hard to identify a key
+research question or new protocol or design idea that the paper contributes to
+the literature, but I think the value of the experience report is enough in my
+view to justify acceptance.
+
+I did have several questions or possible additional details that I would
+certainly raise as issues in a paper about a _new_ system, but which obviously
+don't seem to have been an issue for Snowflake to date; it would be nice to have
+answers to these, but I don't think any of them are required for the paper to be
+a valuable contribution.  I'll list them here in any case:
+
+* It seems that both implementations of the client <-> broker channel require
+domain fronting to be effective.  Since a recurrent theme in the censorship
+space over the last few years has been platforms disabling (google, aws) or
+crippling (azure) domain fronting, are there plans in place for a different
+channel?  Is there evidence that if AMP cache or the CDN currently employed by
+Snowflake were to disable or restrict domain fronting, this would cause a lot of
+collateral damage?
+
+* Since STUN is mostly unauthenticated and ICE normally has a fallback to TURN,
+are there concerns that a censor could simply spoof either STUN responses (or
+STUN probe results) from servers known to be used by Snowflake clients to make clients
+appear to be restricted?  (Are unrestricted proxies a limited resource?)  What
+matching algorithm does the broker use to assign available proxies to client
+requests? 
+
+* Is there a limitation on the number of clients a proxy can/will support?
+
+* I would be curious to know if there is any evidence of censors using active
+measures to try harvesting proxy addresses, or DoSing the broker with proxy
+offers or client requests.  From the description, it doesn't seem as if there
+are any measures in place to prevent such attacks...
+
+* The proxy churn results in section 4.3 are interesting.  I found myself
+wondering, however, if even though proxy IPs don't recur over 24-hour periods,
+they might recur at longer intervals (e.g. because a proxy is rotating between a
+relatively small list of IP addresses due to location changes or carrier NAT).
+How likely is a proxy IP to appear again as a proxy IP within, say a 7-day
+period? If the probability is high enough, perhaps blocking the IP would be
+useful. Another way of stating my concern is that, while blocking just the
+proxies that appeared in the last 24 hours is clearly ineffective, is there a
+larger but mostly fixed list of IPs that would cover a high enough fraction of
+proxies to make rendezvous improbable?
+
+Ethics consideration
+--------------------
+1. No
+
+Required changes
+----------------
+I think the paper can be published as submitted.  I would be curious to know about STUN spoofing, active attacks on the broker, and blocking utility as outlined in the detailed comments.
+
+Reasons to accept the paper
+---------------------------
++ Internet censorship is an ongoing and challenging problem in the field
+
++ The design choices and operational history of Snowflake can provide useful data and experience to the USENIX Sec community
+
++ I expect the paper will be of interest to many potential attendees
+
+Reasons to not accept the paper
+-------------------------------
+- The paper does not fit a traditional "research paper" model in which a central
+question or idea is proposed and evaluated.
+
+Recommended decision
+--------------------
+1. Accept
+
+Writing quality
+---------------
+2. Well-written
+
+Confidence in recommended decision
+----------------------------------
+2. Fairly confident
+
+
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+
+Review #1998D
+===========================================================================
+
+Paper summary
+-------------
+This paper presents the design, deployment, and operational experiences of Snowflake, an introduction system to the Tor network built on WebRTC proxies. The authors begin by presenting the design of snowflake technically, including specific considerations around censor activities. They then explore challenges to avoid fingerprinting, historical experience of deployment, contextualized information on usage over time, and case studies of censor activities.
+
+Detailed comments for authors
+-----------------------------
+Thank you for submitting this paper to USENIX Security. This is an important paper, not only because it documents a critical piece of circumvention infrastructure that has been widely used for years, but also because it carefully documents real-world experiences of deploying, maintaining, and dealing with the real-world challenges of *adopted* circumvention technologies. I welcome this work, and similar work, at USENIX.
+
+My comments on this paper are largely centered around the structure and presentation of the work. As currently built, I struggled with it a bit. Certain technical aspects of the work were unclear, and it was hard to identify some relevant bits, such as related work (including related work on this tool itself). The format is unconventional. That's not a problem itself, but I do think the work would be significantly strengthened if it was restructured. Things are kinda mushed together in a few places.
+
+For example, you could restructure it around background, related work, threat model, method, fingerprinting, deployment, case studies.
+
+Another way of phrasing this: The paper, as currently structured/written, does not convey the importance of the work as well as it could. Those without prior knowledge of Snowflake may struggle to understand your contribution.
+
+Further, there are some additional directions, that if expanded, I think would also strengthen the work.
+
+* Research directions. You are uniquely suited to identified specific actionable research questions for this community to engage with and solve. Indeed, a key reason to write this paper (in my mind) is to get researchers attention. You've now done that, what do you want them to do now?
+
+* Figure 1: Missing from this figure is rendezvous aspect of the broker needed to prevent blocking of the broker. You explain this in text (and the word "rendezvous" in the figure), but it needs some representation here. 
+
+* The intro had significant history in it, and lacked a lot of articulation of the work and its contribution, as well as what to expect in the paper (e.g., historical user data, studies of populations, case studies of censors activities.)
+
+* I struggled with the technical aspects of 2.3. This deserves significantly more technical explanation and space in the paper, as well as additional/more clear figures. 
+
+* I'd be very interested in seeing a dual-axis version of figure 3 that also showed peak, non-average, usage.
+
+* Any form of evaluation of IPv4 vs IPv6 is appreciate, both in terms of usage, as well as how you computed usage data in ipv6 (e.g., ipv6 bottom 64 bit stuff).
+
+* Some of the language in the paper could use more formalizing. e.g., saying "our best guess" sticks out a bit from expected language.
+
+Ethics consideration
+--------------------
+2. Yes: submission appropriately mitigates potential risks or harms
+
+Comments for ethics consideration
+---------------------------------
+You correctly articulate specific concerns with collecting data in this space, and deploy appropriate mitigations.
+
+Required changes
+----------------
+* Significant restructuring of the work that breaks apart technical background, threat model, related work, methodology, and then subsequent evaluation
+* Articulation of research questions
+* Significantly restructured intro that articulates the content of the paper
+* Expanded technical explanations in 2.3
+* Improvement to Figure 1 to show the rendezvous protocol.
+
+Reasons to accept the paper
+---------------------------
+* Is on a tool that has already had significant real world impact on a critical problem
+* Contains valuable deployment experiences and historical context
+* Will lead to significant future work
+
+Reasons to not accept the paper
+-------------------------------
+* Is structured very unconventionally, to the point of diluting the contribution
+* There are some additional technical details and evaluation aspects that would strengthen the work
+
+Recommended decision
+--------------------
+2. Accept on Shepherd Approval
+
+Questions for authors' response
+-------------------------------
+* Do you think you could tackle a restructuring as I sketch in the context of shepherding, or would it require additional time?
+* Thoughts on articulating research questions?
+
+Writing quality
+---------------
+3. Adequate
+
+Confidence in recommended decision
+----------------------------------
+2. Fairly confident
+
+===========================================================================
+
+Thank you for your reviews. We are glad to see this kind of work find a receptive audience.
+
+## A
+
+The broker and bridges are managed centrally by us, the authors. Proxies are run by volunteers with whom we have no relationship.
+
+We can say more about proxy metrics. See the comment about measurements under B.
+
+The risks to proxy operators are treated briefly in Section 2.3 (and somewhat implicitly in Section 1, about the trust models of flash proxy and uProxy). What is not so clear in the current draft is that the "untrusted messenger" model protects proxies from clients, as well as clients from proxies. Since proxies never transmit plaintext and may only forward to known bridges, the ways either peer may misbehave are limited. We will make it clearer. We do not think a separate ethics section is warranted.
+
+## B
+
+About centralization: we had to cut, for reasons of space, a subsection on distributed bridges and a few comments on non-Tor deployments, which we will restore in the final version. To summarize, it is difficult to do otherwise than have fairly centralized bridges for technical reasons relating to the interface with Tor; other systems could offer more flexibility and different tradeoffs. You have understood the crucial point, though, which is that distributed bridges help with QoS and availability, but are not critical for blocking resistance.
+
+About the poolsize of domain fronting and AMP cache, the idea is not to have so many domains the censor cannot discover them all, but to select a domain which the censor knows but is reluctant to block. That said, the client supports multiple front domains, and we have changed the defaults on occasion (such as after the event of 2023-09-20 in Section 4.1). For non–domain fronting rendezvous, see the response to C.
+
+We cut a paragraph from the draft about traffic shaping/padding, which we will consider re-adding, thanks to your comments. We will caution that academic audiences tend to give this aspect of traffic distinguishability undue emphasis, out of proportion with its real importance. Snowflake has a feature for traffic shaping of the client–proxy link, but it is currently disabled, as it has not yet proved necessary.
+
+An attacker may try to impose excessive costs – the [2015 DDoS against GreatFire](https://en.greatfire.org/blog/2015/mar/we-are-under-attack) being a notable example – though the problem is really no more acute for Snowflake than for other systems. The [original 2015 paper on domain fronting](https://www.bamsoftware.com/papers/fronting/#sec:discussion) briefly discusses "financial DoS".
+
+Additional measurement methodology is a good idea. We will say more about how users and proxies are counted (at the bridge and broker respectively), and how measurements are made safe to publish.
+
+"I would argue that it is relatively straight forward for an individual entity to accidentally collect ~1% of all Snowflake traffic…"
+We aren't sure what this means – what is "collect" in this context? Are you proposing a proxy or client enumeration attack? By an attacker in what network position? Counting bytes or IP addresses?
+
+Gbit/s is a reasonable suggestion.
+
+## C
+
+Finding alternatives to domain fronting is becoming more and more urgent, not only for Snowflake. We do not expect domain fronting to remain usable indefinitely. Since submission, we have worked on integrating a new rendezvous method using [Amazon Simple Queue Service](https://aws.amazon.com/sqs/). Developing new rendezvous methods is non-trivial, but luckily Snowflake is not the only project innovating in this space.
+
+Apart from the minor incident in 2019 in China noted in Section 5.3, we are not aware of proxy enumeration attacks by censors. There is a vigilante effort that has (from unclear motives) been posting partial lists of Snowflake and other proxies, but we have not seen that it has had any effect on the availability of circumvention systems. (See also the research question about enumeration resistance under D.)
+
+The idea of STUN spoofing is intriguing – thank you for suggesting it. To guarantee a failed connection, a censor would have to make a restricted client think it is unrestricted. Making unrestricted clients think they are restricted would put more pressure on unrestricted proxies, but the majority of client polls already pull from that pool. STUN over DTLS (RFC 7350), if feasible, would obviate STUN spoofing and fingerprinting concerns. The NAT type matching algorithm is in Table 1.
+
+Browser proxies support one client at a time, though in principle they could support more. The command-line proxies have an operator-configurable limit.
+
+## D
+
+Thanks for comments on Figure 1, Figure 3, Section 1, and Section 2.3 – we will take them into account while making revisions.
+
+Your perspective on presentation is appreciated. The composition of the paper, though really not all that radical, is a conscious choice, and informed by the comments of other readers. We will take your comments to heart, particularly as they regard early context and overview. We believe, however, that to ask for a particular sectionization is outside the purview of a reviewer or shepherd. We, the authors, care about the quality of the manuscript even more than the committee; we will make responsible choices.
+
+We like the suggestion to pose research questions. Some possibilities:
+- (Related to B's comment on traffic shaping.) What is a good (family of) traffic shapes for Snowflake/WebRTC or other protocols?
+- Other than address agility, how might proxy enumeration attacks be inhibited?
