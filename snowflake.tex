@@ -319,8 +319,25 @@ Significantly, where Snowflake now uses WebRTC data channels,
 Protozoa and Stegozoa use WebRTC media streams,
 which may be an advantage in blocking resistance.
 We will say more on this point in \autoref{sec:fingerprinting}.
-
-\todo{Cite TorKameleon~\cite{arxiv.2303.17544}.}
+TorKameleon~\cite{arxiv.2303.17544} is a WebRTC-based transport
+with the dual goals of resisting blocking (circumvention)
+and complicating traffic correlation attacks (anonymity).
+It~has the notable technical innovation of using a draft API called
+WebRTC Encoded Transforms
+% "Editor's Draft" status as of 2023-12-12 https://w3c.github.io/webrtc-encoded-transform/
+% https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Using_Encoded_Transforms
+to support efficient Protozoa-like
+embedding of data within media streams,
+without requiring invasive modifications in a browser.
+% Examples of Encoded Transforms in TorKameleon source code:
+% https://github.com/AfonsoVilalonga/TorKameleon/blob/c6ef7116043dfd74701ddb62f38606e748faf84b/PT/WebRTC/Client/public/js/main.js#L225
+%   const transformStream = new TransformStream({
+% https://github.com/AfonsoVilalonga/TorKameleon/blob/c6ef7116043dfd74701ddb62f38606e748faf84b/PT/WebRTC/Client/public/js/modulators/addFrame.js#L8
+%   if (encodedFrame instanceof RTCEncodedVideoFrame && enconding.length > 0) {
+% Encoded Transforms (earlier called Insertable Streams) had been mentioned as a future possibility in Stegozoa:
+% https://dl.acm.org/doi/pdf/10.1145/3488932.3517419#page=12
+% Snowflake team's notes:
+% 2023-02-24 "WebRTC Encoded Transform (or Insertable Streams) for media channels in Snowflake?" https://lists.torproject.org/pipermail/anti-censorship-team/2023-February/000284.html
 
 % Very early versions of Lantern (circa 2014) used social network–based trusted proxies:
 %   https://web.archive.org/web/20140326223853/http://techpresident.com/news/wegov/24455/why-remarkably-similar-circumvention-tools-uproxy-and-lantern-are-not-overkill
@@ -1256,8 +1273,8 @@ either by modulating binary data into a well-formed encoded
 audio or video signal in the manner~of, say,
 Stegozoa~\cite[\S 3.3]{Figueira2022a},
 or by replacing encoded media content within SRTP packets,
-as in Protozoa~\cite[\S 4.4]{Barradas2020a}.
-% See idea about WebRTC Encoded Transform: https://lists.torproject.org/pipermail/anti-censorship-team/2023-February/000284.html
+as in Protozoa~\cite[\S 4.4]{Barradas2020a}
+or TorKameleon~\cite[\S \mbox{III-D}]{arxiv.2303.17544}.
 
 \end{description}
 
