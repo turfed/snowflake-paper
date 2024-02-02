@@ -175,8 +175,14 @@ bandwidth_multi <- read_csv(bandwidth_multi_csv_path, comment = "#") %>%
 	mutate(
 		good_read = read - `dirreq-read`,
 		good_write = write - `dirreq-write`,
-		good_avg = (good_read + good_write) / 2
+		good_avg = (good_read + good_write) / 2,
+		# good_avg is bytes per day. To get Gbit/s:
+		# good_avg*8           => bytes to bits
+		# good_avg*8/1e9       => bits to gigabits
+		# good_avg*8/1e9/84600 => per day to per second
+		good_avg_gbps = good_avg*8/1e9/86400,
 	)
+
 
 # Join the bandwidth_multi data set with the bridge_transport_multi data set,
 # so we can estimate what fraction of bandwidth is due to snowflake versus
@@ -184,12 +190,12 @@ bandwidth_multi <- read_csv(bandwidth_multi_csv_path, comment = "#") %>%
 bandwidth <- left_join(bridge_transport_multi, bandwidth_multi, by = c("date", "fingerprint")) %>%
 	# Subtract out the pro-rated fraction of non-snowflake transports (basically negligible).
 	group_by(date, fingerprint) %>%
-	mutate(across(c(read, write, `dirreq-read`, `dirreq-write`, good_read, good_write, good_avg), ~ .x * users / sum(users))) %>%
+	mutate(across(c(read, write, `dirreq-read`, `dirreq-write`, good_read, good_write, good_avg, good_avg_gbps), ~ .x * users / sum(users))) %>%
 	ungroup() %>%
 
 	# Sum the contributions of all bridge fingerprints by day.
 	group_by(date, transport) %>%
-	summarize(across(c(read, write, `dirreq-read`, `dirreq-write`, good_read, good_write, good_avg), sum, na.rm = TRUE), .groups = "drop") %>%
+	summarize(across(c(read, write, `dirreq-read`, `dirreq-write`, good_read, good_write, good_avg, good_avg_gbps), sum, na.rm = TRUE), .groups = "drop") %>%
 
 	# Keep only the transport we care about.
 	filter(transport == "snowflake") %>%
@@ -256,7 +262,7 @@ p_users <- ggplot() +
 	theme(plot.margin = unit(c(9, 0, 0, 0), "mm")) +
 	labs(x = NULL, y = "Average simultaneous users")
 
-max_good_avg <- max(bandwidth$good_avg, na.rm = TRUE)
+max_good_avg_gbps <- max(bandwidth$good_avg_gbps, na.rm = TRUE)
 
 p_bandwidth <- ggplot() +
 	# Gaps in the data.
@@ -266,9 +272,9 @@ p_bandwidth <- ggplot() +
 			xmax = end,
 			ymin = 0,
 			ymax = (max(
-				max_nearby(bandwidth$date, bandwidth$good_avg, begin, 2),
-				max_nearby(bandwidth$date, bandwidth$good_avg, end, 2)
-			) + max_good_avg * 0.05) / 1e12
+				max_nearby(bandwidth$date, bandwidth$good_avg_gbps, begin, 2),
+				max_nearby(bandwidth$date, bandwidth$good_avg_gbps, end, 2)
+			) + max_good_avg_gbps * 0.05) / 1e12
 		),
 		fill = "gray",
 		alpha = 0.8
@@ -277,9 +283,9 @@ p_bandwidth <- ggplot() +
 		aes(
 			x = mean(c(begin, end)),
 			ymin = (max(
-				max_nearby(bandwidth$date, bandwidth$good_avg, begin, 2),
-				max_nearby(bandwidth$date, bandwidth$good_avg, end, 2)
-			) + max_good_avg * 0.10) / 1e12,
+				max_nearby(bandwidth$date, bandwidth$good_avg_gbps, begin, 2),
+				max_nearby(bandwidth$date, bandwidth$good_avg_gbps, end, 2)
+			) + max_good_avg_gbps * 0.10) / 1e12,
 			ymax = Inf
 		),
 		color = "#808080",
@@ -292,7 +298,7 @@ p_bandwidth <- ggplot() +
 		aes(
 			x = date,
 			# Place the bottom of the indicator line 5% of the data range above or below nearby values.
-			ymin = (max_nearby(bandwidth$date, bandwidth$good_avg, date, 2) + max_good_avg * 0.05) / 1e12,
+			ymin = (max_nearby(bandwidth$date, bandwidth$good_avg_gbps, date, 2) + max_good_avg_gbps * 0.05),
 			ymax = Inf
 		),
 		color = "#808080",
@@ -301,10 +307,10 @@ p_bandwidth <- ggplot() +
 	) +
 
 	# Data series.
-	geom_line(data = bandwidth, aes(x = date, y = good_avg / 1e12)) +
+	geom_line(data = bandwidth, aes(x = date, y = good_avg_gbps)) +
 
 	scale_y_continuous(
-		breaks = (0:2)*20,
+		# breaks = (0:2)*20,
 		minor_breaks = NULL
 	) +
 	scale_x_date(
@@ -312,13 +318,13 @@ p_bandwidth <- ggplot() +
 		minor_breaks = NULL,
 		labels = NULL
 	) +
-	coord_cartesian(xlim = DATE_LIMITS, ylim = c(0, 45), expand = FALSE, clip = "off") +
+	coord_cartesian(xlim = DATE_LIMITS, ylim = c(0, 4), expand = FALSE, clip = "off") +
 	theme(plot.margin = unit(c(1, 0, 1, 0), "mm")) +
-	labs(x = NULL, y = "TB/day")
+	labs(x = NULL, y = "Gbit/s")
 
 desired_heights <- c(
-	1.74,
-	0.36
+	1.75,
+	0.45
 )
 
 p <- plot_grid(plotlist = align_plots(p_users, p_bandwidth, align = "v", axis = "lr"),
