@@ -1,5 +1,6 @@
 Review #1998A
 ===========================================================================
+* Updated: Jan 30, 2024, 9:59:11 PM AoE
 
 Paper summary
 -------------
@@ -7,16 +8,18 @@ This paper provides a detailed description of Snowflake, a system for circumvent
 
 Detailed comments for authors
 -----------------------------
-Thank you for submitting your work to USENIX SEC. First of all, the paper is well-written and has a nice flow from start to end. It provides a complete picture of Snowflake, the building blocks, and how it in interacts with other technical components of the circumvention system, using different protocols.
+Thank you for your submission to USENIX SEC. Your paper on Snowflake presents a comprehensive overview of its functionality within circumvention systems, shedding light on its significance in providing anti-censorship capabilities to users in regions with restricted internet access. The longitudinal analysis spanning from 2021 to 2023, coupled with event highlights such as the Russia-Ukraine invasion and Iran protests, adds depth to your study.
 
-I believe this work merits the attention of the academic community as it is an important tool that provides important anti-censorship capabilities to many Internet users living in countries with limited access to the Internet. It also provides some longitudinal analysis of the number of users between 2021 and 2023 and highlights some important events (e.g. Russia-Ukraine invasion, Iran protests, etc).
+Here are some areas where your work could be further enhanced:
 
-Some comments for authors to improve on their work:
-1. No proper information has been provided regarding the internals of the Snowflake system itself. It would be interesting to understand the internal mechanics and to know how it is built, the protocols used, and some sort of activity diagram to show the interactions will all the other systems of the network.
+## Internals of Snowflake System
+While your paper provides a thorough overview of Snowflake and its interactions with other components, it lacks detailed insight into the internal mechanics of the Snowflake system itself. Providing information on its architecture, protocols, and possibly an activity diagram illustrating its interactions with other network elements would enrich the understanding of readers.
 
-2. It is not very clear from the paper who manages the different components (bridge, proxies, etc). Also, some analysis on their availability, prevalence and location (geographical and topological), would have been nice.
+## Management and Analysis of Components
+It is unclear from the paper who manages the various components of the system, such as bridges and proxies. Additionally, a detailed analysis of the availability, prevalence, and geographical/topological distribution of these components would offer valuable insights into the operational aspects of the system.
 
-3. A section missing in this paper is about ethics and how owner of proxies are protected? What are the different level of risks, what are the risk mitigating measures put in place to protect users.
+## Ethical Considerations and Risk Mitigation
+A notable omission from the paper is a discussion on ethics and the protection of proxy owners. Addressing the risks associated with proxy ownership, along with measures implemented to mitigate these risks and safeguard users, would contribute to a more comprehensive examination of the system.
 
 Ethics consideration
 --------------------
@@ -338,8 +341,11 @@ Confidence in recommended decision
 ----------------------------------
 2. Fairly confident
 
+Comments
 ===========================================================================
 
+AuthorFeedback Response by Author [David Fifield <david@bamsoftware.com>] (879 words)
+---------------------------------------------------------------------------
 Thank you for your reviews. We are glad to see this kind of work find a receptive audience.
 
 ## A
@@ -386,3 +392,18 @@ Your perspective on presentation is appreciated. The composition of the paper, t
 We like the suggestion to pose research questions. Some possibilities:
 - (Related to B's comment on traffic shaping.) What is a good (family of) traffic shapes for Snowflake/WebRTC or other protocols?
 - Other than address agility, how might proxy enumeration attacks be inhibited?
+
+Comment @A1 by Reviewer D
+---------------------------------------------------------------------------
+We thank the authors for their engagement with the rebuttal process and the framing of their commitment to the work. There was a fairly extensive PC discussion around the scientific nature of the work. In the end, we agreed the optimal outcome was an accept with shepherding decision, focused on restructuring the paper. We acknowledge that a restructuring of the work may be more of a lift than a traditional shepherding outcome, but both strongly support and believe in the work, as well as feel restructuring is necessary to adequately convey its importance to the USENIX community. We expect the shepherding process will be interactive to arrive at a structure amenable to all parties. To that end, we note the proposed structure of reviewer D as a starting point:
+
+* Significant restructuring of the work that breaks apart technical background, threat model, related work, methodology, and then subsequent evaluation
+* Articulate the research questions your existing studies address
+* Significantly restructured intro that articulates the content of the paper
+
+Further, we ask you to address the following other issues:
+* Add an ethics discussion (A)
+* Discuss additional attack vectors and scaling issues (B)
+* Add details on measurement methodology (B)
+* Expanded technical explanations in 2.3 (A/D)
+
