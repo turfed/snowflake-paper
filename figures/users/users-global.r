@@ -150,7 +150,7 @@ bridge_transport <- bridge_transport_multi %>%
 	summarize(users = sum(users, na.rm = TRUE), .groups = "drop") %>%
 
 	# Keep only the records within DATE_LIMITS (necessary to avoid
-	# interference with coord_cartesian(clip = "off") below.
+	# interference with coord_cartesian(clip = "off") below).
 	filter(lubridate::`%within%`(date, do.call(lubridate::interval, as.list(DATE_LIMITS)))) %>%
 
 	# Fill in entirely missing dates with NA.
@@ -201,7 +201,7 @@ bandwidth <- left_join(bridge_transport_multi, bandwidth_multi, by = c("date", "
 	filter(transport == "snowflake") %>%
 
 	# Keep only the records within DATE_LIMITS (necessary to avoid
-	# interference with coord_cartesian(clip = "off") below.
+	# interference with coord_cartesian(clip = "off") below).
 	filter(lubridate::`%within%`(date, do.call(lubridate::interval, as.list(DATE_LIMITS)))) %>%
 
 	# Fill in entirely missing dates with NA.
