@@ -297,7 +297,7 @@ p_bandwidth <- ggplot() +
 	geom_linerange(data = EVENTS,
 		aes(
 			x = date,
-			# Place the bottom of the indicator line 5% of the data range above or below nearby values.
+			# Place the bottom of the indicator line 5% of the data range above nearby values.
 			ymin = (max_nearby(bandwidth$date, bandwidth$good_avg_gbps, date, 2) + max_good_avg_gbps * 0.05),
 			ymax = Inf
 		),
