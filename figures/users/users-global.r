@@ -11,7 +11,7 @@ source("../common.r")
 
 DATE_LIMITS <- lubridate::ymd(c(
 	"2021-06-30",
-	"2024-01-01"
+	"2024-01-31"
 ))
 
 GAPS <- tribble(
