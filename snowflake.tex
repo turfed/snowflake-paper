@@ -1605,14 +1605,15 @@ With these changes, Snowflake became practical for daily browsing,
 and the number of users began to grow into~2021.
 
 This brings us to \autoref{fig:client-counts}, which
-shows the Snowflake users and daily bandwidth since 2021.
+shows the Snowflake users and daily bandwidth since July 2021.
 Be aware: the chart does not show a count of unique clients,
 but rather the \emph{average number of concurrent clients} per day~\cite{tor-tr-2012-10-001}.
 % "The result is an average number of concurrent users, estimated from data collected over a day. We can't say how many distinct users there are."
 % https://metrics.torproject.org/reproducible-metrics.html#users
 % $ grep '^2022-05-01.*,snowflake,' figures/users/userstats-bridge-transport-multi.csv
 % 2022-05-01,5481936581E23D2D178105D44DB6915AB06BFB7F,snowflake,12235.62,100.00
-\todo{Say where the measurements come from; i.e., Tor Metrics descriptors.}
+\todo{Say where the measurements come from; i.e., Tor Metrics descriptors.
+Caveats of geolocation, {IR/US confusion}.}
 For example, the value of 12,000 on \mbox{2022-05-01}
 means that, on~average, 12,000 clients were using the service
 at any point in time on that day.
