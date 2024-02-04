@@ -1365,17 +1365,17 @@ fixed proxies mitigates against this enhancement.
 \caption{
 Estimated average simultaneous Snowflake users and bandwidth by day.
 The values at the far left end of the graph,
-in~early January~2021, are about~60 users
-% > filter(filtered, abs(date - as.Date("2021-01-01")) < 3)
-% # A tibble: 5 x 3
+in~early July~2021, are about~200 users
+% > filter(filtered, abs(date - as.Date("2021-07-01")) < 3)
+% # A tibble: 5 × 3
 %   date       transport users
 %   <date>     <chr>     <dbl>
-% 1 2020-12-30 snowflake  66.2
-% 2 2020-12-31 snowflake  54
-% 3 2021-01-01 snowflake  53.4
-% 4 2021-01-02 snowflake  65.5
-% 5 2021-01-03 snowflake  65.4
-and 400~kbit/s.
+% 1 2021-06-29 snowflake  278.
+% 2 2021-06-30 snowflake  282.
+% 3 2021-07-01 snowflake  262.
+% 4 2021-07-02 snowflake  199.
+% 5 2021-07-03 snowflake  197.
+and 2.7~Mbit/s.
 % > library("tidyverse")
 % > WANTED_FINGERPRINTS <- c(
 %     "7659DA0F96B156C322FBFF3ACCC9B9DC01C27C73" = "snowman",
@@ -1403,7 +1403,7 @@ and 400~kbit/s.
 %     mutate(across(c(read, write, `dirreq-read`, `dirreq-write`, good_read, good_write, good_avg), ~ .x * users / sum(users))) %>%
 %     ungroup() %>%
 %     filter(transport == "snowflake") %>%
-%     filter("2020-12-29" <= date & date < "2021-01-04") %>%
+%     filter("2021-06-28" <= date & date < "2021-07-04") %>%
 %     group_by(date) %>%
 %     summarize(
 %       date = last(date),
@@ -1415,14 +1415,14 @@ and 400~kbit/s.
 %     ) %>%
 %     arrange(date) %>% tail()
 % # A tibble: 6 × 9
-%   date       read     write   `dirreq-read` `dirreq-write` good_read good_write good_avg good_avg_bps
-%   <date>     <chr>    <chr>   <chr>         <chr>          <chr>     <chr>      <chr>    <chr>
-% 1 2020-12-29 9.95 GB  8.89 GB 89.52 MB      825.81 MB      9.86 GB   8.07 GB    8.97 GB  830.24 kbit
-% 2 2020-12-30 10.77 GB 9.07 GB 87.01 MB      787.05 MB      10.68 GB  8.28 GB    9.48 GB  878.05 kbit
-% 3 2020-12-31 5.32 GB  5.13 GB 76.97 MB      682.87 MB      5.25 GB   4.45 GB    4.85 GB  449.01 kbit
-% 4 2021-01-01 4.57 GB  4.25 GB 75.48 MB      683.19 MB      4.49 GB   3.57 GB    4.03 GB  373.40 kbit
-% 5 2021-01-02 7.34 GB  6.56 GB 90.84 MB      822.81 MB      7.25 GB   5.74 GB    6.49 GB  601.37 kbit
-% 6 2021-01-03 8.50 GB  7.74 GB 94.69 MB      844.65 MB      8.40 GB   6.90 GB    7.65 GB  708.40 kbit
+%   date       read     write    `dirreq-read` `dirreq-write` good_read good_write good_avg good_avg_bps
+%   <date>     <chr>    <chr>    <chr>         <chr>          <chr>     <chr>      <chr>    <chr>
+% 1 2021-06-28 43.69 GB 45.14 GB 414.49 MB     5.03 GB        43.28 GB  40.11 GB   41.69 GB 3.86 Mbit
+% 2 2021-06-29 32.92 GB 34.41 GB 404.10 MB     4.92 GB        32.51 GB  29.49 GB   31.00 GB 2.87 Mbit
+% 3 2021-06-30 32.20 GB 34.24 GB 419.36 MB     5.06 GB        31.79 GB  29.18 GB   30.48 GB 2.83 Mbit
+% 4 2021-07-01 31.17 GB 32.60 GB 354.75 MB     4.25 GB        30.82 GB  28.35 GB   29.58 GB 2.74 Mbit
+% 5 2021-07-02 27.72 GB 27.40 GB 178.13 MB     2.15 GB        27.54 GB  25.25 GB   26.40 GB 2.44 Mbit
+% 6 2021-07-03 28.02 GB 27.92 GB 200.54 MB     2.45 GB        27.82 GB  25.47 GB   26.64 GB 2.47 Mbit
 }
 \label{fig:client-counts}
 \end{figure*}
