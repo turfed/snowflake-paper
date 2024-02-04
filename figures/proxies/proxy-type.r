@@ -9,9 +9,8 @@ library("tidyverse")
 source("../common.r")
 
 DATE_LIMITS <- lubridate::ymd(c(
-	# "2019-07-01",
-	"2021-01-01",
-	"2024-01-01"
+	"2021-07-01",
+	"2024-01-31"
 ))
 
 # Timeline of events relevant to proxy type measurement. The tricky part is
@@ -159,7 +158,7 @@ p <- ggplot() +
 				slice(1) %>%
 			ungroup() %>%
 			mutate(date = max(date)) %>%
-			mutate(y = place_no_overlap(unique_ips, -10000, 8000)),
+			mutate(y = place_no_overlap(unique_ips / coverage, -10000, 8000)),
 		aes(
 			x = date,
 			y = y,

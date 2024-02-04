@@ -10,8 +10,8 @@ library("cowplot")
 source("../common.r")
 
 DATE_LIMITS <- lubridate::ymd(c(
-	"2020-12-31",
-	"2024-01-01"
+	"2021-06-30",
+	"2024-01-31"
 ))
 
 GAPS <- tribble(
@@ -19,10 +19,15 @@ GAPS <- tribble(
 	# https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40033#note_2735468
 	# https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/merge_requests/43#note_2740276
 	"2021-05-12 14:13:56", "2021-06-21 14:22:24", 8800, T
-) %>% mutate(
-	begin = lubridate::ymd_hms(begin) %>% lubridate::as_date(),
-	end = lubridate::ymd_hms(end) %>% lubridate::as_date()
-)
+) %>%
+	mutate(
+		begin = lubridate::ymd_hms(begin) %>% lubridate::as_date(),
+		end = lubridate::ymd_hms(end) %>% lubridate::as_date()
+	) %>%
+	filter(
+		lubridate::`%within%`(begin, do.call(lubridate::interval, as.list(DATE_LIMITS))) |
+		lubridate::`%within%`(end, do.call(lubridate::interval, as.list(DATE_LIMITS)))
+	)
 
 EVENTS <- tribble(
 	~date, ~y, ~left_side, ~label,
@@ -34,7 +39,7 @@ EVENTS <- tribble(
 	# "2020-05-22 19:51:29",  1000, T, "Tor Browser 9.5a13\nadds Turbo Tunnel",       # https://blog.torproject.org/new-release-tor-browser-95a13
 	# "2020-06-02 18:09:48",  1000, T, "Tor Browser 10.0a1\nSnowflake for Android",   # https://blog.torproject.org/new-release-tor-browser-100a1
 	"2021-01-12 00:00:00", 25000, F, "Orbot 16.4.0\nincludes Snowflake",              # https://github.com/guardianproject/orbot/releases/tag/16.4.0-RC-1-tor-0.4.4.6
-	"2021-07-06 16:56:37", 39000, T, "Tor Browser 10.5\nincludes Snowflake",          # https://blog.torproject.org/new-release-tor-browser-105
+	"2021-07-06 16:56:37", 20000, F, "Tor Browser 10.5\nincludes Snowflake",          # https://blog.torproject.org/new-release-tor-browser-105
 	"2021-12-01 00:00:00", 38000, T, "Onset of Tor blocking\nin Russia",               # https://bugs.torproject.org/tpo/community/support/40050
 	"2021-12-14 00:00:00", 40000, T, "",                                              # https://blog.torproject.org/new-release-tor-browser-115a1/
 	"2021-12-20 00:00:00", 54000, T, "Tor Browser 11.5a1 and 11.0.3\nalter DTLS fingerprint", # https://blog.torproject.org/new-release-tor-browser-1103/
@@ -73,7 +78,9 @@ EVENTS <- tribble(
 	# "2023-03-20 00:00:00",  8000, T, "Domain fronting rendezvous again blocked in Iran", # https://gitlab.torproject.org/tpo/anti-censorship/team/-/issues/115#note_2892825
 	"2023-09-20 14:00:00",102000, T, "Malfunction in\ndomain fronting rendezvous",          # https://forum.torproject.org/t/problems-with-snowflake-since-2023-09-20-broker-failure-unexpected-error-no-answer/9346
 	# "2023-11-21 04:10:46", 60000, T, "encapsulation.ReadData performance improvement",      # https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/merge_requests/154#note_2967886
-) %>% mutate(date = lubridate::ymd_hms(date) %>% lubridate::as_date())
+) %>%
+	mutate(date = lubridate::ymd_hms(date) %>% lubridate::as_date()) %>%
+	filter(lubridate::`%within%`(date, do.call(lubridate::interval, as.list(DATE_LIMITS))))
 
 # Return an abbreviation for the month, followed by a year for January only.
 date_labels <- function(breaks) {
@@ -83,6 +90,9 @@ date_labels <- function(breaks) {
 # For each element of `at`, returns the minimum element of `values` whose
 # corresponding element of `x` is within `radius` of the `at` element.
 min_nearby <- function(x, values, at, radius) {
+	if (length(at) == 0) {
+		return(c())
+	}
 	in_radius <- abs(outer(x, at, `-`)) <= radius
 	values_in_radius <- apply(in_radius, 2, function(x) values[x])
 	apply(values_in_radius, 2, min, na.rm = TRUE)
@@ -91,6 +101,9 @@ min_nearby <- function(x, values, at, radius) {
 # For each element of `at`, returns the maximum element of `values` whose
 # corresponding element of `x` is within `radius` of the `at` element.
 max_nearby <- function(x, values, at, radius) {
+	if (length(at) == 0) {
+		return(c())
+	}
 	in_radius <- abs(outer(x, at, `-`)) <= radius
 	values_in_radius <- apply(in_radius, 2, function(x) values[x])
 	apply(values_in_radius, 2, max, na.rm = TRUE)
@@ -150,7 +163,7 @@ bridge_transport <- bridge_transport_multi %>%
 	summarize(users = sum(users, na.rm = TRUE), .groups = "drop") %>%
 
 	# Keep only the records within DATE_LIMITS (necessary to avoid
-	# interference with coord_cartesian(clip = "off") below.
+	# interference with coord_cartesian(clip = "off") below).
 	filter(lubridate::`%within%`(date, do.call(lubridate::interval, as.list(DATE_LIMITS)))) %>%
 
 	# Fill in entirely missing dates with NA.
@@ -201,7 +214,7 @@ bandwidth <- left_join(bridge_transport_multi, bandwidth_multi, by = c("date", "
 	filter(transport == "snowflake") %>%
 
 	# Keep only the records within DATE_LIMITS (necessary to avoid
-	# interference with coord_cartesian(clip = "off") below.
+	# interference with coord_cartesian(clip = "off") below).
 	filter(lubridate::`%within%`(date, do.call(lubridate::interval, as.list(DATE_LIMITS)))) %>%
 
 	# Fill in entirely missing dates with NA.
@@ -217,6 +230,7 @@ p_users <- ggplot() +
 			xmax = end,
 			ymin = 0,
 			ymax = max(
+				-Inf,
 				max_nearby(bridge_transport$date, bridge_transport$users, begin, 2),
 				max_nearby(bridge_transport$date, bridge_transport$users, end, 2)
 			) + max_users * 0.01
@@ -227,6 +241,7 @@ p_users <- ggplot() +
 	text_annotation(GAPS %>% mutate(
 		x = mean(c(begin, end)),
 		ymin = max(
+			-Inf,
 			max_nearby(bridge_transport$date, bridge_transport$users, begin, 2),
 			max_nearby(bridge_transport$date, bridge_transport$users, end, 2)
 		) + max_users * 0.02,
@@ -272,6 +287,7 @@ p_bandwidth <- ggplot() +
 			xmax = end,
 			ymin = 0,
 			ymax = (max(
+				-Inf,
 				max_nearby(bandwidth$date, bandwidth$good_avg_gbps, begin, 2),
 				max_nearby(bandwidth$date, bandwidth$good_avg_gbps, end, 2)
 			) + max_good_avg_gbps * 0.05) / 1e12
@@ -283,6 +299,7 @@ p_bandwidth <- ggplot() +
 		aes(
 			x = mean(c(begin, end)),
 			ymin = (max(
+				-Inf,
 				max_nearby(bandwidth$date, bandwidth$good_avg_gbps, begin, 2),
 				max_nearby(bandwidth$date, bandwidth$good_avg_gbps, end, 2)
 			) + max_good_avg_gbps * 0.10) / 1e12,
@@ -297,7 +314,7 @@ p_bandwidth <- ggplot() +
 	geom_linerange(data = EVENTS,
 		aes(
 			x = date,
-			# Place the bottom of the indicator line 5% of the data range above or below nearby values.
+			# Place the bottom of the indicator line 5% of the data range above nearby values.
 			ymin = (max_nearby(bandwidth$date, bandwidth$good_avg_gbps, date, 2) + max_good_avg_gbps * 0.05),
 			ymax = Inf
 		),
