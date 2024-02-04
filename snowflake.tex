@@ -2001,7 +2001,7 @@ representing about 80\%
 of 130,000 daily IP addresses.
 % > library("tidyverse")
 % > proxy_type <- read_csv("figures/proxies/proxy-type.csv", col_types = cols()) %>% filter("2023-12-01" <= date & date < "2024-01-01")
-% > proxy_type %>% group_by(type) %>% summarize(unique_ips = sum(unique_ips)) %>% mutate(percent = 100 * unique_ips / sum(unique_ips)) %>% ungroup()
+% > proxy_type %>% group_by(type) %>% summarize(unique_ips = sum(unique_ips / coverage)) %>% mutate(percent = 100 * unique_ips / sum(unique_ips)) %>% ungroup()
 % # A tibble: 4 × 3
 %   type       unique_ips percent
 %   <chr>           <dbl>   <dbl>
@@ -2009,7 +2009,7 @@ of 130,000 daily IP addresses.
 % 2 iptproxy      694030.  16.1
 % 3 standalone    132941.   3.09
 % 4 webext       3453424.  80.3
-% > proxy_type %>% group_by(date) %>% summarize(unique_ips = sum(unique_ips)) %>% tail()
+% > proxy_type %>% group_by(date) %>% summarize(unique_ips = sum(unique_ips / coverage)) %>% tail()
 % # A tibble: 6 × 2
 %   date       unique_ips
 %   <date>          <dbl>
