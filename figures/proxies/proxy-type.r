@@ -180,7 +180,12 @@ p <- ggplot() +
 		date_minor_breaks = "1 month",
 		date_labels = "%Y"
 	) +
-	scale_color_brewer(palette = "Set1") +
+	scale_color_manual(values = c(
+		"midnightblue",
+		"firebrick",
+		"orangered",
+		"slateblue"
+	)) +
 	coord_cartesian(xlim = DATE_LIMITS, ylim = c(0, NA), expand = FALSE, clip = "off") +
 	labs(x = NULL, y = "Unique IP addresses") +
 
