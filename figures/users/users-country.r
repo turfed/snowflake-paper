@@ -79,40 +79,25 @@ bridge_combined <- bridge_combined_multi %>%
 PLOT_INFO <- list(
 	list(
 		country = "cn",
-		date_limits = lubridate::ymd(c(
-			"2021-12-15",
-			"2023-07-31"
-		)),
-		date_labels = date_labels_abbrev
+		end_date = lubridate::ymd("2023-07-31")
 	),
 	list(
 		country = "ir",
-		date_limits = lubridate::ymd(c(
-			"2022-09-01",
-			"2023-05-31"
-		)),
-		date_labels = date_labels
+		end_date = lubridate::ymd("2023-07-31")
 	),
 	list(
 		country = "ru",
-		date_limits = lubridate::ymd(c(
-			"2021-11-01",
-			# 2021-12-01 first blocking https://bugs.torproject.org/tpo/community/support/40050
-			# 2022-02-15 release of Tor Browser 12.0.3 with altered fingerprint https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40030#note_2893870
-			"2023-07-31"
-		)),
-		date_labels = date_labels_abbrev
+		end_date = lubridate::ymd("2023-07-31")
 	),
 	list(
 		country = "tm",
-		date_limits = lubridate::ymd(c(
-			"2020-10-01",
-			"2022-11-30"
-		)),
-		date_labels = date_labels_abbrev
+		end_date = lubridate::ymd("2022-10-10")
 	)
 )
 plots <- lapply(PLOT_INFO, function(g) {
+	# All the graphs show an equal amount of elapsed time, though the end
+	# point may differ.
+	date_limits <- c(g$end_date - 650, g$end_date)
 	ggplot() +
 		geom_line(
 			data = bridge_combined %>% filter(country == g$country),
@@ -125,9 +110,9 @@ plots <- lapply(PLOT_INFO, function(g) {
 		scale_x_date(
 			date_breaks = "1 month",
 			minor_breaks = NULL,
-			labels = g$date_labels
+			labels = date_labels_abbrev,
 		) +
-		coord_cartesian(xlim = g$date_limits, expand = FALSE) +
+		coord_cartesian(xlim = date_limits, expand = FALSE) +
 		labs(x = NULL, y = NULL)
 })
 # Make the horizontal axis the same size in each graph.
