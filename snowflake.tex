@@ -635,7 +635,16 @@ broker's hostname in the TLS SNI,
 but it increases the number of usable intermediaries and front domains.
 
 % "Snowflake rendezvous using Amazon SQS" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/26151
-\todo{Cover SQS rendezvous.}
+\item[Amazon SQS]
+Amazon's Simple Queue Service (SQS) is a message queuing service designed for
+communication between microservices. Services may create queues, send messages
+with up to 256KB payloads, and retrieve messages from the queues. For the Snowflake
+rendezvous, we create a persistent, public broker queue that any client may send to.
+The broker processes retrieved messages and responds to the client by creating a new
+single-use queue with the client's unique ID in the queue name.\urlfootnote{
+https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/merge_requests/214
+}
+Blocking SQS rendezvous requires, at the very least, blocking access to Amazon's SQS service by region.
 \end{description}
 
 Anything that can be persuaded to convey a message
