@@ -92,7 +92,7 @@ p <- ggplot() +
 				slice(1) %>%
 			ungroup() %>%
 			mutate(date = max(date)) %>%
-			mutate(y = place_no_overlap(unique_ips / coverage, -10000, 5500)),
+			mutate(y = place_no_overlap(unique_ips / coverage, -1500, 7000)),
 		aes(
 			x = date,
 			y = y,
@@ -100,7 +100,7 @@ p <- ggplot() +
 			label = nat_type,
 		),
 		position = position_nudge(x = 5),
-		size = 2,
+		size = 2.5,
 		hjust = 0, vjust = 0.5
 	) +
 
@@ -118,6 +118,6 @@ p <- ggplot() +
 	labs(x = NULL, y = "Unique IP addresses") +
 
 	# Make room for the margin labels added by geom_text above.
-	theme(plot.margin = unit(c(0.2, 11, 0, 0), "mm")) +
+	theme(plot.margin = unit(c(0.5, 13.0, 0, 0.5), "mm")) +
 	guides(color = "none")
 ggsave(output_path, p, width = DOCUMENT_LINEWIDTH, height = 1.25)
