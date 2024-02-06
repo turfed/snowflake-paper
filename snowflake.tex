@@ -1621,13 +1621,19 @@ but rather the \emph{average number of concurrent clients} per day~\cite{tor-tr-
 % https://metrics.torproject.org/reproducible-metrics.html#users
 % $ grep '^2022-05-01.*,snowflake,' figures/users/userstats-bridge-transport-multi.csv
 % 2022-05-01,5481936581E23D2D178105D44DB6915AB06BFB7F,snowflake,12235.62,100.00
-\todo{Say where the measurements come from; i.e., Tor Metrics descriptors.
-Caveats of geolocation, \href{https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40207\#note_2844116}{IR/US confusion}.}
 For example, the value of 12,000 on \mbox{2022-05-01}
 means that, on~average, 12,000 clients were using the service
 at any point in time on that day.
 The contribution of a client depends on how long it uses the system each day,
-not how many temporary proxies it uses.
+not how many temporary proxies it uses. The average concurrent client count is
+estimated from the number of directory requests that are published in the descriptors
+sent by Tor bridges to the bridge authority and archived by CollecTor.\urlfootnote{
+https://metrics.torproject.org/collector.html\#type-extra-info
+}
+This method of estimating usage metrics was developed specifically to
+preserve user anonymity. We discuss the techniques and challenges of
+obtaining country-specific usage counts more in \autoref{sec:block} where we provide measurements
+of Snowflake usage in response to censorship events.
 
 Snowflake's growth began in earnest
 when it became part of default installations.
@@ -2003,6 +2009,23 @@ can also \emph{provide} Snowflake proxy service to others,
 a~feature called ``kindness mode.''
 % Only so called in Orbot v17+, which should be current by the time the paper is submitted.
 
+We coordinated with the Tor Project's network health team to collect privacy preserving metrics at the broker
+during the client and proxy polls of the Snowflake rendezvous.\footnote{
+\raggedright\fontsize{\urlfootnotesize}{\urlfootnotesize}\selectfont%
+\url{https://gitlab.torproject.org/tpo/network-health/metrics/collector/-/issues/29461}
+}
+The resulting metrics
+are published at the end of every 24 hour collection period\footnote{
+\raggedright\fontsize{\urlfootnotesize}{\urlfootnotesize}\selectfont%
+\url{https://metrics.torproject.org/collector.html\#snowflake-stats}
+}
+in aggregate and we do not publish or store
+client or proxy IP addresses. Metrics concerning client polls are rounded up to the nearest multiple
+of 8 to prevent individual participation patterns from becoming visible in the aggregate counts.
+The collected metrics allow us to determine daily unique proxy IP counts,
+along with the associated country
+codes, proxy types, NAT behavior types (i.e., restricted, unrestricted, or unknown), and how many times
+a proxy was matched with a client.
 \autoref{fig:proxy-type} shows the daily counts
 of each proxy type.
 Browser extension proxies predominate,
@@ -2409,6 +2432,20 @@ in order to block~it.
 Advancing the state of the art of censorship circumvention
 consists in pushing blocking
 beyond the capabilities of more and more censors.
+
+Tor bridges report aggregate binned counts by country code of connected unique IP addresses per day in the
+descriptors uploaded to the bridge authority. We use the Tor Metrics method of
+combining the distribution of counts by country code with the number of directory requests to obtain
+an estimate of the average number of concurrent clients per day for each location~\cite{tor-tr-2012-10-001}. The mapping of IP
+addresses to country codes is not without flaws. During the time of the measurements shown here, Tor uses
+the IPFire location database.\urlfootnote{
+https://www.ipfire.org/projects/location/
+}
+There is at least one instance where we were able to detect geolocation inaccuracies after noting
+a significant drop in Snowflake users thought to be located in the US that correlated directly with
+a blocking event in Iran.\urlfootnote{
+https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40207\#note_2844116
+}
 
 \subsection{Blocking in Russia}
 \label{sec:block-ru}
