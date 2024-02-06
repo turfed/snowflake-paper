@@ -76,6 +76,24 @@ bridge_combined <- bridge_combined_multi %>%
 	complete(date = seq.Date(min(date), max(date), "days")) %>%
 	ungroup()
 
+EVENTS <- tribble(
+	~country, ~date,
+	"tm", "2021-10-25", # Blocking of default front domain https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40024
+	"ru", "2021-12-01", # Tor blocking, DTLS Server Hello supported_groups https://bugs.torproject.org/tpo/community/support/40050
+	"tm", "2022-05-03", # Partial unblocking of front domain https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40024#note_2930186
+	"ru", "2022-05-16", # DTLS Client Hello supported_groups specific contents https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40030
+	"ru", "2022-07-21", # https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40030#note_2823140
+	"tm", "2022-08-03", # Possible blocking of STUN ports
+	"ir", "2022-09-21", # Mahsa Amini protests https://lists.torproject.org/pipermail/anti-censorship-team/2022-September/000247.html
+	"ru", "2022-09-30", # Decrease in users from an unknown cause
+	"ir", "2022-10-07", # TLS fingerprint blocking https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40207
+	"ir", "2022-10-29", # Release of Tor Browser 11.5.6 with uTLS support https://blog.torproject.org/new-release-tor-browser-1156/
+	"ir", "2023-01-20", # Blocking of domain fronting rendezvous https://bugs.torproject.org/tpo/anti-censorship/team/115\#note_2873040
+	"ru", "2023-02-15", # Release of Tor Browser 12.0.3 with DTLS Hello Verify Request countermeasure https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40030#note_2893870
+	"cn", "2023-05-13", # Blocking of repeated HTTPS connections to the same SNI https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40038
+) %>%
+	mutate(date = lubridate::ymd(date))
+
 PLOT_INFO <- list(
 	list(
 		country = "cn",
@@ -98,7 +116,17 @@ plots <- lapply(PLOT_INFO, function(g) {
 	# All the graphs show an equal amount of elapsed time, though the end
 	# point may differ.
 	date_limits <- c(g$end_date - 650, g$end_date)
+	# Interpolated function to automaticlly put event markers near the data
+	# lines.
+	bridge_combined_fn <- with(bridge_combined %>% filter(country == g$country), approxfun(date, users))
 	ggplot() +
+		geom_point(
+			data = EVENTS %>% filter(country == g$country),
+			aes(x = date, y = bridge_combined_fn(date)),
+			shape = 1,
+			color = "#d97062",
+			size = 3.75
+		) +
 		geom_line(
 			data = bridge_combined %>% filter(country == g$country),
 			aes(x = date, y = users),
