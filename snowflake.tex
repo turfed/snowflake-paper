@@ -1939,10 +1939,10 @@ Snowflake had transferred 13.9~PB of circumvention data.
 % 1 2024-01-31 14.00 PB 14.03 PB 9.75 TB       181.10 TB      13.99 PB  13.85 PB   13.92 PB
 We~are referring to goodput: Tor TLS traffic inside the tunnel,
 ignoring WebRTC, WebSocket, and KCP/\allowbreak smux overhead.
-At~that time, about 0.7\% of all Tor users\todo{
-As of \mbox{2024-02-01}, relay users are currently inflated due to
-\href{https://bugs.torproject.org/tpo/network-health/analysis/59}{\#59}.
-}
+At~that time, about 0.7\% of all Tor users
+% It was a higher fraction before the addition of about 2 M users
+% from Germany in June 2023:
+% https://bugs.torproject.org/tpo/network-health/analysis/59
 (24\%~of bridge users) used Snowflake to connect to Tor.
 % > library("tidyverse")
 % > WANTED_FINGERPRINTS <- c(
