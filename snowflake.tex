@@ -1068,9 +1068,10 @@ The purpose of this channel is to let
 the client tell the bridge what destinations to access,
 and prevent the proxy from inspecting or tampering with the traffic
 it carries.
-Nothing sophisticated is required here---SOCKS over TLS,
+Nothing special is required here: for example,
+SOCKS over TLS,
 or any VPN protocol,
-for example, would work fine.
+would work fine.
 Our deployment uses Tor as this secure channel:
 after removing the WebSocket and Turbo Tunnel layers,
 the bridge feeds the client's stream into a local Tor bridge,
@@ -1108,12 +1109,12 @@ who have no preexisting trust relationship.
 
 % https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/wikis/Fingerprinting
 
-Snowflake leans heavily into the ``address blocking'' side of circumvention,
+Snowflake's main focus is the ``address blocking'' side of circumvention,
 but the ``content blocking'' part matters too.
 The goal, as~always, is to make circumvention traffic
 difficult to distinguish from traffic the censor prefers not to block.
 Snowflake is tied to WebRTC,
-and can only be effective against a censor
+and so can only be effective against a censor
 that is not willing to block WebRTC protocols wholesale.
 But even within that scope,
 there are many variations in \emph{how}
@@ -1144,25 +1145,25 @@ https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/2
 }
 It~is not tied to any browser,
 which is both good and bad.
-The good is less development friction,
+The good features are less development friction,
 better memory safety
-(Pion is written in Go, while Chromium WebRTC is C++),
+(Pion is written in Go, Chromium WebRTC in C++),
 and a working relationship with upstream developers
-that enables us to get fingerprinting-related changes made.
+to make fingerprinting-related changes when needed.
 The bad is that the protocol fingerprints of Pion
 do not automatically match the mostly browser-originated
 WebRTC that Snowflake aims to blend in with.
 
-The following is a list of fingerprinting concerns
-that bear on Snowflake, and
-how we have tried to address them.
-The existence of a fingerprinting vulnerability
-does not automatically invalidate a circumvention system:
-the question is whether the vulnerability is reparable.
+The following is a list of the main fingerprinting concerns in Snowflake and
+what we have done to address them.
+A~fingerprinting vulnerability
+does not automatically disqualify a circumvention system:
+it~depends on whether the vulnerability is fixable
+without fundamentally changing the system.
 Even among demonstrable vulnerabilities,
 some are more and some are less practical for a censor to take advantage~of.
-The important thing is to build on a solid foundation;
-minor flaws may be patched up as necessary.
+The important thing is to build on a solid foundation.
+Minor flaws may be patched up as necessary.
 
 \begin{description}
 \item[Selection of STUN servers]
@@ -1376,8 +1377,8 @@ but find them still prohibitively imprecise at realistic base rates.
 % rate λ. For more realistic base rates, such as λ > 1 × 10^6, the
 % precision attained by any of the classifiers is near-zero."
 They propose to reduce false positives by combining
-multiple observations per IP address---classifying hosts
-rather than flows---and suggest that Snowflake's lack of
+multiple observations per IP address---classifying hosts,
+not flows---and suggest that Snowflake's lack of
 fixed proxies mitigates against this enhancement.
 % VII: "One way to mitigate the effects of host-based analysis is to
 % design circumvention systems to use multiple ephemeral bridges
