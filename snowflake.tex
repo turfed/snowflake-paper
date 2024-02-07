@@ -1804,7 +1804,9 @@ we deployed a second bridge to share the load.
 We discuss the challenges and design considerations of doing so in \autoref{sec:multi-bridge}.
 The new bridge was made available in
 Tor Browser~12.0 on \mbox{2022-12-07}.
-By~July, it~supported about 18\% of users.\todo{Revisit this when Orbot~17 hits the \href{https://play.google.com/store/apps/details?id=org.torproject.android}{Play Store}.}
+By~July, it~supported about
+18\% of users and
+20\% of bandwidth.\todo{Revisit this when Orbot~17 hits the \href{https://play.google.com/store/apps/details?id=org.torproject.android}{Play Store}.}
 % > library("tidyverse")
 % > WANTED_FINGERPRINTS <- c(
 %     "7659DA0F96B156C322FBFF3ACCC9B9DC01C27C73" = "snowman",
@@ -1812,28 +1814,69 @@ By~July, it~supported about 18\% of users.\todo{Revisit this when Orbot~17 hits 
 %     "91DA221A149007D0FD9E5515F5786C3DD07E4BB0" = "snowflake-02"
 %   )
 % > userstats <- read_csv("figures/users/userstats-bridge-transport-multi.csv") %>%
-%     filter(transport == "snowflake" & fingerprint %in% names(WANTED_FINGERPRINTS)) %>%
-%     mutate(users = users / (coverage / pmax(num_instances, coverage))) %>%
-%     mutate(instance = WANTED_FINGERPRINTS[fingerprint], fingerprint = NULL) %>%
-%     group_by(date, transport) %>% mutate (percent = 100 * users / sum(users, na.rm = TRUE)) %>% ungroup()
-% > print(userstats %>% filter("2023-07-25" <= date & date < "2023-08-01"), n = 100)
-% # A tibble: 14 × 7
-%    date       transport  users num_instances coverage instance     percent
-%    <date>     <chr>      <dbl>         <dbl>    <dbl> <chr>          <dbl>
-%  1 2023-07-25 snowflake 56792.            12     11.4 snowflake-01    82.0
-%  2 2023-07-25 snowflake 12449.            12     12   snowflake-02    18.0
-%  3 2023-07-26 snowflake 55699.            12     12   snowflake-01    81.8
-%  4 2023-07-26 snowflake 12430.            12     12   snowflake-02    18.2
-%  5 2023-07-27 snowflake 54512.            12     12   snowflake-01    81.6
-%  6 2023-07-27 snowflake 12282             12     12   snowflake-02    18.4
-%  7 2023-07-28 snowflake 53879.            12     12   snowflake-01    81.4
-%  8 2023-07-28 snowflake 12299.            12     12   snowflake-02    18.6
-%  9 2023-07-29 snowflake 54822.            12     12   snowflake-01    81.3
-% 10 2023-07-29 snowflake 12649.            12     12   snowflake-02    18.7
-% 11 2023-07-30 snowflake 55682.            12     11.6 snowflake-01    81.3
-% 12 2023-07-30 snowflake 12848.            12     12   snowflake-02    18.7
-% 13 2023-07-31 snowflake 56160.            12     11.4 snowflake-01    81.2
-% 14 2023-07-31 snowflake 13007.            12     12   snowflake-02    18.8
+%     filter(fingerprint %in% names(WANTED_FINGERPRINTS)) %>%
+%     mutate(users = users / (coverage / pmax(num_instances, coverage)))
+% > bandwidth <- read_csv("figures/users/bandwidth-multi.csv") %>%
+%     filter(fingerprint %in% names(WANTED_FINGERPRINTS)) %>%
+%     filter(coverage > 0) %>%
+%     mutate(bytes = bytes / (coverage / pmax(num_instances, coverage))) %>%
+%     pivot_wider(id_cols = c(date, fingerprint), names_from = c(type), values_from = c(bytes)) %>%
+%     mutate(
+%       good_read = read - `dirreq-read`,
+%       good_write = write - `dirreq-write`,
+%       good_avg = (good_read + good_write) / 2,
+%     )
+% > left_join(userstats, bandwidth, by = c("date", "fingerprint")) %>%
+%     # Subtract out the pro-rated fraction of non-snowflake transports (basically negligible).
+%     group_by(date, fingerprint) %>%
+%     mutate(across(c(read, write, `dirreq-read`, `dirreq-write`, good_read, good_write, good_avg), ~ .x * users / sum(users))) %>%
+%     ungroup() %>%
+%     filter(transport == "snowflake") %>%
+%     filter(date >= "2022-12-01") %>%
+%     mutate(
+%       year = lubridate::year(date),
+%       month = lubridate::month(date),
+%       instance = WANTED_FINGERPRINTS[fingerprint], fingerprint = NULL,
+%     ) %>%
+%     group_by(year, month, transport, instance) %>% summarize(users = sum(users), good_avg = sum(good_avg)) %>%
+%     group_by(year, month, transport) %>%
+%     mutate(
+%       users_percent = 100 * users / sum(users, na.rm = TRUE),
+%       bw_percent = 100 * good_avg / sum(good_avg, na.rm = TRUE),
+%     ) %>% ungroup() %>% print(n = 30)
+% # A tibble: 30 × 8
+%     year month transport instance        users good_avg users_percent bw_percent
+%    <dbl> <dbl> <chr>     <chr>           <dbl>    <dbl>         <dbl>      <dbl>
+%  1  2022    12 snowflake snowflake-01 2043946.  4.40e14         98.0       96.3
+%  2  2022    12 snowflake snowflake-02   42158.  1.67e13          2.02       3.66
+%  3  2023     1 snowflake snowflake-01 2766748.  6.02e14         97.3       95.7
+%  4  2023     1 snowflake snowflake-02   76198.  2.71e13          2.68       4.30
+%  5  2023     2 snowflake snowflake-01 2286603.  4.72e14         96.3       93.8
+%  6  2023     2 snowflake snowflake-02   88801.  3.10e13          3.74       6.16
+%  7  2023     3 snowflake snowflake-01 1958580.  5.95e14         93.7       91.8
+%  8  2023     3 snowflake snowflake-02  132598.  5.30e13          6.34       8.18
+%  9  2023     4 snowflake snowflake-01 2044709.  7.97e14         89.4       86.2
+% 10  2023     4 snowflake snowflake-02  242634.  1.27e14         10.6       13.8
+% 11  2023     5 snowflake snowflake-01 2115663.  8.60e14         84.4       76.7
+% 12  2023     5 snowflake snowflake-02  391264.  2.62e14         15.6       23.3
+% 13  2023     6 snowflake snowflake-01 1889398.  8.21e14         81.6       76.8
+% 14  2023     6 snowflake snowflake-02  425019.  2.48e14         18.4       23.2
+% 15  2023     7 snowflake snowflake-01 1840693.  7.98e14         81.2       79.6
+% 16  2023     7 snowflake snowflake-02  426490.  2.04e14         18.8       20.4
+% 17  2023     8 snowflake snowflake-01 1718368.  7.55e14         83.9       84.0
+% 18  2023     8 snowflake snowflake-02  328826.  1.44e14         16.1       16.0
+% 19  2023     9 snowflake snowflake-01 1260765.  8.25e14         86.4       92.3
+% 20  2023     9 snowflake snowflake-02  198159.  6.92e13         13.6        7.73
+% 21  2023    10 snowflake snowflake-01  965871.  7.07e14         90.5       78.5
+% 22  2023    10 snowflake snowflake-02  101105.  1.94e14          9.48      21.5
+% 23  2023    11 snowflake snowflake-01  925517.  6.84e14         86.4       72.7
+% 24  2023    11 snowflake snowflake-02  146157.  2.56e14         13.6       27.3
+% 25  2023    12 snowflake snowflake-01 1000067.  7.51e14         85.2       73.7
+% 26  2023    12 snowflake snowflake-02  173915.  2.68e14         14.8       26.3
+% 27  2024     1 snowflake snowflake-01 1055248.  8.20e14         84.2       75.0
+% 28  2024     1 snowflake snowflake-02  197708.  2.74e14         15.8       25.0
+% 29  2024     2 snowflake snowflake-01   72876.  5.73e13         85.1       73.6
+% 30  2024     2 snowflake snowflake-02   12764.  2.06e13         14.9       26.4
 
 The drop in users by about half on \mbox{2023-09-20}
 was not caused by censor action:
