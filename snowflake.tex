@@ -1061,29 +1061,47 @@ We~prototyped successfully with QUIC before deciding on KCP/\allowbreak smux.
 % "turn off reliable mode for WebRTC DataChannel" https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/merge_requests/109
 % "Snowflake is currently using network resource in a so suboptimal way..." https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40251#note_2891751
 
-Snowflake can be seen as an instance of the
-``untrusted messengers'' model of Feamster et~al.~\cite[\S 3]{Feamster2003a}:
-our \firstterm{proxies} and \firstterm{bridge} correspond to their
-\firstterm{messengers} and \firstterm{portal}.
-Proxies are tasked with delivering the client's data to the bridge,
-but are not permitted to tamper with or inspect~it,
-which necessitates an inner,
-end-to-end secure protocol between the client and the bridge.
-In~our deployment, this is Tor protocol.
-After removing the WebSocket and Turbo Tunnel layers,
-the Snowflake bridge feeds the client's Tor streams
-into a Tor bridge running on the same host.
-The use of Tor is an implementation choice, not a requirement---many
-other protocols would work in its place.
-Tor has the nice quality that
-not even the bridge
-sees the plaintext of client streams.
+One more protocol layer is needed inside the tunnel:
+an~end-to-end secure channel between the client and the bridge,
+using keys unknown to the proxy.
+The purpose of this channel is to let
+the client tell the bridge what destinations to access,
+and prevent the proxy from inspecting or tampering with the traffic
+it carries.
+Nothing sophisticated is required here---SOCKS over TLS,
+or any VPN protocol,
+for example, would work fine.
+Our deployment uses Tor as this secure channel:
+after removing the WebSocket and Turbo Tunnel layers,
+the bridge feeds the client's stream into a local Tor bridge,
+which routes the stream into the Tor network
+and eventually to its destination.
+Using Tor, of course,
+has the advantage that not even the bridge
+is trusted to see the contents of client streams
+or know their destination.
 But Tor also has certain drawbacks,
 which we will comment on in
 \autoref{sec:multi-bridge}
 and
 \autoref{sec:future}.
-\todo{State that ``untrusted messenger'' protects proxies as well.}
+
+Snowflake may be seen as an instance of the
+``untrusted messengers'' model of Feamster et~al.~\cite[\S 3]{Feamster2003a}.
+Our \firstterm{proxies} correspond to their \firstterm{messengers};
+our \firstterm{bridge} is their \firstterm{portal}.
+Proxies are trusted to deliver the client's client's traffic to the bridge,
+but not directly to the destination.
+An~inner layer of cryptography protects the client's traffic
+from observation and manipulation by malicious proxies.
+The protection goes in the other direction as well:
+because proxies are programmed to connect only to a Snowflake bridge,
+and they never process anything but ciphertext,
+a~malicious client cannot cause a proxy to misbehave
+or have the client's actions attributed to~it.
+Without this mutual guarantee of safety,
+it~would be too risky to associate a client and proxy
+who have no preexisting trust relationship.
 
 \section{Protocol fingerprinting}
 \label{sec:fingerprinting}
