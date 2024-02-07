@@ -3,6 +3,7 @@
 \usepackage{bigdelim}
 \usepackage[top=1in,bottom=1in,left=0.75in,right=0.75in]{geometry}
 \usepackage{graphicx}
+\usepackage[marginal]{footmisc}
 \usepackage{makecell}
 \usepackage{multirow}
 \usepackage{newtxtext}
@@ -65,10 +66,13 @@
 % Use a smaller font size for footnotes that consist entirely of a URL, so URLs like
 % https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/XXXXX
 % fit in one line.
+\setlength{\footnotemargin}{1.5ex}
 \newlength{\urlfootnotesize}
-\setlength{\urlfootnotesize}{6.4pt}
+\setlength{\urlfootnotesize}{7pt}
 \newcommand{\urlfootnote}[1]{\footnote{
-\raggedright\fontsize{\urlfootnotesize}{\urlfootnotesize}\selectfont\url{#1}
+\raggedright\hangindent\footnotemargin%
+\fontsize{\urlfootnotesize}{\urlfootnotesize}\selectfont%
+\url{#1}
 }}
 
 \begin{document}
