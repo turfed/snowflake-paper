@@ -1352,17 +1352,15 @@ controllable by the application.
 The DNS prefilter may perhaps be mitigated
 by alternative rendezvous methods (\autoref{sec:rendezvous}),
 or~by smarter selection of STUN servers.
-Xie et~al.~\cite{Xie2023a} trained a decision tree on
-packet size, direction, latency, and bandwidth features, with the aim of
-distinguishing Snowflake's domain fronting rendezvous
-from other forms of HTTPS.
-A~challenge in classifying rendezvous flows
-is that they do not consist of many packets,
-which limits the features a classifier has to work with.
-Their lowest reported false positive rate of 0.25\%~is,
-in~our opinion, unworkably high,
-given the low base rate of Snowflake rendezvous connections.
 
+Xie et~al.~\cite{Xie2023a} trained a decision tree to
+distinguish Snowflake's domain fronting rendezvous
+from certain other HTTPS exchanges.
+They achieved some success using
+packet size, direction, latency, and bandwidth features,
+though the lowest reported false positive rate of 0.25\%
+would translate into substantial overblocking
+at the scale of an international Internet connection.
 Wails et~al.~\cite{Wails2024a}
 criticize past research on detecting circumvention systems,
 saying that accuracy claims do not hold up
@@ -1388,7 +1386,37 @@ fixed proxies mitigates against this enhancement.
 % over time rather than a few long-term static bridges, similar
 % the design of Snowflake."
 
-\todo{Talk about traffic shaping, ``Grounding in Empiricism''~\cite{Tschantz2016a}?}
+Related to protocol fingerprinting is \firstterm{traffic analysis}:
+classifying connections based on features like
+the sequence of packet lengths and transmission times,
+which may differ, in~circumvention use cases,
+from other uses of the cover protocol.
+The best classifiers in the works of the previous paragraph
+use traffic analysis features.
+While traffic analysis attacks are worth thinking about,
+we~caution that academic audiences
+have historically overestimated how much they matter in practice.
+Tschantz et~al.~\cite[\S VII]{Tschantz2016a} have observed
+that censors are sensitive to costs
+and---particularly---false positives.
+They claim (and our experience bears it out)
+that censors prefer to traffic classification rules
+that are simple, precise, and deterministic,
+and avoid ones that
+require keeping state,
+are computationally expensive,
+or~have non-negligible false positive rates---all
+of which descriptors apply to traffic analysis classifiers.
+% Traffic analysis attacks are hardly worth considering
+% until after taking care of the fundamentals
+% of endpoint and content blocking,
+% and even then, there is, as~yet, little evidence of their being used.
+Nevertheless, we~have tried to future-proof Snowflake in this regard:
+the protocol inside the WebRTC data channel supports
+arbitrary shaping of data units inside the tunnel,
+which ought to be sufficient to imitate the traffic fingerprint
+of other WebRTC applications, should that become necessary.
+But the feature is currently unused.
 
 \begin{figure*}[t]
 \includegraphics{figures/users/users-global}
