@@ -638,7 +638,7 @@ but it increases the number of usable intermediaries and front domains.
 \item[Amazon SQS]
 Amazon's Simple Queue Service (SQS) is a message queuing service designed for
 communication between microservices. Services may create queues, send messages
-with up to 256KB payloads, and retrieve messages from the queues. For the Snowflake
+with up to 256~kB payloads, and retrieve messages from the queues. For the Snowflake
 rendezvous, we create a persistent, public broker queue that any client may send to.
 The broker processes retrieved messages and responds to the client by creating a new
 single-use queue with the client's unique ID in the queue name.\urlfootnote{
