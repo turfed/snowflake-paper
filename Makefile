@@ -37,6 +37,6 @@ snowflake.bst:
 
 .PHONY: clean
 clean:
-	rm -rf $(addprefix snowflake,.aux .ent .log .pdf .bbl .blg .out)
+	rm -f $(addprefix snowflake,.aux .ent .log .pdf .bbl .blg .out)
 
 .DELETE_ON_ERROR:
