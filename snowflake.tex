@@ -593,7 +593,7 @@ and the methods do not necessarily need to bear any relation
 to the circumvention techniques of the main system.
 While the assumption of WebRTC permeates Snowflake's design,
 its rendezvous modules are independent.
-We~currently support two rendezvous methods in Snowflake:
+We~currently support three rendezvous methods in Snowflake:
 
 \begin{description}
 \item[Domain fronting]
@@ -635,16 +635,20 @@ broker's hostname in the TLS SNI,
 but it increases the number of usable intermediaries and front domains.
 
 % "Snowflake rendezvous using Amazon SQS" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/26151
-\item[Amazon SQS]
-Amazon's Simple Queue Service (SQS) is a message queuing service designed for
-communication between microservices. Services may create queues, send messages
-with up to 256~kB payloads, and retrieve messages from the queues. For the Snowflake
-rendezvous, we create a persistent, public broker queue that any client may send to.
-The broker processes retrieved messages and responds to the client by creating a new
-single-use queue with the client's unique ID in the queue name.\urlfootnote{
+% "Deploy new SQS rendezvous method" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40323
+% https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/blob/38352b22ade217bd1372772b9cb69f8eff93e919/doc/rendezvous-with-sqs.md
+\item[SQS (Simple Queue Service)]
+Amazon SQS is a message queuing service designed for
+communication of short messages between microservices.
+Snowflake has the ability
+(new at the time of this writing)
+to use a message queue as a one-way communication channel.\urlfootnote{
 https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/merge_requests/214
 }
-Blocking SQS rendezvous requires, at the very least, blocking access to Amazon's SQS service by region.
+Clients write into a public, well-known queue which the broker reads from.
+The broker responds to the client by creating a new, single-use queue
+under the client's random session session identifier.
+Communication is indirect, via SQS servers.
 \end{description}
 
 Anything that can be persuaded to convey a message
