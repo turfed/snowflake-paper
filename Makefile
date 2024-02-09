@@ -39,20 +39,20 @@ ORIG = a653e7c0285529c8f2502ab2cb74e73660cf4dc9
 PREV = 4a9d42cb0fb200af079ae3421b0c96d79385a6e3
 STAMP = $(shell git log -1 --pretty=format:%ad --date=format:%Y%m%d HEAD).$(shell git rev-parse --short=8 HEAD)
 .PHONY: diff
-diff: sec24fall-paper45.$(STAMP).pdf \
-	sec24fall-paper45.$(STAMP).diff.pdf \
-	sec24fall-paper45.$(STAMP).cumul.pdf
-.INTERMEDIATE: sec24fall-paper45.orig.tex sec24fall-paper45.prev.tex
-sec24fall-paper45.orig.tex:
+diff: sec24fall-paper1998.$(STAMP).pdf \
+	sec24fall-paper1998.$(STAMP).diff.pdf \
+	sec24fall-paper1998.$(STAMP).cumul.pdf
+.INTERMEDIATE: sec24fall-paper1998.orig.tex sec24fall-paper1998.prev.tex
+sec24fall-paper1998.orig.tex:
 	git show $(ORIG):snowflake.tex > "$@"
-sec24fall-paper45.prev.tex:
+sec24fall-paper1998.prev.tex:
 	git show $(PREV):snowflake.tex > "$@"
-sec24fall-paper45.$(STAMP).tex:
+sec24fall-paper1998.$(STAMP).tex:
 	git show HEAD:snowflake.tex > "$@"
-sec24fall-paper45.$(STAMP).diff.tex: sec24fall-paper45.prev.tex sec24fall-paper45.$(STAMP).tex
-	latexdiff sec24fall-paper45.prev.tex sec24fall-paper45.$(STAMP).tex > "$@"
-sec24fall-paper45.$(STAMP).cumul.tex: sec24fall-paper45.orig.tex sec24fall-paper45.$(STAMP).tex
-	latexdiff sec24fall-paper45.orig.tex sec24fall-paper45.$(STAMP).tex > "$@"
+sec24fall-paper1998.$(STAMP).diff.tex: sec24fall-paper1998.prev.tex sec24fall-paper1998.$(STAMP).tex
+	latexdiff sec24fall-paper1998.prev.tex sec24fall-paper1998.$(STAMP).tex > "$@"
+sec24fall-paper1998.$(STAMP).cumul.tex: sec24fall-paper1998.orig.tex sec24fall-paper1998.$(STAMP).tex
+	latexdiff sec24fall-paper1998.orig.tex sec24fall-paper1998.$(STAMP).tex > "$@"
 
 .PHONY: clean
 clean:
