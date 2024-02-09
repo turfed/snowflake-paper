@@ -103,7 +103,7 @@ which accept traffic from censored clients using peer-to-peer WebRTC protocols
 and forward it to a centralized bridge.
 The temporary proxies are simple enough to be implemented in JavaScript,
 in~a web page or browser extension,
-making them vastly cheaper to run than
+making them much cheaper to run than
 a traditional proxy or VPN server.
 The large and constantly changing pool
 of proxy addresses resists enumeration and blocking by a censor.
@@ -206,7 +206,7 @@ can then forward the client's communication to any destination.
 and a stable long-term \firstterm{bridge}, but the idea is the same.)
 The censor is presumed to derive benefit
 from permitting some forms of network access:
-the censor cannot trivially ``win''
+the censor does not trivially ``win''
 by shutting down all communication,
 but must be selective in its blocking decisions,
 in order to optimize some objective of its own.
@@ -488,8 +488,8 @@ whenever the current one stops working.
 State variables stored at the client and the bridge
 let the session pick up where it left off.
 The change of proxies is invisible to the applications using Snowflake
-(except for a brief delay while rendezvous happens):
-the Snowflake client presents an abstraction of a single, uninterrupted connection.
+(except for a brief delay for another rendezvous).
+The Snowflake client presents an abstraction of one uninterrupted connection.
 
 It~does not avail a censor to block the broker or bridge,
 because Snowflake clients never contact either one directly.
@@ -931,7 +931,7 @@ and could be changed
 without affecting the rest of the system.
 It does not need to be resist blocking,
 it~just needs to be available to JavaScript code in web browsers.
-WebRTC, for example, would work for this link too.
+WebRTC, for example, could be used for this link as well.
 
 \subsection{Data transfer}
 \label{sec:data-transfer}
@@ -1080,8 +1080,8 @@ and
 
 Snowflake may be seen as an instance of the
 ``untrusted messengers'' model of Feamster et~al.~\cite[\S 3]{Feamster2003a}.
-Our \firstterm{proxies} correspond to their \firstterm{messengers},
-our \firstterm{bridge} to their \firstterm{portal}.
+Our \firstterm{proxies} correspond to their \firstterm{messengers};
+our \firstterm{bridge} is their \firstterm{portal}.
 Proxies are trusted to deliver the client's client's traffic to the bridge,
 but not directly to the destination.
 An~inner layer of cryptography protects the client's traffic
@@ -1117,9 +1117,8 @@ Unfortunately for the circumvention developer,
 the richness of WebRTC protocols
 creates a large attack surface for fingerprinting.
 Not only that, WebRTC leaves the details of
-signaling---the process by which peers exchange the information
-needed to set up a connection,
-corresponding to Snowflake rendezvous---unspecified~\cite[\S 3]{rfc8825},
+the signaling path---the medium through which peers exchange information
+needed to set up a connection---unspecified~\cite[\S 3]{rfc8825},
 leaving every application to invent its own mechanism.
 % "The choice of protocols for client-server and inter-server signaling, and the definition of the translation between them, are outside the scope of the WebRTC protocol suite described in this document."
 % https://www.rfc-editor.org/rfc/rfc8829.html#section-3.1: "JSEP does not specify a particular signaling model or state machine, other than the generic need to exchange session descriptions in the fashion described by [RFC3264] (offer/answer)..."
@@ -2037,7 +2036,7 @@ and network restrictions in Iran beginning September~2022,
 % 2022-10-03 https://www.eff.org/deeplinks/2022/10/snowflake-makes-it-easy-anyone-fight-censorship
 at which times there were campaigns
 to encourage running Snowflake proxies.
-Unknown proxy types (amounting to fewer than~50) are not shown.
+Unknown proxy types (fewer than~50 instances) are not shown.
 }
 \label{fig:proxy-type}
 % 2021-02-23 https://github.com/guardianproject/orbot/releases/tag/16.4.1-BETA-2-tor.0.4.4.6
