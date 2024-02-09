@@ -132,9 +132,33 @@ and reflect on implications for circumvention generally.
 \section{Introduction}
 \label{sec:intro}
 
-Censorship circumvention systems---systems
-to enable network communication
-despite interference by a censor---may
+Snowflake is a censorship circumvention system,
+a~system to enable network communication
+despite interference by a censor.
+Its blocking resistance comes from a large pool
+of low-cost, temporary proxies
+that varies over time
+and offers a censor no fixed target for blocking.
+The core research purpose of this paper
+is to investigate experimentally to what extent
+a circumvention system that makes the tradeoffs Snowflake does
+can be effective against contemporary censors.
+We~will present the design of the system,
+listing the many challenges of circumvention
+and showing how Snowflake addresses them.
+We~will explain how Snowflake solves the technical challenge
+of providing a good user experience
+when proxies are individually unreliable.
+We~will document the reactions of national censors
+through case studies in
+Russia, Iran, China, and Turkmenistan
+over more than three years of deployment.
+On~the way will will provide quantitative evaluations
+of various facets of the system,
+including the number of clients served,
+and the size and composition of the proxy pool.
+
+Censorship circumvention systems may
 be characterized on multiple axes.
 Some systems imitate a common network protocol;
 others try
@@ -149,28 +173,21 @@ research and development, human resources, and hardware;
 or in the inevitable overblocking that results
 when a censor tries to selectively block
 some connections but not others.
-Snowflake, the subject of this paper,
-is a circumvention system that
-uses thousands of temporary proxies
-and makes switching between them easy and fast.
 On~the spectrum of imitation to randomization,
 Snowflake falls on the side of imitation;
 on the scale of diffuse to concentrated, it is diffuse.
-What characterizes Snowflake the most is that
-it pushes the idea of distributed, disposable
-proxies to an extreme:
-its~proxies can run in a web browser,
-and censored clients communicate with them using WebRTC.
+Snowflake's defining characteristic is that it
+pushes the idea of distributed, disposable
+proxies to an extreme.
 
 WebRTC is a suite of protocols
 intended for real-time communication applications
 on the web~\cite{rfc8825}.
-Video and voice chat are typical examples
-of WebRTC applications.
+Video and voice chat are typical applications.
 Snowflake exchanges WebRTC data formats
 in the course of establishing a connection,
-and uses WebRTC protocols for traversal of NAT (network address translation)
-and communication between clients and proxies.
+and uses WebRTC protocols to traverse of NAT (network address translation)
+and to connect clients and proxies.
 Crucially for Snowflake, WebRTC APIs
 are available to JavaScript code in web browsers,
 meaning it is possible to implement a proxy
@@ -189,14 +206,14 @@ typical real-world censor behaviors include
 inspecting IP addresses and hostnames,
 checking packet contents for keywords,
 blocking IP addresses, and injecting false DNS responses
-or TCP RST packets.
+and TCP RST packets.
 The client wants to communicate with some
 \firstterm{destination} outside the censor's network,
 possibly with the aid of third-party \firstterm{proxies}.
 The censor is motivated to block the contents
-of the client's communication, or even the destination itself.
-The censor is aware of the possibility of circumvention,
-and therefore seeks to block not only direct communication,
+of the client's communication, or the destination itself.
+The censor knows of the possibility of circumvention,
+and therefore seeks to block not only direct communication with the destination,
 but also indirect communication by way of a proxy or circumvention system.
 Circumvention is accomplished when the client
 can reliably reach any proxy,
@@ -204,9 +221,9 @@ because a proxy, being outside the censor's control,
 can then forward the client's communication to any destination.
 (In Snowflake, we separate the roles of temporary \firstterm{proxies}
 and a stable long-term \firstterm{bridge}, but the idea is the same.)
-The censor is presumed to derive benefit
+The censor derives benefit
 from permitting some forms of network access:
-the censor does not trivially ``win''
+it~cannot trivially ``win''
 by shutting down all communication,
 but must be selective in its blocking decisions,
 in order to optimize some objective of its own.
@@ -220,27 +237,21 @@ Snowflake originates in two earlier projects:
 flash proxy and uProxy.
 % https://lists.torproject.org/pipermail/tor-dev/2016-January/010310.html "Snowflake is a webrtc pluggable transport inspired by flashproxy."
 % https://keroserene.net/snowflake/technical/#1-introduction "It is inspired by and builds upon the previous work of Flashproxy. Snowflake is much like a hybrid of previous Pluggable Transports..."
-Flash proxy~\cite{Fifield2012a}, like Snowflake, used a model
-of untrusted, temporary JavaScript proxies in web browsers,
-but the link between client and proxy used WebSocket
-rather than WebRTC.
-(WebSocket still finds use in Snowflake,
-but on the proxy--bridge link,
-not the client--proxy link.)
-Flash proxy was deployed in Tor Browser
+Flash proxy~\cite{Fifield2012a}, like Snowflake, used
+untrusted temporary JavaScript proxies in web browsers
+forwarding to a central bridge,
+but the link between client and proxy was WebSocket
+rather than WebRTC,
+which was then an emerging technology.
+Flash proxy was deployed
 % 2013: https://blog.torproject.org/combined-flash-proxy-pyobfsproxy-browser-bundles
 % 2016: "Remove Flashproxy from Tor Browser" https://bugs.torproject.org/17428#note_2203210
 from 2013 to~2016,
 but never saw much use,
-probably because the reliance on WebSocket,
+probably because WebSocket,
 which lacks the built-in NAT traversal of WebRTC,
-required client users to do their own port forwarding.
+required clients to do complicated port forwarding.
 % https://gitlab.torproject.org/legacy/trac/-/wikis/doc/PluggableTransports/FlashProxy/Howto
-WebRTC was then an emerging technology, and while
-% "Investigate WebRTC for flash proxy NAT punching" https://bugs.torproject.org/5578
-% flashproxy.pdf §5.2: "New technologies like WebRTC [24] may fill this need in the future, if they become sufficiently popular that flash proxies' use of them does not stand out as unusual."
-it had been considered as a transport protocol for flash proxy,
-we decided to start Snowflake as an independent project.
 % https://serene.cx/snowflake/#note-flashproxy "...one could say that uProxy and flashproxy are the ancestors of snowflake."
 uProxy~\cite{uproxy}, in one of its early incarnations,
 % "in one of its earlier incarnations": uProxy pivoted from friend proxies to cloud servers in 2016:
@@ -249,26 +260,26 @@ uProxy~\cite{uproxy}, in one of its early incarnations,
 % https://lists.torproject.org/pipermail/tor-dev/2016-September/011489.html
 pioneered the use of WebRTC proxies for circumvention.
 uProxy's proxies were browser-based,
-but its trust and deployment models were different
+but its trust and deployment model was different
 from flash proxy's and Snowflake's.
-Each censored client would arrange, out of band,
+Censored clients would arrange, out of band,
 for an acquaintance outside the censor's network
 to run a proxy in their browser~\cite{uproxy-design-doc}.
 % uProxy v1.2.5 Design Doc: https://docs.google.com/document/d/1t_30vX7RcrEGuWwcg0Jub-HiNI0Ko3kBOyqXgrQN3Kw
 % "uProxy depends on leveraging existing trust relationships to to find and use a proxy."
 A~personal trust relationship was necessary to prevent misuse,
 since browser proxies fetched destination content directly---meaning
-the client's activity would be attributed to the proxy,
-and the proxy could inspect the client's traffic.
+client activity would be attributed to the proxy,
+and the proxy might inspect the client's traffic.
 Clients did not change proxies on the fly.
 uProxy supported protocol obfuscation:
-the communications protocol was fundamentally WebRTC,
-but packets could be transformed to resemble something else.
+its packets could be transformed to resemble something
+other than WebRTC.
 % https://github.com/uProxy/uproxy-obfuscators
-This obfuscation was possible because of
-uProxy's implementation as a privileged browser extension,
+This was possible because of
+uProxy's implementation as a privileged browser extension
 with access to real sockets.
-Because Snowflake uses ordinary unprivileged browser APIs,
+Because Snowflake uses ordinary unprivileged APIs,
 its WebRTC can only look like WebRTC;
 on the other hand, for the same reason,
 Snowflake proxies are easier to deploy.
@@ -285,16 +296,13 @@ proxying though volunteer proxies, called buddies.
 MassBrowser's architecture is similar to Snowflake's:
 there is a centralized component that coordinates
 connections between clients and buddies,
-corresponding to a piece in Snowflake called the broker;
-buddies play the same role as our proxies.
-The~trust model is intermediate between Snowflake's and uProxy's.
+which corresponds to a piece in Snowflake called the broker;
+buddies are similar to our proxies.
+The~trust model is in between Snowflake's and uProxy's.
 Buddies preferentially operate as one-hop proxies, as in uProxy,
 but are not limited to proxying only for trusted friends.
 To~deter misuse, buddies specify a policy of
 what categories of content they are willing to proxy.
-An~innovation in MassBrowser not present in Snowflake is client-to-client proxying:
-clients may act as buddies for other clients,
-the logic being that what is censored for one client may not be censored for another.
 The buddy software is
 not constrained by a web browser environment,
 and can, like uProxy, use protocol obfuscation
@@ -306,29 +314,29 @@ on the client--buddy link.
 % VI-A: "MassBrowser uses a custom protocol over TCP/UDP for the communications
 % between Clients and Buddies."
 
+Other circumvention systems have used WebRTC,
+though without Snowflake's focus on numerous proxies.
 Protozoa~\cite{Barradas2020a}
 % reading group summary of Protozoa https://github.com/net4people/bbs/issues/55
 and Stegozoa~\cite{Figueira2022a}
-show ways of building a point-to-point covert tunnel over WebRTC,
+demonstrate point-to-point covert tunnel over WebRTC,
 the former by directly replacing encoded media
 with its own ciphertexts,
 the latter using video steganography.
-Designs like these might serve as alternatives
-for the link between client and proxy in Snowflake.
 Significantly, where Snowflake now uses WebRTC data channels,
 Protozoa and Stegozoa use WebRTC media streams,
-which may be an advantage in blocking resistance.
+which may have advantages for blocking resistance.
 We will say more on this point in \autoref{sec:fingerprinting}.
-TorKameleon~\cite{arxiv.2303.17544} is a WebRTC-based transport
-with the dual goals of resisting blocking (circumvention)
-and complicating traffic correlation attacks (anonymity).
-It~has the notable technical innovation of using a draft API called
+TorKameleon~\cite{arxiv.2303.17544} is a WebRTC-based system
+with the dual goals of resisting blocking
+and complicating traffic correlation attacks.
+It~uses a recent draft programming interface called
 WebRTC Encoded Transforms
 % "Editor's Draft" status as of 2023-12-12 https://w3c.github.io/webrtc-encoded-transform/
 % https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Using_Encoded_Transforms
-to support efficient Protozoa-like
+to support Protozoa-like
 embedding of data within media streams,
-without requiring invasive modifications in a browser.
+without invasive browser modifications.
 % Examples of Encoded Transforms in TorKameleon source code:
 % https://github.com/AfonsoVilalonga/TorKameleon/blob/c6ef7116043dfd74701ddb62f38606e748faf84b/PT/WebRTC/Client/public/js/main.js#L225
 %   const transformStream = new TransformStream({
@@ -347,19 +355,15 @@ without requiring invasive modifications in a browser.
 % But it wasn't WebRTC, so was less like Snowflake than uProxy was.
 % I'll draw the line here, since even Tor bridges are "volunteer-operated" in a sense.
 
-Our goal in this paper
-is not to exaggerate the advantages of Snowflake,
+Our goal in this paper is to provide a realistic assessment of Snowflake,
+neither to exaggerate its advantages,
 nor disproportionately emphasize the limitations
-of other circumvention systems.
+of other systems.
 Circumvention research is a cooperative enterprise,
 and we recognize and support our colleagues who
-pursue and maintain their own designs.
-While challenges remain,
-today's circumvention systems by and large
-accomplish their intended purpose,
-and are a vital element of day-to-day Internet access for many people.
-With Snowflake, we have explored a different point in the design space---a~fruitful
-one to be sure---but one with its own tradeoffs.
+design and maintain their own systems.
+With Snowflake, we have tried to explore a different point in the design space,
+and by this exploration widen the scope of effective circumvention techniques.
 We~acknowledge that Snowflake will be a better choice in some
 censorship environments and
 worse in others; indeed,
@@ -368,9 +372,6 @@ is that blocking resistance
 can be meaningfully understood only in relation to particular censor
 and its resources, costs, and motivations.
 
-In~this paper we present the design of Snowflake,
-discuss various challenges and considerations,
-and reflect on over three years of deployment.
 As~of February 2024, Snowflake supports an estimated 42,000 average concurrent users
 % > library("tidyverse")
 % > WANTED_FINGERPRINTS <- c(
