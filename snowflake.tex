@@ -2090,20 +2090,20 @@ can also \emph{provide} Snowflake proxy service to others,
 a~feature called ``kindness mode.''
 % Only so called in Orbot v17+, which should be current by the time the paper is submitted.
 
-We coordinated with the Tor Project's network health team to collect privacy preserving metrics at the broker
+We coordinated with the Tor Project's network health team to collect privacy-preserving metrics at the broker
 during the client and proxy polls of the Snowflake rendezvous.\urlfootnote{
 https://bugs.torproject.org/tpo/network-health/metrics/collector/29461
 }
 The resulting metrics
-are published at the end of every 24 hour collection period\urlfootnote{
+are published at the end of every 24-hour collection period\urlfootnote{
 https://metrics.torproject.org/collector.html\#snowflake-stats
 }
 in aggregate and we do not publish or store
 client or proxy IP addresses. Metrics concerning client polls are rounded up to the nearest multiple
-of 8 to prevent individual participation patterns from becoming visible in the aggregate counts.
+of~8 to prevent individual participation patterns from becoming visible in the aggregate counts.
 The collected metrics allow us to determine daily unique proxy IP counts,
 along with the associated country
-codes, proxy types, NAT behavior types (i.e., restricted, unrestricted, or unknown), and how many times
+codes, proxy types, NAT behavior types (restricted, unrestricted, or unknown), and how many times
 a proxy was matched with a client.
 \autoref{fig:proxy-type} shows the daily counts
 of each proxy type.
