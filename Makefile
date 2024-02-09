@@ -56,6 +56,6 @@ sec24fall-paper45.$(STAMP).cumul.tex: sec24fall-paper45.orig.tex sec24fall-paper
 
 .PHONY: clean
 clean:
-	rm -rf $(addprefix snowflake,.aux .ent .log .pdf .bbl .blg .out)
+	rm -f $(addprefix snowflake,.aux .ent .log .pdf .bbl .blg .out)
 
 .DELETE_ON_ERROR:
