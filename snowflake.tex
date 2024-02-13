@@ -943,14 +943,23 @@ No~complicated processing takes place at the proxy.
 The main value of a Snowflake proxy is its IP address:
 it~gives the client a peer to connect to that is not on the censor's address blocklist.
 Having provided that,
-the proxy assumes a role of pure data transfer.
+the proxy assumes a role of data transfer,
+copying data upstream from client to bridge
+and downstream from bridge to client.
 
 Snowflake uses a stack of nested protocol layers.
-We~will walk though the layers and describe the purpose of each.
+\autoref{fig:protocol-layers}
+shows the stack for the link between the client and the proxy.
+This is the link that uses WebRTC,
+and the one that is exposed to the censor.
+The stack for the proxy--bridge link is the same,
+but with WebSocket replacing
+WebRTC in the outermost layer.
+The top of the diagram is ``outer,'' closer to the network;
+the bottom is ``inner,'' closer to the user.
 
-\bigskip
-
-\noindent
+\begin{figure}[h]
+\centering
 \begin{tabular}{@{}l@{\,}l@{}l@{\,}l}
 UDP & \rdelim\}{3}{*} & \multirow{3}{5em}{WebRTC\\[-2pt]data channel} & \rdelim\}{3}{*}[\,ephemeral, per proxy]\\
 DTLS \\
@@ -960,22 +969,24 @@ smux \\
 \multicolumn{3}{@{}l}{Tor protocol} \\
 \multicolumn{4}{@{}l}{application streams} \\
 \end{tabular}
+\caption{
+The protocol stack for the client--proxy link.
+}
+\label{fig:protocol-layers}
+\end{figure}
 
-\bigskip
-
-\noindent
-This is the stack for the client--proxy link,
-which is the place where WebRTC is used, and which is
-exposed to observation by the censor (\autoref{fig:architecture}).
-The stack for the proxy--bridge link is the same,
-but with WebSocket in place of the
-WebRTC data channel at the top.
-The layers marked ``ephemeral'' are skimmed off
-and replaced as proxies come and~go.
-The layers marked ``persistent'' are instantiated once
-in each circumvention session,
-hold long-term state,
-and are end-to-end between client and bridge.
+Each layer serves a different purpose.
+The layers marked ``ephemeral'' are replaced
+at every proxy switchover.
+These outer layers form the ``carrier''
+over which the more stateful inner layers are transported.
+The layers marked ``persistent'' are instantiated just once
+per circumvention session, outliving any single proxy.
+They maintain end-to-end state
+and present an abstraction of a single long-lived tunnel.
+Finally, over this tunnel
+are transported the user's application streams,
+for example web browsing and messaging.
 
 The connection between a client and its proxy is
 a WebRTC data channel~\cite{rfc8831},
