@@ -801,11 +801,13 @@ Symmetric            & \Y & \Y & \Y & \n & \n & \\[\dimexpr 0.5ex - \dimexpr 0.5
 \end{tabular}
 \caption{
 Pairwise compatibility of NAT variants,
-using the facilities of STUN alone
-(no fallback to TURN).
-The incompatible cases are when one peer's NAT is symmetric
+assuming the facilities of STUN alone
+(no~fallback to TURN).
+The incompatible cases,
+which the broker tries to avoid when matching,
+are when one peer's NAT is symmetric
 and the other's is symmetric or port-restricted cone.
-Note the asymmetry in what NAT variants we consider ``restricted''
+Note the asymmetry in what NAT variants are considered ``restricted''
 in client and proxy.
 }
 \label{tab:nat-matching}
@@ -844,8 +846,8 @@ Proxies cannot use the same technique,
 because the necessary STUN features are not exposed
 to JavaScript.
 Instead,
-we adapt a technique from MassBrowser~\cite[\S \mbox{V-A}]{Nasr2020a}:
-we~run a centralized, always-on WebRTC testing peer
+we adapt a technique from MassBrowser~\cite[\S \mbox{V-A}]{Nasr2020a}
+and run a centralized, always-on WebRTC testing peer
 behind a simulated symmetric NAT.\urlfootnote{
 % "Have a remote probe service to test snowflake proxy NAT compatability"
 https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40013
@@ -864,10 +866,9 @@ which the broker conservatively treats as if it were restricted.
 \caption{
 Proxy NAT types, in unique IP addresses per day.
 The places in 2021 and 2022
-where there is an increase in the ``unknown'' NAT type
-and a decrease in the other types
-were the result of operational problems with
-NAT type testing.
+where ``Unknown'' displaced other types
+were caused by operational problems with
+the centralized NAT type testing peer.
 % "Increase of 'unknown' NAT assignments by probetest since 2021-10-25" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40071
 % "Move snowflake-broker to a systemd based setup" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40147
 }
