@@ -691,76 +691,83 @@ the combination is only as strong as the weaker of the~two.
 \subsection{Peer-to-peer connection establishment}
 \label{sec:connection}
 
-Now the client and the proxy connect to each other directly.
+After rendezvous,
+the client and its assigned proxy connect to one another directly.
 Even in the absence of censorship,
-making a direct connection between two Internet peers is not always easy,
-because of NAT (network address translation) and firewalls.
-Snowflake clients and proxies alike run in diverse networks
+making a connection between two Internet peers is not trivial,
+because of possible interference by NAT (network address translation) and firewalls.
+Snowflake clients and proxies run in diverse networks
 with varying NATs and ingress policies.
 Fortunately for us,
-WebRTC is designed with this use case in mind,
-and has built-in support for traversing NAT, in~the form of
+WebRTC is designed with this use case in mind.
+It~has built-in support for NAT traversal in the form of
 ICE (Interactive Connectivity Establishment)~\cite{rfc8445},
-a procedure for testing candidate pairs of peer network addresses
-to find one that works.
-ICE~makes use of third-party
-STUN (Session Traversal Utilities for NAT)~\cite{rfc8489}
-servers that, among other things,
-enable a host to learn its external IP addresses.
+a procedure for testing combinations of peer addresses
+until finding one that works.
+ICE~uses third-party
+STUN (Session Traversal Utilities for NAT) servers~\cite{rfc8489}
+that, among other services,
+let a host discover its own external IP addresses.
 The first part of ICE took place at the beginning of rendezvous,
 when the client and proxy contacted STUN servers to gather
 external address candidates and included them in their respective
 SDP offer and answer.
+After rendezvous,
+the peers try pairs of candidate addresses
+until they are able to establish a connection.
 
-There is no guarantee that two hosts will be able to make
-a connection using the facilities of STUN alone.
-Some address mapping and
-filtering setups are simply incompatible.
+There is no guarantee that two hosts will be able to
+connect using the facilities of STUN alone.
+Some combinations of address mapping and
+filtering are simply incompatible.
 In~such a case,
-ICE would normally fall back to using
-TURN (Traversal Using Relays around NAT)~\cite{rfc8656},
+ICE would normally fall back to relaying traffic through a
+TURN (Traversal Using Relays around NAT) server~\cite{rfc8656},
 a~kind of UDP proxy.
-Such a fallback would be problematic for Snowflake,
-because the TURN relays themselves
+A~fallback to TURN would be problematic for Snowflake,
+because the TURN servers themselves
 would become a target of blocking by the censor.
 % "Configure TURN servers for the proxy and/or client" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/25596
-But Snowflake has an advantage most WebRTC applications do not.
-Most WebRTC applications want to connect \emph{a particular} pair of peers,
-whereas we are satisfied when a client can connect to \emph{any} proxy.
-Snowflake clients and proxies self-measure their NAT type
+% https://datatracker.ietf.org/doc/html/rfc8445#section-5.1.1.2
+% "...use of STUN and TURN servers may be unnecessary in certain networks and use of TURN servers may be expensive, so some deployments may elect not to use them."
+But Snowflake has an advantage:
+most WebRTC applications want to connect \emph{a particular} pair of peers,
+whereas we are happy to connect a client to \emph{any} proxy.
+Snowflake clients and proxies self-assess their NAT type
 and report it to the broker,
-which takes NAT compatibility into account
-and avoids cases that would require a fallback to TURN.
+which avoids making matches
+that would require TURN.
 
 % "Investigate Snowflake proxy failures" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/33666#note_2595319
 % "Okay here's a summary of what I've found: ..."
 
-We condense the possible combinations of NAT and firewall features
-that impact
-a Snowflake client or proxy's
-ability to make a peer-to-peer connection
-into the following well-known variations:
+We condense NAT and firewall features
+into the following well-known variations:\todo{
+Cut these definitions and replace with a reference to RFC 3489\cite[\S 5]{rfc3489}?
+}
 
+% These labels were used in RFC 3489 (2003; back when STUN was "Simple Traversal of UDP through NAT").
 % https://datatracker.ietf.org/doc/html/rfc3489#section-5
+% They aren't used in the obsoleting RFC 5389 and RFC 8489 (after it became "Session Traversal Utilities for NAT").
 \begin{description}
 \item[Full cone]
 The same internal IP--port pair always maps to the same external port.
-Any remote host may send a packet to an internal IP address and port by sending a packet to the
-mapped external port.
+Any remote host may send a packet to an internal IP--port pair through its
+external port.
 \item[Restricted cone]
 Like full cone,
-but incoming packets
+but inbound packets
 are allowed only if
-there has recently been an outgoing packet
+there has recently been an outbound packet
 to the same remote IP address.
 \item[Port-restricted cone]
 Like restricted cone,
-but incoming packets are allowed only if
-there has recently been an outgoing packet
+but inbound packets are allowed only if
+there has recently been an outbound packet
 to the same remote IP--port pair.
 \item[Symmetric]
 The external port depends on both
-the internal IP--port pair and the remote IP--port pair.
+the internal and external IP--port pairs.
 Incoming packets are allowed only if
 there has recently been an outgoing
 packet to the same remote address.
@@ -800,14 +807,14 @@ Symmetric            & \Y & \Y & \Y & \n & \n & \\[\dimexpr 0.5ex - \dimexpr 0.5
                      & \multicolumn{4}{c}{\footnotesize\makecell{unrestricted\\client}} & \clap{\footnotesize\makecell{restricted\\client}} \\
 \end{tabular}
 \caption{
-Pairwise compatibility of NAT variants,
-assuming the facilities of STUN alone
+Compatibility of NAT variations,
+assuming the use of STUN only
 (no~fallback to TURN).
 The incompatible cases,
 which the broker tries to avoid when matching,
 are when one peer's NAT is symmetric
 and the other's is symmetric or port-restricted cone.
-Note the asymmetry in what NAT variants are considered ``restricted''
+Note the asymmetry in what NAT variations are considered ``restricted''
 in client and proxy.
 }
 \label{tab:nat-matching}
@@ -816,7 +823,7 @@ in client and proxy.
 \autoref{tab:nat-matching}
 shows the pairwise compatibility of NAT variations.
 As~the incompatible cases always involve a symmetric NAT,
-we further simplify matching by categorizing the variations into the two types
+we further categorize the variations into the two types
 \firstterm{unrestricted} (works with most other NATs) and
 \firstterm{restricted} (works only with more permissive NATs).
 Unrestricted proxies may be matched with any client;
@@ -826,115 +833,106 @@ The broker prefers to match unrestricted clients with restricted proxies,
 in~order to conserve unrestricted proxies
 for the clients that need them.
 Symmetric NAT is always considered restricted,
-but port-restricted cone NAT differs
+but the type of port-restricted cone NAT differs
 depending on the peer:
 for proxies it is restricted, but
 for clients it is unrestricted.
-The asymmetric categorization is an approximation
-to help conserve unrestricted proxies
+This is a heuristic
+to conserve unrestricted proxies
 for clients with symmetric NATs.
-Though it creates the potential for an incompatible match,
-we believe this to be uncommon in practice.
-In~case of a connection failure,
-clients re-rendezvous and try again.
+Though it creates the potential for an incompatible match
+between a port-restricted cone client and a symmetric proxy,
+% https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/wikis/NAT-matching?version_id=dd1f328e2c9570eb252c43a053bdec0314c73345#fn-1-6791
+this case is rare in practice,
+and in the event it happens,
+a~client can re-rendezvous and try again.
 
-To self-assess their NAT type,
-clients use the NAT behavior discovery feature of STUN~\cite{rfc5780}.
+Clients use the NAT behavior discovery feature~\cite{rfc5780} of STUN
+to self-assess their NAT type.
 % "Use STUN to determine NAT behaviour of peers" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/34129
 % "Add utility to help user discover their NAT type" https://github.com/pion/stun/issues/8
 Proxies cannot use the same technique,
 because the necessary STUN features are not exposed
 to JavaScript.
-Instead,
+For them,
 we adapt a technique from MassBrowser~\cite[\S \mbox{V-A}]{Nasr2020a}
 and run a centralized, always-on WebRTC testing peer
 behind a simulated symmetric NAT.\urlfootnote{
 % "Have a remote probe service to test snowflake proxy NAT compatability"
 https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40013
 }
-Proxies try connecting to this peer:
-if~the connection succeeds, the proxy's type is unrestricted;
+If~a proxy can connect to the testing peer,
+its type is unrestricted;
 otherwise it is restricted.
-Clients and proxies retest their NAT type periodically,
-to account for potential changes in their local networking environment.
-If~a client or proxy is unable to determine its NAT type for some reason,
-it reports the type ``unknown,''
-which the broker conservatively treats as if it were restricted.
+% Clients and proxies retest their NAT type periodically,
+% to account for potential changes in their local networking environment.
+If~a client or proxy is unable to determine its NAT type,
+it~reports the type ``unknown,''
+which the broker conservatively treats as restricted.
 
 \begin{figure}
 \includegraphics{figures/proxies/proxy-nat-type}
 \caption{
 Proxy NAT types, in unique IP addresses per day.
 The places in 2021 and 2022
-where ``Unknown'' displaced other types
+where ``unknown'' displaced other types
 were caused by operational problems with
-the centralized NAT type testing peer.
+the NAT type testing peer.
 % "Increase of 'unknown' NAT assignments by probetest since 2021-10-25" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40071
 % "Move snowflake-broker to a systemd based setup" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40147
 }
 \label{fig:proxy-nat-type}
 \end{figure}
 
-\autoref{fig:proxy-nat-type}
-shows that unrestricted proxies form
-a relatively small fraction of the proxy population.
-In~absolute terms, there are enough,
-thanks in large part to the volunteers who run
-the command-line
-version of the Snowflake proxy
-on networks unencumbered by NAT.
-Though stable, long-term proxies go
-somewhat against the ethos of Snowflake,
-it~has proved useful, as a matter of practicality,
-to~sacrifice a measure of address diversity
-for better NAT compatibility in a common case.
-We~can estimate how many tries it takes a client
-to be matched with a proxy, on average,
-by counting failed and successful rendezvous attempts at the broker,
-under the assumption that clients repeat rendezvous attempts
-until getting a match.
-In~July 2023,
-unrestricted clients almost always got a match on the first attempt,
-while restricted clients needed an average of
-1.07 attempts (standard deviation 0.05).
+Unrestricted proxies are
+a relatively small fraction of the proxy population,
+as \autoref{fig:proxy-nat-type} shows.
+In~absolute number, though, there are enough
+for restricted clients at current levels of use.
+The broker counts the number of matched \((M)\)
+and unmatched \((U)\) client rendezvous requests per day.
+If~we assume that clients attempt rendezvous repeatedly until getting a match,
+then the number of attempts per success is \((U + M) / M\).
+Under this assumption, as~of February 2024,
+the average client needs 1.01 rendezvous attempts
+to find a compatible proxy.
 % > library(tidyverse)
 % > read_csv("figures/proxies/client-match.csv") %>%
 %     filter(date < "2024-02-01") %>%
+%     mutate(
+%       attempts_per_success = (matched_count + unrestricted_denied_count + restricted_denied_count) / matched_count,
+%     ) %>%
 %     group_by(month = format(date, "%Y-%m")) %>%
 %     summarize(
-%       unrestricted_n  = mean((matched_count + unrestricted_denied_count) / matched_count),
-%       unrestricted_sd =   sd((matched_count + unrestricted_denied_count) / matched_count),
-%       restricted_n    = mean((matched_count + restricted_denied_count) / matched_count),
-%       restricted_sd   =   sd((matched_count + restricted_denied_count) / matched_count),
+%       mean_attempts_per_success = mean(attempts_per_success),
+%         sd_attempts_per_success =   sd(attempts_per_success),
 %       .groups = "drop"
 %     ) %>% tail(10)
-% # A tibble: 10 × 5
-%    month   unrestricted_n unrestricted_sd restricted_n restricted_sd
-%    <chr>            <dbl>           <dbl>        <dbl>         <dbl>
-%  1 2023-04           1        0                   1.15       0.152
-%  2 2023-05           1.00     0.00204             1.23       0.113
-%  3 2023-06           1.00     0.0000834           1.23       0.0734
-%  4 2023-07           1        0                   1.07       0.0498
-%  5 2023-08           1        0                   1.02       0.0568
-%  6 2023-09           1        0                   1.00       0.0148
-%  7 2023-10           1.00     0.000000552         1.01       0.0137
-%  8 2023-11           1        0                   1.00       0.00499
-%  9 2023-12           1        0                   1.00       0.0121
-% 10 2024-01           1        0                   1.01       0.0168
+% # A tibble: 10 × 3
+%    month   mean_attempts_per_success sd_attempts_per_success
+%    <chr>                       <dbl>                   <dbl>
+%  1 2023-04                      1.15                 0.152
+%  2 2023-05                      1.23                 0.114
+%  3 2023-06                      1.23                 0.0734
+%  4 2023-07                      1.07                 0.0498
+%  5 2023-08                      1.02                 0.0568
+%  6 2023-09                      1.00                 0.0148
+%  7 2023-10                      1.01                 0.0137
+%  8 2023-11                      1.00                 0.00499
+%  9 2023-12                      1.00                 0.0121
+% 10 2024-01                      1.01                 0.0168
 
-While the proxy is connecting to its client,
-% "While": https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40228
-it also connects to the bridge.
-This connection
-uses WebSocket~\cite{rfc6455}, which
-offers a TCP-like, client--server connection
-layered on HTTPS.
-The choice of protocol for the proxy--bridge link is arbitrary,
-and could be changed
-without affecting the rest of the system.
-It does not need to be resist blocking,
-it~just needs to be available to JavaScript code in web browsers.
-WebRTC, for example, could be used for this link as well.
+As~the proxy negotiates the WebRTC connection with its client,
+% "At the same time": https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40228
+it~also connects to the bridge using WebSocket~\cite{rfc6455}.
+Unlike the client connection, the bridge connection
+presents no challenges:
+it's just HTTPS to an open port on a server.
+The choice of WebSocket for this link is arbitrary,
+and another protocol might be substituted in its place.
+It~does not need to be blocking-resistant
+(because we are already outside the censor's zone of control),
+it~only needs to be available to JavaScript code in web browsers.
 
 \subsection{Data transfer}
 \label{sec:data-transfer}
