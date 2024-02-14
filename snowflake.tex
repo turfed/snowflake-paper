@@ -955,8 +955,8 @@ and the one that is exposed to the censor.
 The stack for the proxy--bridge link is the same,
 but with WebSocket replacing
 WebRTC in the outermost layer.
-The top of the diagram is ``outer,'' closer to the network;
-the bottom is ``inner,'' closer to the user.
+Layers at the top of the diagram are ``outer,'' closer to the network;
+ones at the bottom are ``inner,'' closer to the user.
 
 \begin{figure}[h]
 \centering
@@ -981,82 +981,35 @@ at every proxy switchover.
 These outer layers form the ``carrier''
 over which the more stateful inner layers are transported.
 The layers marked ``persistent'' are instantiated just once
-per circumvention session, outliving any single proxy.
+per circumvention session and outlive any single proxy.
 They maintain end-to-end state
 and present an abstraction of a single long-lived tunnel.
-Finally, over this tunnel
-are transported the user's application streams,
-for example web browsing and messaging.
+This virtual tunnel then transports user application traffic
+such as web browsing and messaging.
 
-The connection between a client and its proxy is
-a WebRTC data channel~\cite{rfc8831},
-which provides a way to send arbitrary binary messages between peers.
-A~data channel is its own stack of three protocols:
+The point-to-point link between a client and its proxy is
+a WebRTC data channel~\cite{rfc8831}.
+Data channels let two WebRTC peers
+exchange arbitrary binary messages.
+A~data channel is itself a composition of three protocol layers:
 UDP for network transport,
 DTLS (Datagram TLS)
 for confidentiality and integrity, and
 SCTP (Stream Control Transmission Protocol)
 for delimiting message boundaries
 and other features like congestion control.
-Working UDP port numbers will have been discovered
-using ICE in the previous phase.
-The peers authenticate one another
+The peers authenticate each other
 at the DTLS layer using certificate fingerprints
 that were exchanged during rendezvous~\cite[\S 5.1]{rfc8842}.
 
-Data channels are well-suited to Snowflake's needs.
-(The specification even lists circumvention as a use case~\cite[\S 3.2]{rfc8831}.)
-But data channels are not the only option:
-WebRTC also offers \firstterm{media streams}
-for unreliable transport of real-time audio and video.
-Which of these is used may be a fingerprinting vector.
-We~will take up this topic in \autoref{sec:fingerprinting}.
-
-If~clients only ever used one proxy,
-a~WebRTC data channel alone would be sufficient.
-But a Snowflake proxy might
-disappear at any moment,
-and when that happens, its data channel goes with~it.
-If~the client was in the middle of a long download,
-for example, it should be possible to resume the download
-without interruption after rendezvousing with a new proxy.
-For this we need a shared notion of session state that exists
-at the client and the bridge, not tied to any temporary proxy.
-A~lack of session continuity across proxy failures
-had been an unsolved problem in flash proxy~\cite[\S 5.2]{Fifield2012a}.
-
-We~adopt the
-Turbo Tunnel design pattern~\cite{Fifield2020a}
-and insert a userspace
-session and reliability protocol
-between the ephemeral proxy data channels
-and the client's own application streams.\urlfootnote{
-% "[anti-censorship-team] Turbo Tunnel in Snowflake"
-https://lists.torproject.org/pipermail/anti-censorship-team/2020-February/000059.html
-}
-This part of the protocol stack
-outlives any single proxy; it~belongs to
-the client and the bridge.
-Its primary function is to attach sequence numbers and acknowledgements
-to packets of data,
-so~that both ends know what parts of the data stream
-need to be retransmitted after a temporary loss of proxy connectivity.
-The client tags its traffic
-with a random session identifier string that remains
-consistent throughout a session,
-which the bridge uses to index a map of session variables.
-For the inner session layer we use a combination of
-KCP~\cite{kcp} and
-smux~\cite{smux}.
-KCP provides reliability,
-and smux detects the end of idle sessions and terminates them.
-KCP and smux have shown their worth in other deployments,
-and are easy to program,
-but there is nothing about them on which we depend essentially.
-Any other transport protocol that provides the necessary features
-and can be implemented in userspace would~do,
-such as QUIC, TCP, or (another layer~of) SCTP.
-We~prototyped successfully with QUIC before deciding on KCP/\allowbreak smux.
+Data channels are well-suited to the circumvention use case.
+But data channels are not the only option
+in WebRTC for data transport:
+there are also \firstterm{media streams},
+meant for real-time audio and video.
+Which of these options is used is an externally observable feature,
+and may therefore become a fingerprinting vector.
+We~will consider this topic further in \autoref{sec:fingerprinting}.
 
 % Not going to get into how we currently use reliable, ordered (TCP-like) data
 % channels, but plan to switch to unreliable, unordered (UDP-like) data
@@ -1066,27 +1019,95 @@ We~prototyped successfully with QUIC before deciding on KCP/\allowbreak smux.
 % "turn off reliable mode for WebRTC DataChannel" https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/merge_requests/109
 % "Snowflake is currently using network resource in a so suboptimal way..." https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40251#note_2891751
 
-One more protocol layer is needed inside the tunnel:
+A~proxy maintains two connections for each client it is currently serving:
+one WebRTC connection to the client and one WebSocket connection to the bridge.
+Data received from the client over WebRTC
+is copied to the bridge over WebSocket,
+and vice versa.
+Although this pair of connections
+effectively connects the client to the bridge,
+it~alone is not enough for usable circumvention.
+This is because Snowflake proxies do not last forever.
+When a proxy goes away,
+its WebRTC and WebSocket connections go with~it.
+Without additional consideration,
+the loss of a proxy would mean the end
+of a client's circumvention session.
+What is needed is a separate notion of session state
+that is independent of the currently used proxy
+and its data channel.
+
+We~adopt the
+Turbo Tunnel design pattern~\cite{Fifield2020a}
+and insert a userspace
+session and reliability protocol
+between the ephemeral ``carrier'' protocols
+and the client's own application streams.\urlfootnote{
+% "[anti-censorship-team] Turbo Tunnel in Snowflake"
+https://lists.torproject.org/pipermail/anti-censorship-team/2020-February/000059.html
+}
+It~attaches sequence and acknowledgement numbers
+to the pieces of data that pass through the tunnel.
+After a temporary break in proxy connectivity,
+the client and bridge retransmit whatever data has not been acknowledged
+by the other side,
+then carry on as normal,
+with no duplication or loss of data.
+How this works, concretely,
+is~the client chooses a random session identifier string
+at the beginning of its session,
+and sends it as a preamble each time it
+connects to a new proxy.
+When the bridge accepts a new WebSocket connection,
+it~inspects the preamble to find the client's session identifier string,
+and uses it to index a table of session state information.
+If~the session does not yet exist,
+the bridge creates~one;
+otherwise it resumes an existing session
+(starting by retransmitting unacknowledged data).
+If~a client's proxy disappears
+while in the middle of a long download,
+there may be a pause while Snowflake
+does another rendezvous and acquires a fresh proxy,
+but after that the download will continue uninterrupted.
+
+For the inner session layer we use a combination of
+KCP~\cite{kcp} and
+smux~\cite{smux}.
+KCP provides reliability and retransmission,
+and smux timed-out streams and terminates them.
+Other userspace protocols, for example QUIC or TCP,
+could perform the function of an inner session layer
+more or less equivalently.
+We~prototyped successfully with both QUIC and KCP/\allowbreak smux
+before settling on KCP/\allowbreak smux.
+The main criteria influencing our decision
+were familiarity and ease of maintenance.
+
+One more protocol layer is needed
+before sending user application data through the tunnel:
 an~end-to-end secure channel between the client and the bridge,
 using keys unknown to the proxy.
-The purpose of this channel is to let
-the client tell the bridge what destinations to access,
-and prevent the proxy from inspecting or tampering with the traffic
-it carries.
-Nothing special is required here: for example,
-SOCKS over TLS,
-or any VPN protocol,
+The inner session layer does not provide security,
+and the DTLS of the data channel is only hop-by-hop,
+not end-to-end.
+The purpose of this additional secure channel is
+to prevent proxies from inspecting or tampering with the traffic
+they carry.
+Nothing special is needed here; for example,
+TLS or a VPN protocol
 would work fine.
-Our deployment uses Tor as this secure channel:
+Our deployment uses the Tor protocol as this secure channel:
 after removing the WebSocket and Turbo Tunnel layers,
-the bridge feeds the client's stream into a local Tor bridge,
+the bridge feeds the data it receives into a local Tor bridge,
 which routes the stream into the Tor network
 and eventually to its destination.
-Using Tor, of course,
-has the advantage that not even the bridge
-is trusted to see the contents of client streams
-or know their destination.
-But Tor also has certain drawbacks,
+Tor, of course, has additional privacy advantages
+that are not, strictly speaking, required for circumvention,
+but are nevertheless nice to have,
+such as that not even the Snowflake bridge
+is trusted to know the contents or destinations of client streams.
+But Tor also has some drawbacks,
 which we will comment on in
 \autoref{sec:multi-bridge}
 and
@@ -1094,10 +1115,10 @@ and
 
 Snowflake may be seen as an instance of the
 ``untrusted messengers'' model of Feamster et~al.~\cite[\S 3]{Feamster2003a}.
-Our \firstterm{proxies} correspond to their \firstterm{messengers};
-our \firstterm{bridge} is their \firstterm{portal}.
+Their \firstterm{messengers} correspond to our \firstterm{proxies};
+their \firstterm{portal} is our \firstterm{bridge}.
 Proxies are trusted to deliver the client's client's traffic to the bridge,
-but not directly to the destination.
+but do not themselves connect to the destination, or~even know what it~is.
 An~inner layer of cryptography protects the client's traffic
 from observation and manipulation by malicious proxies.
 The protection goes in the other direction as well:
