@@ -1073,12 +1073,12 @@ For the inner session layer we use a combination of
 KCP~\cite{kcp} and
 smux~\cite{smux}.
 KCP provides reliability and retransmission,
-and smux timed-out streams and terminates them.
+and smux detects and terminates timed-out streams.
 Other userspace protocols, for example QUIC or TCP,
-could perform the function of an inner session layer
-more or less equivalently.
+could be used more or less equivalently
+as the inner session layer.
 We~prototyped successfully with both QUIC and KCP/\allowbreak smux
-before settling on KCP/\allowbreak smux.
+before settling on the latter.
 The main criteria influencing our decision
 were familiarity and ease of maintenance.
 
@@ -3176,7 +3176,7 @@ and distributed nature.
 Our measurements indicate a high degree of address churn; the large
 and ever-changing pool of proxy IP addresses is itself a deterrent to enumeration and blocking.
 However, significant enumeration attacks are still possible, and it is worth considering
-both the impact of and possible defences to such attacks.
+both the impact of and possible defenses to such attacks.
 
 \paragraph{What is a good (family of) traffic shapes?}
 
