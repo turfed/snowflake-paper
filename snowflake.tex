@@ -2519,7 +2519,7 @@ This is no paradox:
 as~censorship intensifies,
 users are displaced from less resilient
 to more resilient systems.
-Snowflake's blocking resistance has not in every case been a success,
+Snowflake's blocking resistance has not always been a success,
 though, and here we also reflect on missteps
 and persistent challenges.
 The examples are taken from
@@ -2530,33 +2530,32 @@ with affected users is invaluable in quickly understanding and reacting to block
 and that blocking resistance is relative to a given censor,
 because every censor's cost calculus is different.
 
-Snowflake is blockable by a censor that is willing to block WebRTC.
-We~would not argue otherwise.
-Indeed, we~believe this is how a circumvention system
-should be presented:
-not by arguing its unblockability in absolute terms,
-but by laying out
+Client count estimates come from the
+Tor Metrics descriptors described in \autoref{sec:clients}.
+Country code assignments use the same IP geolocation database
+used by ordinary Tor relays and bridges,
+and the caveats of IP geolocation apply to the per-country estimates in this section.
+In~particular, we~have noticed that a fraction of clients
+that geolocate to the United States are likely actually to be in Iran,
+based on correlation of their dynamics with other clients that geolocate to Iran,
+and with the timing of known political events.\urlfootnote{
+https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40207\#note_2844116
+}
+The graphs of this section use the raw geolocation results,
+with no attempt to adjust for errors.
+
+Snowflake is blockable by any censor that is willing to block WebRTC.
+We~would not try to argue otherwise.
+Indeed, we~believe that the way to present a circumvention system is
+not to argue for its absolute unblockability,
+but to lay out
 what actions by a censor would suffice to block~it---or~more
 to the point,
 \emph{what sacrifices a censor would have to make}
 in order to block~it.
 Advancing the state of the art of censorship circumvention
 consists in pushing blocking
-beyond the capabilities of more and more censors.
-
-Tor bridges report aggregate binned counts by country code of connected unique IP addresses per day in the
-descriptors uploaded to the bridge authority. We use the Tor Metrics method of
-combining the distribution of counts by country code with the number of directory requests to obtain
-an estimate of the average number of concurrent clients per day for each location~\cite{tor-tr-2012-10-001}. The mapping of IP
-addresses to country codes is not without flaws. During the time of the measurements shown here, Tor uses
-the IPFire location database.\urlfootnote{
-https://www.ipfire.org/projects/location/
-}
-There is at least one instance where we were able to detect geolocation inaccuracies after noting
-a significant drop in Snowflake users thought to be located in the US that correlated directly with
-a blocking event in Iran.\urlfootnote{
-https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40207\#note_2844116
-}
+out of reach of more and more censors.
 
 \subsection{Blocking in Russia}
 \label{sec:block-ru}
