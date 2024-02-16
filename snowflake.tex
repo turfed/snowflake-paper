@@ -2049,6 +2049,47 @@ At~that time, around 0.7\% of Tor users
 \subsection{Number and type of proxies}
 \label{sec:proxies}
 
+\begin{figure}
+\includegraphics{figures/proxies/proxy-type}
+\caption{
+Unique proxy IP addresses per day,
+by proxy type.
+The two steps in the graph correspond
+to the invasion of Ukraine by Russia in February~2022,
+% 2022-02-25 https://twitter.com/torproject/status/1497276960556429324
+% 2022-02-25 https://twitter.com/0xggus/status/1497224413829283877
+and network restrictions in Iran beginning September~2022,
+% 2022-09-24 https://twitter.com/torproject/status/1573670895696183303
+% 2022-10-03 https://www.eff.org/deeplinks/2022/10/snowflake-makes-it-easy-anyone-fight-censorship
+at which times there were campaigns
+to encourage running Snowflake proxies.
+Unknown proxy types (fewer than~50 instances) are not shown.
+}
+\label{fig:proxy-type}
+% 2021-02-23 https://github.com/guardianproject/orbot/releases/tag/16.4.1-BETA-2-tor.0.4.4.6
+% "experimental mode to enable running as a Snowflake proxy"
+% 2021-07-14 https://github.com/tladesignz/IPtProxy/commit/228e9e61e285ee548a42d6bee487577e44630695
+% IPtProxy 1.1.0 changes its proxy type from "standalone" to "iptproxy"
+% 2021-12-20 https://github.com/guardianproject/orbot/releases/tag/16.5.2-RC-1-tor.0.4.6.8
+% Orbot updates IPtProxy from 1.0.0 to 1.2.0 https://github.com/guardianproject/orbot/commit/57add48cd904afe94363219887cd142bb5cf6696
+% 2022-01-03 https://github.com/guardianproject/orbot/releases/tag/16.5.2-RC-5-tor.0.4.6.9
+% This is close to the date (2022-01-05) when there's sudden growth in "Unknown",
+% which is probably Orbot self-reporting as "iptproxy" and the broker throwing away that label for being unrecognized.
+% 2022-03-21 https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/merge_requests/82
+% Broker starts to recognize "iptproxy" as a probe type, but not deployed yet.
+% 2022-05-03 https://github.com/tladesignz/IPtProxy/commit/c6ba25ef6ce8449476f734c626eadffdf55d0519
+% IPtProxy 1.6.0 adds 'ProxyType: "iptproxy"' (no effective change, had already been done in a patch).
+% 2022-06-21 https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40151
+% Broker deployment, broker starts recording "iptproxy" in descriptors.
+% 2022-07-05 https://github.com/guardianproject/orbot/releases/tag/16.6.2-RC-1-tor.0.4.7.8
+% Orbot 16.6.2 RC 1 upgrades to IPtProxy 1.6.0.
+% 2022-08-02 https://github.com/guardianproject/orbot/releases/tag/17.0.0-ALPHA-1-tor.0.4.7.8
+% "updated UI based on new design spec: https://github.com/guardianproject/orbot/blob/NEW_UX/docs/design-spec-kindness-mode.md"
+% "improved support for Snowflake Proxying "kindness" / volunteer mode"
+% 2023-01-13 https://github.com/guardianproject/orbot/releases/tag/17.0.0-BETA-1-tor.0.4.7.11
+% "easy access to Snowflake proxy 'kindness' mode"
+\end{figure}
+
 Snowflake's effectiveness depends on its proxies,
 of~which there are several types.
 The primary type is the web browser extension,
@@ -2095,47 +2136,6 @@ of clients or proxies.
 Metrics concerning client polls are rounded to multiples of~8,
 in~accordance with established Tor Metrics practice.
 % "With relays and bridges, we round the counts up to the nearest multiple of 8." https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/21315#note_2591581
-
-\begin{figure}
-\includegraphics{figures/proxies/proxy-type}
-\caption{
-Unique proxy IP addresses per day,
-by proxy type.
-The two steps in the graph correspond
-to the invasion of Ukraine by Russia in February~2022,
-% 2022-02-25 https://twitter.com/torproject/status/1497276960556429324
-% 2022-02-25 https://twitter.com/0xggus/status/1497224413829283877
-and network restrictions in Iran beginning September~2022,
-% 2022-09-24 https://twitter.com/torproject/status/1573670895696183303
-% 2022-10-03 https://www.eff.org/deeplinks/2022/10/snowflake-makes-it-easy-anyone-fight-censorship
-at which times there were campaigns
-to encourage running Snowflake proxies.
-Unknown proxy types (fewer than~50 instances) are not shown.
-}
-\label{fig:proxy-type}
-% 2021-02-23 https://github.com/guardianproject/orbot/releases/tag/16.4.1-BETA-2-tor.0.4.4.6
-% "experimental mode to enable running as a Snowflake proxy"
-% 2021-07-14 https://github.com/tladesignz/IPtProxy/commit/228e9e61e285ee548a42d6bee487577e44630695
-% IPtProxy 1.1.0 changes its proxy type from "standalone" to "iptproxy"
-% 2021-12-20 https://github.com/guardianproject/orbot/releases/tag/16.5.2-RC-1-tor.0.4.6.8
-% Orbot updates IPtProxy from 1.0.0 to 1.2.0 https://github.com/guardianproject/orbot/commit/57add48cd904afe94363219887cd142bb5cf6696
-% 2022-01-03 https://github.com/guardianproject/orbot/releases/tag/16.5.2-RC-5-tor.0.4.6.9
-% This is close to the date (2022-01-05) when there's sudden growth in "Unknown",
-% which is probably Orbot self-reporting as "iptproxy" and the broker throwing away that label for being unrecognized.
-% 2022-03-21 https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/merge_requests/82
-% Broker starts to recognize "iptproxy" as a probe type, but not deployed yet.
-% 2022-05-03 https://github.com/tladesignz/IPtProxy/commit/c6ba25ef6ce8449476f734c626eadffdf55d0519
-% IPtProxy 1.6.0 adds 'ProxyType: "iptproxy"' (no effective change, had already been done in a patch).
-% 2022-06-21 https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40151
-% Broker deployment, broker starts recording "iptproxy" in descriptors.
-% 2022-07-05 https://github.com/guardianproject/orbot/releases/tag/16.6.2-RC-1-tor.0.4.7.8
-% Orbot 16.6.2 RC 1 upgrades to IPtProxy 1.6.0.
-% 2022-08-02 https://github.com/guardianproject/orbot/releases/tag/17.0.0-ALPHA-1-tor.0.4.7.8
-% "updated UI based on new design spec: https://github.com/guardianproject/orbot/blob/NEW_UX/docs/design-spec-kindness-mode.md"
-% "improved support for Snowflake Proxying "kindness" / volunteer mode"
-% 2023-01-13 https://github.com/guardianproject/orbot/releases/tag/17.0.0-BETA-1-tor.0.4.7.11
-% "easy access to Snowflake proxy 'kindness' mode"
-\end{figure}
 
 \autoref{fig:proxy-type} shows the number of proxies by type.
 Web browser extension proxies predominate,
