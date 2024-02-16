@@ -1,3 +1,7 @@
+% This BibTeX style file was created by first doing:
+%   urlbst --noeprint --nodoi --nopubmed --literal urlintro="" /usr/share/texlive/texmf-dist/bibtex/bst/base/plain.bst > snowflake.bst
+% and then manually hacking it to put the "note" after "url" and "lastcited".
+
 %%% Modification of BibTeX style file /usr/share/texlive/texmf-dist/bibtex/bst/base/plain.bst
 %%% ... by urlbst, version 0.8 (marked with "% urlbst")
 %%% See <http://purl.org/nxg/dist/urlbst>
@@ -835,9 +839,13 @@ FUNCTION {fin.entry}
     'skip$
   if$
   bracket.state close.brackets = % urlbst
-    { "]" * }
+    { "]" *
+      outside.brackets 'bracket.state :=
+    }
     'skip$
   if$
+  new.block
+  note output
   fin.entry.original
 }
 
@@ -873,12 +881,6 @@ FUNCTION {webpage}
     'skip$
     { format.date "year" output.check }
   if$
-  % We don't need to output the URL details ('lastchecked' and 'url'),
-  % because fin.entry does that for us, using output.web.refs.  The only
-  % reason we would want to put them here is if we were to decide that
-  % they should go in front of the rather miscellaneous information in 'note'.
-  new.block
-  note output
   fin.entry
 }
 % ...urlbst to here
@@ -900,8 +902,6 @@ FUNCTION {article}
       format.pages output
     }
   if$
-  new.block
-  note output
   fin.entry
 }
 
@@ -933,8 +933,6 @@ FUNCTION {book}
   if$
   format.edition output
   format.date "year" output.check
-  new.block
-  note output
   fin.entry
 }
 
@@ -948,8 +946,6 @@ FUNCTION {booklet}
   howpublished output
   address output
   format.date output
-  new.block
-  note output
   fin.entry
 }
 
@@ -983,8 +979,6 @@ FUNCTION {inbook}
   if$
   format.edition output
   format.date "year" output.check
-  new.block
-  note output
   fin.entry
 }
 
@@ -1010,8 +1004,6 @@ FUNCTION {incollection}
       format.chapter.pages output
     }
   if$
-  new.block
-  note output
   fin.entry
 }
 
@@ -1045,8 +1037,6 @@ FUNCTION {inproceedings}
       format.pages output
     }
   if$
-  new.block
-  note output
   fin.entry
 }
 
@@ -1082,8 +1072,6 @@ FUNCTION {manual}
   if$
   format.edition output
   format.date output
-  new.block
-  note output
   fin.entry
 }
 
@@ -1098,8 +1086,6 @@ FUNCTION {mastersthesis}
   school "school" output.check
   address output
   format.date "year" output.check
-  new.block
-  note output
   fin.entry
 }
 
@@ -1112,8 +1098,6 @@ FUNCTION {misc}
   howpublished new.block.checka
   howpublished output
   format.date output
-  new.block
-  note output
   fin.entry
   empty.misc.check
 }
@@ -1129,8 +1113,6 @@ FUNCTION {phdthesis}
   school "school" output.check
   address output
   format.date "year" output.check
-  new.block
-  note output
   fin.entry
 }
 
@@ -1165,8 +1147,6 @@ FUNCTION {proceedings}
       publisher output
     }
   if$
-  new.block
-  note output
   fin.entry
 }
 
@@ -1181,8 +1161,6 @@ FUNCTION {techreport}
   institution "institution" output.check
   address output
   format.date "year" output.check
-  new.block
-  note output
   fin.entry
 }
 
