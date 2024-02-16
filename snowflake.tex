@@ -3209,46 +3209,36 @@ shaping traffic to imitate popular WebRTC applications. While traffic analysis a
 extensively covered in academia, frameworks for proposing and evaluating
 traffic shaping techniques have been under-explored.
 
-\paragraph{What is the design space of alternative models of Snowflake deployment?}
+\paragraph{What do alternative Snowflake deployments look like?}
 
 A~natural extension of Snowflake would be
-to have it access systems other than Tor---ordinary
-VPNs, for example.
+to have it access systems other than Tor, such as ordinary
+VPNs.
 Tor has its benefits:
 an~existing user base,
 a~standard (pluggable transports) for integrating
 circumvention modules,
 and exit nodes separate from entry nodes,
-which relieve the circumvention developer of the concerns associated
-with actually exiting traffic to its destination.
-But Tor has drawbacks as well,
-notably its lower speed and
-lack of support for UDP and other non-TCP protocols.
-Nothing inherently ties Snowflake to Tor,
-and it might easily be adapted to other systems.
-One question is whether every Snowflake-like deployment
-should manage its own pool of proxies,
-or~if proxies can somehow be shared.
+which avoids the need for an exit policy at the proxies.
+However, Tor has low speeds and lacks
+support for UDP and other non-TCP protocols.
+One consideration for a world with multiple Snowflake deployments
+is the management of the pool of proxies.
 Building Snowflake's population of proxies
 has been a substantial undertaking in itself---for
 every project to have to repeat the process from scratch
 would be a regrettable duplication of effort.
-There is no reason why one proxy might not
-serve multiple projects,
+A~next-generation proxy pool might be designed
+from the ground up with multiple cooperating projects in mind.
+Proxies in this pool could serve multiple projects,
 the client expressing its preference
-in the same way it now signals which Tor bridge to use (\autoref{sec:multi-bridge}).
-But there would be design issues to work out.
+in the same way it now signals which Tor bridge to use (\autoref{sec:multi-bridge}),
+and similar to Mass Browser's content policy~\cite{Nasr2020a}.
 While some proxy operators may be happy to donate
 bandwidth to a free-to-use project like Tor,
-they may need more incentive than altruism to help a commercial VPN.
-A~shared deployment would impose additional friction on development
-(making it harder to alter the proxy protocol, for example).
-Rather than retrofit the current Tor-based proxies
-with support for other systems,
-a~next-generation proxy pool might be designed
-from the ground up with multiple cooperating projects in mind.
-If~it proved successful,
-the Tor deployment could migrate to~it.
+they may need more incentive to help a commercial VPN.
+Another challenge of a~shared deployment is the increase in
+development friction (e.g., the difficulty of altering the proxy protocol).
 
 \paragraph{Can traffic splitting improve performance or blocking resistance?}
 
