@@ -36,7 +36,7 @@ snowflake.bst:
 	urlbst --noeprint --nodoi --nopubmed --literal urlintro="" /usr/share/texlive/texmf-dist/bibtex/bst/base/plain.bst > "$@"
 
 ORIG = a653e7c0285529c8f2502ab2cb74e73660cf4dc9
-PREV = 4a9d42cb0fb200af079ae3421b0c96d79385a6e3
+PREV = 5403843cbda02fad46a37b4309ea6306b0d161d8
 STAMP = $(shell git log -1 --pretty=format:%ad --date=format:%Y%m%d HEAD).$(shell git rev-parse --short=8 HEAD)
 .PHONY: diff
 diff: sec24fall-paper1998.$(STAMP).pdf \
