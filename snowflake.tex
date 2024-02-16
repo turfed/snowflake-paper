@@ -741,38 +741,9 @@ that would require TURN.
 % "Investigate Snowflake proxy failures" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/33666#note_2595319
 % "Okay here's a summary of what I've found: ..."
 
-We condense NAT and firewall features
-into the following well-known variations:\todo{
-Cut these definitions and replace with a reference to RFC 3489\cite[\S 5]{rfc3489}?
-}
-
 % These labels were used in RFC 3489 (2003; back when STUN was "Simple Traversal of UDP through NAT").
 % https://datatracker.ietf.org/doc/html/rfc3489#section-5
 % They aren't used in the obsoleting RFC 5389 and RFC 8489 (after it became "Session Traversal Utilities for NAT").
-\begin{description}
-\item[Full cone]
-The same internal IP--port pair always maps to the same external port.
-Any remote host may send a packet to an internal IP--port pair through its
-external port.
-\item[Restricted cone]
-Like full cone,
-but inbound packets
-are allowed only if
-there has recently been an outbound packet
-to the same remote IP address.
-\item[Port-restricted cone]
-Like restricted cone,
-but inbound packets are allowed only if
-there has recently been an outbound packet
-to the same remote IP--port pair.
-\item[Symmetric]
-The external port depends on both
-the internal and external IP--port pairs.
-Incoming packets are allowed only if
-there has recently been an outgoing
-packet to the same remote address.
-\end{description}
-
 \begin{table}
 \definecolor{Ycolor}{Gray}{14}
 \definecolor{ncolor}{Gray}{13}
@@ -790,17 +761,17 @@ packet to the same remote address.
 \begin{tabular}{@{}rcccccl@{\hspace{0.5ex}}l@{}}
 & % empty
 \rot{No NAT} &
-\rot{Full cone} &
-\rot{Restricted cone} &
-\rot{Port-restricted cone} &
-\rot{Symmetric} &
+    \rot{(EI,EI)} &
+    \rot{(EI, AO)} &
+    \rot{(EI, AP)} &
+    \rot{(ED, ED)} &
 &
 \\
 No NAT               & \Y & \Y & \Y & \Y & \Y & \multirow{3}{*}{\kern-\tabcolsep\kern0.5ex\footnotesize\(\left.\kern-\nulldelimiterspace\rule[-19pt]{0pt}{38pt}\right\}\)} & \multirow{3}{*}{\footnotesize\makecell[l]{unrestricted\\proxy}} \\
-Full cone            & \Y & \Y & \Y & \Y & \Y & \\
-Restricted cone      & \Y & \Y & \Y & \Y & \Y & \\
-Port-restricted cone & \Y & \Y & \Y & \Y & \n & \multirow{2}{*}{\kern-\tabcolsep\kern0.5ex\footnotesize\(\left.\kern-\nulldelimiterspace\rule[-12pt]{0pt}{24pt}\right\}\)} & \multirow{2}{*}{\footnotesize\makecell[l]{restricted\\proxy}} \\
-Symmetric            & \Y & \Y & \Y & \n & \n & \\[\dimexpr 0.5ex - \dimexpr 0.5\dimexpr\arraystretch\normalbaselineskip]
+    (EI, EI) & \Y & \Y & \Y & \Y & \Y & \\
+    (EI, AO) & \Y & \Y & \Y & \Y & \Y & \\
+    (EI, AP) & \Y & \Y & \Y & \Y & \n & \multirow{2}{*}{\kern-\tabcolsep\kern0.5ex\footnotesize\(\left.\kern-\nulldelimiterspace\rule[-12pt]{0pt}{24pt}\right\}\)} & \multirow{2}{*}{\footnotesize\makecell[l]{restricted\\proxy}} \\
+    (ED, ED) & \Y & \Y & \Y & \n & \n & \\[\dimexpr 0.5ex - \dimexpr 0.5\dimexpr\arraystretch\normalbaselineskip]
 % \hfill hack to make \upbracefill work with colortbl:
 % https://tex.stackexchange.com/questions/202138/upbracefill-filling-entire-tabular-cell-and-package-colortbl#comment474604_202143
                      & \multicolumn{4}{@{~}c@{~}}{\footnotesize\def\hfill{\hskip 0pt plus 1filll}\upbracefill} & \clap{\footnotesize\def\hfill{\hskip 0pt plus 1filll}\upbracefill} & \\
@@ -810,10 +781,15 @@ Symmetric            & \Y & \Y & \Y & \n & \n & \\[\dimexpr 0.5ex - \dimexpr 0.5
 Compatibility of NAT variations,
 assuming the use of STUN only
 (no~fallback to TURN).
+Variations are labelled as (mapping behavior, filtering behavior) pairs.
+The possible behaviors are: Endpoint-Independent (EI), Address-Dependent (AO),
+and Address and Port-Dependent (AP). We introduce the shorthand Endpoint-Dependent (ED)
+to indicate either AO or AP behavior.
 The incompatible cases,
 which the broker tries to avoid when matching,
-are when one peer's NAT is symmetric
-and the other's is symmetric or port-restricted cone.
+are when one peer's NAT has ED mapping
+and the other's has ED mapping or
+AP filtering.
 Note the asymmetry in what NAT variations are considered ``restricted''
 in client and proxy.
 }
@@ -821,8 +797,15 @@ in client and proxy.
 \end{table}
 
 \autoref{tab:nat-matching}
-shows the pairwise compatibility of NAT variations.
-As~the incompatible cases always involve a symmetric NAT,
+shows the pairwise compatibility of possible NAT variations~\cite{rfc5780}.
+Endpoint-dependent NAT mapping behaviour
+(be it address-dependent or both address and port-dependent),
+indicates that the address a local endpoint is translated to depends on
+the remote endpoint's address (or both address and port). Endpoint-dependent NAT
+filtering indicates that incoming packets from a remote endpoint are
+allowed only if outgoing packets have already been sent to that remote.
+As~the incompatible cases always involve endpoint-dependent NAT mapping
+(sometimes referred to as symmetric NATs),
 we further categorize the variations into the two types
 \firstterm{unrestricted} (works with most other NATs) and
 \firstterm{restricted} (works only with more permissive NATs).
@@ -832,16 +815,17 @@ The broker prefers to match unrestricted clients with restricted proxies,
 % https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/blob/9edaee65470a1483bbdbe984e5e15a885f1e95d2/broker/ipc.go#L236
 in~order to conserve unrestricted proxies
 for the clients that need them.
-Symmetric NAT is always considered restricted,
-but the type of port-restricted cone NAT differs
+Endpoint-dependent mapping is always considered restricted,
+but the type of NATs with address and port-dependent filtering differs
 depending on the peer:
 for proxies it is restricted, but
 for clients it is unrestricted.
 This is a heuristic
 to conserve unrestricted proxies
-for clients with symmetric NATs.
+for clients with endpoint-dependent NAT mapping.
 Though it creates the potential for an incompatible match
-between a port-restricted cone client and a symmetric proxy,
+between a client with an address and port-dependent filter and a
+proxy with endpoint-dependent mapping,
 % https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/wikis/NAT-matching?version_id=dd1f328e2c9570eb252c43a053bdec0314c73345#fn-1-6791
 this case is rare in practice,
 and in the event it happens,
@@ -857,7 +841,7 @@ to JavaScript.
 For them,
 we adapt a technique from MassBrowser~\cite[\S \mbox{V-A}]{Nasr2020a}
 and run a centralized, always-on WebRTC testing peer
-behind a simulated symmetric NAT.\urlfootnote{
+behind a simulated NAT with endpoint-dependent mapping.\urlfootnote{
 % "Have a remote probe service to test snowflake proxy NAT compatability"
 https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40013
 }
