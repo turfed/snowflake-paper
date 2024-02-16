@@ -758,24 +758,24 @@ that would require TURN.
 \renewcommand{\arraystretch}{1.25}
 % Tighten line spacing in \makecell cells.
 \renewcommand\cellset{\renewcommand\arraystretch{0.8}\setlength\extrarowheight{0pt}}
-\begin{tabular}{@{}rcccccl@{\hspace{0.5ex}}l@{}}
-& % empty
+\begin{tabular}{@{}r@{~}lcccccl@{\hspace{0.5ex}}l@{}}
+& & % empty
 \rot{No NAT} &
-    \rot{(EI,EI)} &
-    \rot{(EI, AO)} &
-    \rot{(EI, AP)} &
-    \rot{(ED, ED)} &
+\rot{(EI, EI)} &
+\rot{(EI, AO)} &
+\rot{(EI, AP)} &
+\rot{(ED, ED)} &
 &
 \\
-No NAT               & \Y & \Y & \Y & \Y & \Y & \multirow{3}{*}{\kern-\tabcolsep\kern0.5ex\footnotesize\(\left.\kern-\nulldelimiterspace\rule[-19pt]{0pt}{38pt}\right\}\)} & \multirow{3}{*}{\footnotesize\makecell[l]{unrestricted\\proxy}} \\
-    (EI, EI) & \Y & \Y & \Y & \Y & \Y & \\
-    (EI, AO) & \Y & \Y & \Y & \Y & \Y & \\
-    (EI, AP) & \Y & \Y & \Y & \Y & \n & \multirow{2}{*}{\kern-\tabcolsep\kern0.5ex\footnotesize\(\left.\kern-\nulldelimiterspace\rule[-12pt]{0pt}{24pt}\right\}\)} & \multirow{2}{*}{\footnotesize\makecell[l]{restricted\\proxy}} \\
-    (ED, ED) & \Y & \Y & \Y & \n & \n & \\[\dimexpr 0.5ex - \dimexpr 0.5\dimexpr\arraystretch\normalbaselineskip]
+\multicolumn{2}{r}{No NAT} & \Y & \Y & \Y & \Y & \Y & \multirow{3}{*}{\kern-\tabcolsep\kern0.5ex\footnotesize\(\left.\kern-\nulldelimiterspace\rule[-19pt]{0pt}{38pt}\right\}\)} & \multirow{3}{*}{\footnotesize\makecell[l]{unrestricted\\proxy}} \\
+(EI, & EI)                 & \Y & \Y & \Y & \Y & \Y & \\
+(EI, & AO)                 & \Y & \Y & \Y & \Y & \Y & \\
+(EI, & AP)                 & \Y & \Y & \Y & \Y & \n & \multirow{2}{*}{\kern-\tabcolsep\kern0.5ex\footnotesize\(\left.\kern-\nulldelimiterspace\rule[-12pt]{0pt}{24pt}\right\}\)} & \multirow{2}{*}{\footnotesize\makecell[l]{restricted\\proxy}} \\
+(ED, & ED)                 & \Y & \Y & \Y & \n & \n & \\[\dimexpr 0.5ex - \dimexpr 0.5\dimexpr\arraystretch\normalbaselineskip]
 % \hfill hack to make \upbracefill work with colortbl:
 % https://tex.stackexchange.com/questions/202138/upbracefill-filling-entire-tabular-cell-and-package-colortbl#comment474604_202143
-                     & \multicolumn{4}{@{~}c@{~}}{\footnotesize\def\hfill{\hskip 0pt plus 1filll}\upbracefill} & \clap{\footnotesize\def\hfill{\hskip 0pt plus 1filll}\upbracefill} & \\
-                     & \multicolumn{4}{c}{\footnotesize\makecell{unrestricted\\client}} & \clap{\footnotesize\makecell{restricted\\client}} \\
+     &                     & \multicolumn{4}{@{~}c@{~}}{\footnotesize\def\hfill{\hskip 0pt plus 1filll}\upbracefill} & \clap{\footnotesize\def\hfill{\hskip 0pt plus 1filll}\upbracefill} & \\
+     &                     & \multicolumn{4}{c}{\footnotesize\makecell{unrestricted\\client}} & \clap{\footnotesize\makecell{restricted\\client}} \\
 \end{tabular}
 \caption{
 Compatibility of NAT variations,
