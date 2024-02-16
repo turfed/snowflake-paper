@@ -118,7 +118,7 @@ proxy_type <- proxy_type %>%
 	mutate(type = fct_recode(type,
 		"Browser\nextension" = "webext",
 		"Orbot" = "iptproxy",
-		"Standalone" = "standalone",
+		"Command-line" = "standalone",
 		"Web badge" = "badge"
 	))
 
@@ -163,7 +163,9 @@ p <- ggplot() +
 			x = date,
 			y = y,
 			color = type,
-			label = type
+			# \u00ad (soft hyphen) is a hack to avoid the hypohen
+			# turning into a minus sign: https://stackoverflow.com/a/48510383.
+			label = gsub("-", "\u00ad", type)
 		),
 		position = position_nudge(x = 5),
 		size = 2.5,
@@ -190,6 +192,6 @@ p <- ggplot() +
 	labs(x = NULL, y = "Unique IP addresses") +
 
 	# Make room for the margin labels added by geom_text above.
-	theme(plot.margin = unit(c(0.5, 11.5, 0, 0.5), "mm")) +
+	theme(plot.margin = unit(c(0.5, 15.5, 0, 0.5), "mm")) +
 	guides(color = "none")
 ggsave(output_path, p, width = DOCUMENT_LINEWIDTH, height = 1.25)
