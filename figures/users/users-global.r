@@ -275,7 +275,7 @@ p_users <- ggplot() +
 	) +
 	coord_cartesian(xlim = DATE_LIMITS, ylim = c(0, 100000), expand = FALSE, clip = "off") +
 	theme(plot.margin = unit(c(9, 0, 0, 0), "mm")) +
-	labs(x = NULL, y = "Average simultaneous users")
+	labs(x = NULL, y = "Average concurrent clients")
 
 max_good_avg_gbps <- max(bandwidth$good_avg_gbps, na.rm = TRUE)
 
