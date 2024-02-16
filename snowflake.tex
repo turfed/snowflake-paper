@@ -327,7 +327,7 @@ Significantly, where Snowflake now uses WebRTC data channels,
 Protozoa and Stegozoa use WebRTC media streams,
 which may have advantages for blocking resistance.
 We will say more on this point in \autoref{sec:fingerprinting}.
-TorKameleon~\cite{arxiv.2303.17544} is a WebRTC-based system
+TorKameleon~\cite{Vilalonga2023a} is a WebRTC-based system
 with the dual goals of resisting blocking
 and complicating traffic correlation attacks.
 It~uses a recent draft programming interface called
@@ -690,76 +690,83 @@ the combination is only as strong as the weaker of the~two.
 \subsection{Peer-to-peer connection establishment}
 \label{sec:connection}
 
-Now the client and the proxy connect to each other directly.
+After rendezvous,
+the client and its assigned proxy connect to one another directly.
 Even in the absence of censorship,
-making a direct connection between two Internet peers is not always easy,
-because of NAT (network address translation) and firewalls.
-Snowflake clients and proxies alike run in diverse networks
+making a connection between two Internet peers is not trivial,
+because of possible interference by NAT (network address translation) and firewalls.
+Snowflake clients and proxies run in diverse networks
 with varying NATs and ingress policies.
 Fortunately for us,
-WebRTC is designed with this use case in mind,
-and has built-in support for traversing NAT, in~the form of
+WebRTC is designed with this use case in mind.
+It~has built-in support for NAT traversal in the form of
 ICE (Interactive Connectivity Establishment)~\cite{rfc8445},
-a procedure for testing candidate pairs of peer network addresses
-to find one that works.
-ICE~makes use of third-party
-STUN (Session Traversal Utilities for NAT)~\cite{rfc8489}
-servers that, among other things,
-enable a host to learn its external IP addresses.
+a procedure for testing combinations of peer addresses
+until finding one that works.
+ICE~uses third-party
+STUN (Session Traversal Utilities for NAT) servers~\cite{rfc8489}
+that, among other services,
+let a host discover its own external IP addresses.
 The first part of ICE took place at the beginning of rendezvous,
 when the client and proxy contacted STUN servers to gather
 external address candidates and included them in their respective
 SDP offer and answer.
+After rendezvous,
+the peers try pairs of candidate addresses
+until they are able to establish a connection.
 
-There is no guarantee that two hosts will be able to make
-a connection using the facilities of STUN alone.
-Some address mapping and
-filtering setups are simply incompatible.
+There is no guarantee that two hosts will be able to
+connect using the facilities of STUN alone.
+Some combinations of address mapping and
+filtering are simply incompatible.
 In~such a case,
-ICE would normally fall back to using
-TURN (Traversal Using Relays around NAT)~\cite{rfc8656},
+ICE would normally fall back to relaying traffic through a
+TURN (Traversal Using Relays around NAT) server~\cite{rfc8656},
 a~kind of UDP proxy.
-Such a fallback would be problematic for Snowflake,
-because the TURN relays themselves
+A~fallback to TURN would be problematic for Snowflake,
+because the TURN servers themselves
 would become a target of blocking by the censor.
 % "Configure TURN servers for the proxy and/or client" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/25596
-But Snowflake has an advantage most WebRTC applications do not.
-Most WebRTC applications want to connect \emph{a particular} pair of peers,
-whereas we are satisfied when a client can connect to \emph{any} proxy.
-Snowflake clients and proxies self-measure their NAT type
+% https://datatracker.ietf.org/doc/html/rfc8445#section-5.1.1.2
+% "...use of STUN and TURN servers may be unnecessary in certain networks and use of TURN servers may be expensive, so some deployments may elect not to use them."
+But Snowflake has an advantage:
+most WebRTC applications want to connect \emph{a particular} pair of peers,
+whereas we are happy to connect a client to \emph{any} proxy.
+Snowflake clients and proxies self-assess their NAT type
 and report it to the broker,
-which takes NAT compatibility into account
-and avoids cases that would require a fallback to TURN.
+which avoids making matches
+that would require TURN.
 
 % "Investigate Snowflake proxy failures" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/33666#note_2595319
 % "Okay here's a summary of what I've found: ..."
 
-We condense the possible combinations of NAT and firewall features
-that impact
-a Snowflake client or proxy's
-ability to make a peer-to-peer connection
-into the following well-known variations:
+We condense NAT and firewall features
+into the following well-known variations:\todo{
+Cut these definitions and replace with a reference to RFC 3489\cite[\S 5]{rfc3489}?
+}
 
+% These labels were used in RFC 3489 (2003; back when STUN was "Simple Traversal of UDP through NAT").
 % https://datatracker.ietf.org/doc/html/rfc3489#section-5
+% They aren't used in the obsoleting RFC 5389 and RFC 8489 (after it became "Session Traversal Utilities for NAT").
 \begin{description}
 \item[Full cone]
 The same internal IP--port pair always maps to the same external port.
-Any remote host may send a packet to an internal IP address and port by sending a packet to the
-mapped external port.
+Any remote host may send a packet to an internal IP--port pair through its
+external port.
 \item[Restricted cone]
 Like full cone,
-but incoming packets
+but inbound packets
 are allowed only if
-there has recently been an outgoing packet
+there has recently been an outbound packet
 to the same remote IP address.
 \item[Port-restricted cone]
 Like restricted cone,
-but incoming packets are allowed only if
-there has recently been an outgoing packet
+but inbound packets are allowed only if
+there has recently been an outbound packet
 to the same remote IP--port pair.
 \item[Symmetric]
 The external port depends on both
-the internal IP--port pair and the remote IP--port pair.
+the internal and external IP--port pairs.
 Incoming packets are allowed only if
 there has recently been an outgoing
 packet to the same remote address.
@@ -799,12 +806,14 @@ Symmetric            & \Y & \Y & \Y & \n & \n & \\[\dimexpr 0.5ex - \dimexpr 0.5
                      & \multicolumn{4}{c}{\footnotesize\makecell{unrestricted\\client}} & \clap{\footnotesize\makecell{restricted\\client}} \\
 \end{tabular}
 \caption{
-Pairwise compatibility of NAT variants,
-using the facilities of STUN alone
-(no fallback to TURN).
-The incompatible cases are when one peer's NAT is symmetric
+Compatibility of NAT variations,
+assuming the use of STUN only
+(no~fallback to TURN).
+The incompatible cases,
+which the broker tries to avoid when matching,
+are when one peer's NAT is symmetric
 and the other's is symmetric or port-restricted cone.
-Note the asymmetry in what NAT variants we consider ``restricted''
+Note the asymmetry in what NAT variations are considered ``restricted''
 in client and proxy.
 }
 \label{tab:nat-matching}
@@ -813,7 +822,7 @@ in client and proxy.
 \autoref{tab:nat-matching}
 shows the pairwise compatibility of NAT variations.
 As~the incompatible cases always involve a symmetric NAT,
-we further simplify matching by categorizing the variations into the two types
+we further categorize the variations into the two types
 \firstterm{unrestricted} (works with most other NATs) and
 \firstterm{restricted} (works only with more permissive NATs).
 Unrestricted proxies may be matched with any client;
@@ -823,116 +832,106 @@ The broker prefers to match unrestricted clients with restricted proxies,
 in~order to conserve unrestricted proxies
 for the clients that need them.
 Symmetric NAT is always considered restricted,
-but port-restricted cone NAT differs
+but the type of port-restricted cone NAT differs
 depending on the peer:
 for proxies it is restricted, but
 for clients it is unrestricted.
-The asymmetric categorization is an approximation
-to help conserve unrestricted proxies
+This is a heuristic
+to conserve unrestricted proxies
 for clients with symmetric NATs.
-Though it creates the potential for an incompatible match,
-we believe this to be uncommon in practice.
-In~case of a connection failure,
-clients re-rendezvous and try again.
+Though it creates the potential for an incompatible match
+between a port-restricted cone client and a symmetric proxy,
+% https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/wikis/NAT-matching?version_id=dd1f328e2c9570eb252c43a053bdec0314c73345#fn-1-6791
+this case is rare in practice,
+and in the event it happens,
+a~client can re-rendezvous and try again.
 
-To self-assess their NAT type,
-clients use the NAT behavior discovery feature of STUN~\cite{rfc5780}.
+Clients use the NAT behavior discovery feature~\cite{rfc5780} of STUN
+to self-assess their NAT type.
 % "Use STUN to determine NAT behaviour of peers" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/34129
 % "Add utility to help user discover their NAT type" https://github.com/pion/stun/issues/8
 Proxies cannot use the same technique,
 because the necessary STUN features are not exposed
 to JavaScript.
-Instead,
-we adapt a technique from MassBrowser~\cite[\S \mbox{V-A}]{Nasr2020a}:
-we~run a centralized, always-on WebRTC testing peer
+For them,
+we adapt a technique from MassBrowser~\cite[\S \mbox{V-A}]{Nasr2020a}
+and run a centralized, always-on WebRTC testing peer
 behind a simulated symmetric NAT.\urlfootnote{
 % "Have a remote probe service to test snowflake proxy NAT compatability"
 https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40013
 }
-Proxies try connecting to this peer:
-if~the connection succeeds, the proxy's type is unrestricted;
+If~a proxy can connect to the testing peer,
+its type is unrestricted;
 otherwise it is restricted.
-Clients and proxies retest their NAT type periodically,
-to account for potential changes in their local networking environment.
-If~a client or proxy is unable to determine its NAT type for some reason,
-it reports the type ``unknown,''
-which the broker conservatively treats as if it were restricted.
+% Clients and proxies retest their NAT type periodically,
+% to account for potential changes in their local networking environment.
+If~a client or proxy is unable to determine its NAT type,
+it~reports the type ``unknown,''
+which the broker conservatively treats as restricted.
 
 \begin{figure}
 \includegraphics{figures/proxies/proxy-nat-type}
 \caption{
 Proxy NAT types, in unique IP addresses per day.
 The places in 2021 and 2022
-where there is an increase in the ``unknown'' NAT type
-and a decrease in the other types
-were the result of operational problems with
-NAT type testing.
+where ``unknown'' displaced other types
+were caused by operational problems with
+the NAT type testing peer.
 % "Increase of 'unknown' NAT assignments by probetest since 2021-10-25" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40071
 % "Move snowflake-broker to a systemd based setup" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40147
 }
 \label{fig:proxy-nat-type}
 \end{figure}
 
-\autoref{fig:proxy-nat-type}
-shows that unrestricted proxies form
-a relatively small fraction of the proxy population.
-In~absolute terms, there are enough,
-thanks in large part to the volunteers who run
-the command-line
-version of the Snowflake proxy
-on networks unencumbered by NAT.
-Though stable, long-term proxies go
-somewhat against the ethos of Snowflake,
-it~has proved useful, as a matter of practicality,
-to~sacrifice a measure of address diversity
-for better NAT compatibility in a common case.
-We~can estimate how many tries it takes a client
-to be matched with a proxy, on average,
-by counting failed and successful rendezvous attempts at the broker,
-under the assumption that clients repeat rendezvous attempts
-until getting a match.
-In~July 2023,
-unrestricted clients almost always got a match on the first attempt,
-while restricted clients needed an average of
-1.07 attempts (standard deviation 0.05).
+Unrestricted proxies are
+a relatively small fraction of the proxy population,
+as \autoref{fig:proxy-nat-type} shows.
+In~absolute number, though, there are enough
+for restricted clients at current levels of use.
+The broker counts the number of matched \((M)\)
+and unmatched \((U)\) client rendezvous requests per day.
+If~we assume that clients attempt rendezvous repeatedly until getting a match,
+then the number of attempts per success is \((U + M) / M\).
+Under this assumption, as~of February 2024,
+the average client needs 1.01 rendezvous attempts
+to find a compatible proxy.
 % > library(tidyverse)
 % > read_csv("figures/proxies/client-match.csv") %>%
 %     filter(date < "2024-02-01") %>%
+%     mutate(
+%       attempts_per_success = (matched_count + unrestricted_denied_count + restricted_denied_count) / matched_count,
+%     ) %>%
 %     group_by(month = format(date, "%Y-%m")) %>%
 %     summarize(
-%       unrestricted_n  = mean((matched_count + unrestricted_denied_count) / matched_count),
-%       unrestricted_sd =   sd((matched_count + unrestricted_denied_count) / matched_count),
-%       restricted_n    = mean((matched_count + restricted_denied_count) / matched_count),
-%       restricted_sd   =   sd((matched_count + restricted_denied_count) / matched_count),
+%       mean_attempts_per_success = mean(attempts_per_success),
+%         sd_attempts_per_success =   sd(attempts_per_success),
 %       .groups = "drop"
 %     ) %>% tail(10)
-% # A tibble: 10 × 5
-%    month   unrestricted_n unrestricted_sd restricted_n restricted_sd
-%    <chr>            <dbl>           <dbl>        <dbl>         <dbl>
-%  1 2023-04           1        0                   1.15       0.152
-%  2 2023-05           1.00     0.00204             1.23       0.113
-%  3 2023-06           1.00     0.0000834           1.23       0.0734
-%  4 2023-07           1        0                   1.07       0.0498
-%  5 2023-08           1        0                   1.02       0.0568
-%  6 2023-09           1        0                   1.00       0.0148
-%  7 2023-10           1.00     0.000000552         1.01       0.0137
-%  8 2023-11           1        0                   1.00       0.00499
-%  9 2023-12           1        0                   1.00       0.0121
-% 10 2024-01           1        0                   1.01       0.0168
+% # A tibble: 10 × 3
+%    month   mean_attempts_per_success sd_attempts_per_success
+%    <chr>                       <dbl>                   <dbl>
+%  1 2023-04                      1.15                 0.152
+%  2 2023-05                      1.23                 0.114
+%  3 2023-06                      1.23                 0.0734
+%  4 2023-07                      1.07                 0.0498
+%  5 2023-08                      1.02                 0.0568
+%  6 2023-09                      1.00                 0.0148
+%  7 2023-10                      1.01                 0.0137
+%  8 2023-11                      1.00                 0.00499
+%  9 2023-12                      1.00                 0.0121
+% 10 2024-01                      1.01                 0.0168
 
-While the proxy is connecting to its client,
-% "While": https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40228
-it also connects to the bridge.
-This connection
-uses WebSocket~\cite{rfc6455}, which
-offers a TCP-like, client--server connection
-layered on HTTPS.
-The choice of protocol for the proxy--bridge link is arbitrary,
-and could be changed
-without affecting the rest of the system.
-It does not need to be resist blocking,
-it~just needs to be available to JavaScript code in web browsers.
-WebRTC, for example, could be used for this link as well.
+As~the proxy negotiates the WebRTC connection with its client,
+% "At the same time": https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40228
+it~also connects to the bridge using WebSocket~\cite{rfc6455}.
+Unlike the client connection, the bridge connection
+presents no challenges:
+it's just HTTPS to an open port on a server.
+The choice of WebSocket for this link is arbitrary,
+and another protocol might be substituted in its place.
+It~does not need to be blocking-resistant
+(because we are already outside the censor's zone of control),
+it~only needs to be available to JavaScript code in web browsers.
 
 \subsection{Data transfer}
 \label{sec:data-transfer}
@@ -941,109 +940,73 @@ No~complicated processing takes place at the proxy.
 The main value of a Snowflake proxy is its IP address:
 it~gives the client a peer to connect to that is not on the censor's address blocklist.
 Having provided that,
-the proxy assumes a role of pure data transfer.
+the proxy assumes a role of data transfer,
+copying data upstream from client to bridge
+and downstream from bridge to client.
 
 Snowflake uses a stack of nested protocol layers.
-We~will walk though the layers and describe the purpose of each.
+\autoref{fig:protocol-layers}
+shows the stack for the link between the client and the proxy.
+This is the link that uses WebRTC,
+and the one that is exposed to the censor.
+The stack for the proxy--bridge link is the same,
+but with WebSocket replacing
+WebRTC in the outermost layer.
+Layers at the top of the diagram are ``outer,'' closer to the network;
+ones at the bottom are ``inner,'' closer to the user.
 
-\bigskip
-
-\noindent
-\begin{tabular}{@{}l@{\,}l@{}l@{\,}l}
-UDP & \rdelim\}{3}{*} & \multirow{3}{5em}{WebRTC data channel} & \rdelim\}{3}{*}[\,ephemeral, per proxy]\\
+\begin{figure}[h]
+\centering
+\begin{tabular}{l@{\,}l@{}l@{\,}l}
+UDP & \rdelim\}{3}{*} & \multirow{3}{5em}{WebRTC\\[-2pt]data channel} & \rdelim\}{3}{*}[\,ephemeral, per proxy]\\
 DTLS \\
 SCTP \\
 KCP & \rdelim\}{2}{*} & \multirow{2}{*}{Turbo Tunnel} & \rdelim\}{3}{*}[\,persistent, per session] \\
 smux \\
-\multicolumn{3}{@{}l}{Tor protocol} \\
-\multicolumn{4}{@{}l}{application streams} \\
+\multicolumn{3}{l}{Tor protocol} \\
+\multicolumn{4}{l}{application streams} \\
 \end{tabular}
+\caption{
+The protocol stack for the client--proxy link.
+}
+\label{fig:protocol-layers}
+\end{figure}
 
-\bigskip
+Each layer serves a different purpose.
+The layers marked ``ephemeral'' are replaced
+at every proxy switchover.
+These outer layers form the ``carrier''
+over which the more stateful inner layers are transported.
+The layers marked ``persistent'' are instantiated just once
+per circumvention session and outlive any single proxy.
+They maintain end-to-end state
+and present an abstraction of a single long-lived tunnel.
+This virtual tunnel then transports user application traffic
+such as web browsing and messaging.
 
-\noindent
-This is the stack for the client--proxy link,
-which is the place where WebRTC is used, and which is
-exposed to observation by the censor (\autoref{fig:architecture}).
-The stack for the proxy--bridge link is the same,
-but with WebSocket in place of the
-WebRTC data channel at the top.
-The layers marked ``ephemeral'' are skimmed off
-and replaced as proxies come and~go.
-The layers marked ``persistent'' are instantiated once
-in each circumvention session,
-hold long-term state,
-and are end-to-end between client and bridge.
-
-The connection between a client and its proxy is
-a WebRTC data channel~\cite{rfc8831},
-which provides a way to send arbitrary binary messages between peers.
-A~data channel is its own stack of three protocols:
+The point-to-point link between a client and its proxy is
+a WebRTC data channel~\cite{rfc8831}.
+Data channels let two WebRTC peers
+exchange arbitrary binary messages.
+A~data channel is itself a composition of three protocol layers:
 UDP for network transport,
 DTLS (Datagram TLS)
 for confidentiality and integrity, and
 SCTP (Stream Control Transmission Protocol)
 for delimiting message boundaries
 and other features like congestion control.
-Working UDP port numbers will have been discovered
-using ICE in the previous phase.
-The peers authenticate one another
+The peers authenticate each other
 at the DTLS layer using certificate fingerprints
 that were exchanged during rendezvous~\cite[\S 5.1]{rfc8842}.
 
-Data channels are well-suited to Snowflake's needs.
-(The specification even lists circumvention as a use case~\cite[\S 3.2]{rfc8831}.)
-But data channels are not the only option:
-WebRTC also offers \firstterm{media streams}
-for unreliable transport of real-time audio and video.
-Which of these is used may be a fingerprinting vector.
-We~will take up this topic in \autoref{sec:fingerprinting}.
-
-If~clients only ever used one proxy,
-a~WebRTC data channel alone would be sufficient.
-But a Snowflake proxy might
-disappear at any moment,
-and when that happens, its data channel goes with~it.
-If~the client was in the middle of a long download,
-for example, it should be possible to resume the download
-without interruption after rendezvousing with a new proxy.
-For this we need a shared notion of session state that exists
-at the client and the bridge, not tied to any temporary proxy.
-A~lack of session continuity across proxy failures
-had been an unsolved problem in flash proxy~\cite[\S 5.2]{Fifield2012a}.
-
-We~adopt the
-Turbo Tunnel design pattern~\cite{Fifield2020a}
-and insert a userspace
-session and reliability protocol
-between the ephemeral proxy data channels
-and the client's own application streams.\urlfootnote{
-% "[anti-censorship-team] Turbo Tunnel in Snowflake"
-https://lists.torproject.org/pipermail/anti-censorship-team/2020-February/000059.html
-}
-This part of the protocol stack
-outlives any single proxy; it~belongs to
-the client and the bridge.
-Its primary function is to attach sequence numbers and acknowledgements
-to packets of data,
-so~that both ends know what parts of the data stream
-need to be retransmitted after a temporary loss of proxy connectivity.
-The client tags its traffic
-with a random session identifier string that remains
-consistent throughout a session,
-which the bridge uses to index a map of session variables.
-For the inner session layer we use a combination of
-KCP~\cite{kcp} and
-smux~\cite{smux}.
-KCP provides reliability,
-and smux detects the end of idle sessions and terminates them.
-KCP and smux have shown their worth in other deployments,
-and are easy to program,
-but there is nothing about them on which we depend essentially.
-Any other transport protocol that provides the necessary features
-and can be implemented in userspace would~do,
-such as QUIC, TCP, or (another layer~of) SCTP.
-We~prototyped successfully with QUIC before deciding on KCP/\allowbreak smux.
+Data channels are well-suited to the circumvention use case.
+But data channels are not the only option
+in WebRTC for data transport:
+there are also \firstterm{media streams},
+meant for real-time audio and video.
+Which of these options is used is an externally observable feature,
+and may therefore become a fingerprinting vector.
+We~will consider this topic further in \autoref{sec:fingerprinting}.
 
 % Not going to get into how we currently use reliable, ordered (TCP-like) data
 % channels, but plan to switch to unreliable, unordered (UDP-like) data
@@ -1053,27 +1016,95 @@ We~prototyped successfully with QUIC before deciding on KCP/\allowbreak smux.
 % "turn off reliable mode for WebRTC DataChannel" https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/merge_requests/109
 % "Snowflake is currently using network resource in a so suboptimal way..." https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40251#note_2891751
 
-One more protocol layer is needed inside the tunnel:
+A~proxy maintains two connections for each client it is currently serving:
+one WebRTC connection to the client and one WebSocket connection to the bridge.
+Data received from the client over WebRTC
+is copied to the bridge over WebSocket,
+and vice versa.
+Although this pair of connections
+effectively connects the client to the bridge,
+it~alone is not enough for usable circumvention.
+This is because Snowflake proxies do not last forever.
+When a proxy goes away,
+its WebRTC and WebSocket connections go with~it.
+Without additional consideration,
+the loss of a proxy would mean the end
+of a client's circumvention session.
+What is needed is a separate notion of session state
+that is independent of the currently used proxy
+and its data channel.
+
+We~adopt the
+Turbo Tunnel design pattern~\cite{Fifield2020a}
+and insert a userspace
+session and reliability protocol
+between the ephemeral ``carrier'' protocols
+and the client's own application streams.\urlfootnote{
+% "[anti-censorship-team] Turbo Tunnel in Snowflake"
+https://lists.torproject.org/pipermail/anti-censorship-team/2020-February/000059.html
+}
+It~attaches sequence and acknowledgement numbers
+to the pieces of data that pass through the tunnel.
+After a temporary break in proxy connectivity,
+the client and bridge retransmit whatever data has not been acknowledged
+by the other side,
+then carry on as normal,
+with no duplication or loss of data.
+How this works, concretely,
+is~the client chooses a random session identifier string
+at the beginning of its session,
+and sends it as a preamble each time it
+connects to a new proxy.
+When the bridge accepts a new WebSocket connection,
+it~inspects the preamble to find the client's session identifier string,
+and uses it to index a table of session state information.
+If~the session does not yet exist,
+the bridge creates~one;
+otherwise it resumes an existing session
+(starting by retransmitting unacknowledged data).
+If~a client's proxy disappears
+while in the middle of a long download,
+there may be a pause while Snowflake
+does another rendezvous and acquires a fresh proxy,
+but after that the download will continue uninterrupted.
+
+For the inner session layer we use a combination of
+KCP~\cite{kcp} and
+smux~\cite{smux}.
+KCP provides reliability and retransmission,
+and smux detects and terminates timed-out streams.
+Other userspace protocols, for example QUIC or TCP,
+could be used more or less equivalently
+as the inner session layer.
+We~prototyped successfully with both QUIC and KCP/\allowbreak smux
+before settling on the latter.
+The main criteria influencing our decision
+were familiarity and ease of maintenance.
+
+One more protocol layer is needed
+before sending user application data through the tunnel:
 an~end-to-end secure channel between the client and the bridge,
 using keys unknown to the proxy.
-The purpose of this channel is to let
-the client tell the bridge what destinations to access,
-and prevent the proxy from inspecting or tampering with the traffic
-it carries.
-Nothing special is required here: for example,
-SOCKS over TLS,
-or any VPN protocol,
+The inner session layer does not provide security,
+and the DTLS of the data channel is only hop-by-hop,
+not end-to-end.
+The purpose of this additional secure channel is
+to prevent proxies from inspecting or tampering with the traffic
+they carry.
+Nothing special is needed here; for example,
+TLS or a VPN protocol
 would work fine.
-Our deployment uses Tor as this secure channel:
+Our deployment uses the Tor protocol as this secure channel:
 after removing the WebSocket and Turbo Tunnel layers,
-the bridge feeds the client's stream into a local Tor bridge,
+the bridge feeds the data it receives into a local Tor bridge,
 which routes the stream into the Tor network
 and eventually to its destination.
-Using Tor, of course,
-has the advantage that not even the bridge
-is trusted to see the contents of client streams
-or know their destination.
-But Tor also has certain drawbacks,
+Tor, of course, has additional privacy advantages
+that are not, strictly speaking, required for circumvention,
+but are nevertheless nice to have,
+such as that not even the Snowflake bridge
+is trusted to know the contents or destinations of client streams.
+But Tor also has some drawbacks,
 which we will comment on in
 \autoref{sec:multi-bridge}
 and
@@ -1081,10 +1112,10 @@ and
 
 Snowflake may be seen as an instance of the
 ``untrusted messengers'' model of Feamster et~al.~\cite[\S 3]{Feamster2003a}.
-Our \firstterm{proxies} correspond to their \firstterm{messengers};
-our \firstterm{bridge} is their \firstterm{portal}.
+Their \firstterm{messengers} correspond to our \firstterm{proxies};
+their \firstterm{portal} is our \firstterm{bridge}.
 Proxies are trusted to deliver the client's client's traffic to the bridge,
-but not directly to the destination.
+but do not themselves connect to the destination, or~even know what it~is.
 An~inner layer of cryptography protects the client's traffic
 from observation and manipulation by malicious proxies.
 The protection goes in the other direction as well:
@@ -1102,75 +1133,64 @@ who have no preexisting trust relationship.
 % https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/wikis/Fingerprinting
 
 Snowflake's main focus is the ``address blocking'' side of circumvention,
-but the ``content blocking'' part matters too.
+but the ``content blocking'' side matters too.
 The goal, as~always, is to make circumvention traffic
-difficult to distinguish from traffic the censor prefers not to block.
-Snowflake is tied to WebRTC,
-and so can only be effective against a censor
-that is not willing to block WebRTC protocols wholesale.
+hard to distinguish from traffic the censor cares not to block.
+Design decisions in Snowflake---the use of WebRTC,
+and the requirement to run proxies in browsers---mean
+that Snowflake can, at~best, only blend in with other WebRTC traffic.
 But even within that scope,
-there are many variations in \emph{how}
+there are variations in \emph{how}
 WebRTC is implemented and used,
 which, if~not carefully considered, might enable a censor
 to selectively block only Snowflake,
-while leaving other uses of WebRTC undisturbed.
+leaving other uses of WebRTC undisturbed.
 Unfortunately for the circumvention developer,
 the richness of WebRTC protocols
 creates a large attack surface for fingerprinting.
-Not only that, WebRTC leaves the details of
-the signaling path---the medium through which peers exchange information
-needed to set up a connection---unspecified~\cite[\S 3]{rfc8825},
-leaving every application to invent its own mechanism.
-% "The choice of protocols for client-server and inter-server signaling, and the definition of the translation between them, are outside the scope of the WebRTC protocol suite described in this document."
-% https://www.rfc-editor.org/rfc/rfc8829.html#section-3.1: "JSEP does not specify a particular signaling model or state machine, other than the generic need to exchange session descriptions in the fashion described by [RFC3264] (offer/answer)..."
 
-As~WebRTC is designed for the web,
-most implementations of WebRTC are embedded in web browsers,
-and are not easily removed from that context.
-Snowflake originally used a WebRTC library extracted from Chromium,
-but that eventually proved unworkable for cross-platform deployment.
-Since~2019, Snowflake has used Pion~\cite{pion-webrtc},
-an independent implementation of WebRTC.\urlfootnote{
+The most prevalent implementations of WebRTC are those in web browsers.
+Snowflake originally used a WebRTC library extracted from Chromium\urlfootnote{
+https://github.com/keroserene/go-webrtc
+},
+but that proved to be difficult to maintain
+and build for multiple platforms.
+Since~2019, Snowflake uses the Pion~\cite{pion-webrtc},
+implementation of WebRTC.\urlfootnote{
 % "Evaluate pion WebRTC"
 https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/28942
 }
-It~is not tied to any browser,
+It~is not tied to a browser,
 which is both good and bad.
-The good features are less development friction,
+The good is less development friction,
 better memory safety
 (Pion is written in Go, Chromium WebRTC in C++),
-and a working relationship with upstream developers
-to make fingerprinting-related changes when needed.
-The bad is that the protocol fingerprints of Pion
-do not automatically match the mostly browser-originated
+and a working relationship with the developers
+to have fingerprinting changes made when needed.
+The bad is that its protocol fingerprints
+do not automatically match those of the mostly browser-originated
 WebRTC that Snowflake aims to blend in with.
 
 The following is a list of the main fingerprinting concerns in Snowflake and
 what we have done to address them.
 A~fingerprinting vulnerability
 does not automatically disqualify a circumvention system:
-it~depends on whether the vulnerability is fixable
-without fundamentally changing the system.
-Even among demonstrable vulnerabilities,
-some are more and some are less practical for a censor to take advantage~of.
-The important thing is to build on a solid foundation.
-Minor flaws may be patched up as necessary.
+it~depends on whether it can be fixed
+without changing the basic nature of the system.
+The important thing is to have solid fundamentals;
+minor flaws may be patched up as needed.
 
 \begin{description}
 \item[Selection of STUN servers]
-It~is not unusual for a WebRTC application to use STUN,
+The use of STUN with WebRTC is common,
 but the choice of what STUN servers to use is up to the application.
-Running dedicated STUN servers just for Snowflake would not work,
+Running dedicated STUN servers for Snowflake would not work,
 because a censor would experience no collateral harm in
 blocking them.
 Our deployment uses a pool of public STUN servers
-that are used for applications other than circumvention,
-filtered for those that support the NAT behavior discovery feature
-of \autoref{sec:connection}.
-The client chooses a random subset of servers from the pool
-when it makes a connection;
-this is because not every STUN server is accessible
-under every censor.
+that are used for purposes other than circumvention.
+The client chooses a random subset
+for each new session.
 % I thought about using stun.l.google.com as an example here.
 % As of 2024-01-31, stun.l.google.com seems to work in China.
 % It was DNS-blocked on 2022-10-01, but must have been unblocked since.
@@ -1178,71 +1198,61 @@ under every censor.
 
 \item[Format of STUN messages]
 STUN is most often deployed over plaintext UDP,
-which leaves the formatting of messages open to inspection
-and potential fingerprinting.
+which leaves the contents of messages open to inspection.
 STUN messages consist of a fixed header
-followed by a variable-length list of ordered
+followed by a list of
 attributes~\cite[\S 5]{rfc8489}.
 What attributes appear,
 and their order,
 depends on the STUN implementation
 and how the application uses it.
 
-We have not done anything in particular
+We have not done anything particular
 to disguise STUN messages.
-Though plaintext UDP is the most common,
+Though UDP is the most common,
 STUN specifies other transports,
 including encrypted ones like DTLS.
-These may be options for Snowflake in the future---of~course,
-only if they are common enough that their use
-does not stick out on its own.
+The alternative transports may be options for Snowflake in the future---of~course,
+only if they are commonly used enough not to
+stick out in themselves.
 % "Investigate if STUN over TCP/TLS is beneficial to us" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40240
 
 \item[Rendezvous]
 Because the rendezvous methods of
 \autoref{sec:rendezvous}
 are modular,
-each one needs its own justification
+each one needs a separate justification
 as to why it should be difficult to block.
-In~addition, they must be implemented in a way
+They must also be implemented in a way
 that does not expose accidental distinguishers.
-For example, the domain fronting and AMP cache rendezvous methods
-use HTTPS, which is TLS,
-which means that TLS fingerprinting is a concern~\cite[\S 5.1]{Fifield2015a}.
-Snowflake, like many other circumvention systems,
+The domain fronting, AMP cache, and SQS rendezvous methods
+use HTTPS,
+which is TLS,
+which means TLS fingerprinting is a concern~\cite[\S 5.1]{Fifield2015a}.
+
+Snowflake, like many circumvention systems,
 uses the uTLS package~\cite[\S VII]{Frolov2019a}
-for a client TLS fingerprint that is randomized or that imitates common browsers.
-See \autoref{sec:block-ir} for an account of when
+to get a client TLS fingerprint that is randomized or that imitates common browsers.
+\autoref{sec:block-ir} has an account of when
 domain fronting rendezvous was briefly blocked in Iran,
 because we were slow in activating uTLS.
-
-Though each rendezvous method may be difficult to block in itself,
-a~censor might combine a low-confidence detection of rendezvous
-with features from other phases of Snowflake data exchange
-to strengthen its guess.
 
 \item[DTLS]
 The outermost layer of a WebRTC data connection,
 directly exposed to a censor,
-is DTLS (Datagram TLS) over UDP.
+is~DTLS over UDP.
 DTLS is an adaptation of TLS~\cite[\S 1]{rfc9147} to the datagram setting,
-and therefore inherits the fingerprinting concerns of TLS~\cite{Frolov2019a}.
-TLS/DTLS fingerprinting may involve, for example,
-inspecting the ciphersuites and extensions of Client Hello messages,
-and their order.
-If~a combination
-is specific to a particular implementation of a circumvention system,
-it~may be blocked at low cost.
+and therefore has the fingerprinting concerns of TLS~\cite{Frolov2019a}.
 
-Due to practical considerations,
+Owing to practical considerations,
 Snowflake's defenses to DTLS fingerprinting are not very robust,
 and are reactive rather than proactive.
 In~the realm of TLS one may use uTLS,
 but there is as yet no equivalent for DTLS.
 The present way of altering DTLS fingerprints in Snowflake
-is to submit a pull request upstream to Pion
-when a fingerprint feature used for blocking is identified.
-\autoref{sec:block-ru} documents how this has happened twice already,
+is to submit a patch to Pion
+when a feature used for fingerprinting is identified.
+\autoref{sec:block-ru} documents how this has happened twice,
 in response to blocking in Russia.
 
 % For reference, fingerprinting changes upstreamed to Pion:
@@ -1267,45 +1277,41 @@ in response to blocking in Russia.
 %   https://github.com/pion/stun/pull/33
 
 \item[Data channel or media stream]
-Besides data channels, WebRTC offers \firstterm{media streams},
-serving the purpose of real-time
-audio and video communication.
-Though both are encrypted,
-data channels and media streams are externally distinguishable
-because they use different containers.
+Along with data channels, WebRTC offers \firstterm{media streams},
+which transmit encoded audio and video.
+Though both data channels and media streams are encrypted,
+they are externally distinguishable
+because they use different encryption containers.
 Data channels use DTLS,
 while media streams use DTLS-SRTP;
 that is, the Secure Real-Time Transport Protocol
 with a DTLS key exchange~\cite[\S 4.3]{rfc8827}.
 
 Data channels are a closer match to Snowflake's communication model:
-media streams are meant to contain encoded audio and video,
-not arbitrary binary data.
-But the use of DTLS rather than DTLS-SRTP could become
-a significant feature if other WebRTC applications mainly use media streams.
-Although it would be less convenient,
-it would be possible to adapt the WebRTC link between
-client and proxy
-to use a media stream rather than a data channel,
-either by modulating binary data into a well-formed encoded
+media streams are meant for audio and video,
+not arbitrary binary messages.
+But the use of data channels could become
+a fingerprinting feature if other WebRTC applications mainly use media streams.
+Should it become necessary,
+it~would likely be possible to adapt Snowflake's WebRTC connections
+to use media streams rather than data channels,
+either by modulating data into an
 audio or video signal in the manner~of, say,
 Stegozoa~\cite[\S 3.3]{Figueira2022a},
-or by replacing encoded media content within SRTP packets,
+or by replacing the encoded data inside SRTP packets,
 as in Protozoa~\cite[\S 4.4]{Barradas2020a}
-or TorKameleon~\cite[\S \mbox{III-D}]{arxiv.2303.17544}.
+or TorKameleon~\cite[\S \mbox{III-D}]{Vilalonga2023a}.
 
 \end{description}
 
-Protocol fingerprinting
-is~where most research on detecting Snowflake has focused.
+Most research on detecting Snowflake to date
+has focused on protocol fingerprinting.
 Fifield and Gil Epner~\cite{arxiv.1605.08805}
-studied the network traffic of WebRTC applications,
-with the goal of finding fingerprinting pitfalls
-that might affect Snowflake,
-which was then in early development.
+studied the network traffic of WebRTC applications
+with the goal of finding fingerprinting pitfalls.
 Frolov et~al.~\cite[\S \mbox{V-C}]{Frolov2019a}
 observed that the undisguised TLS fingerprint
-of domain fronting rendezvous was distinctive,
+of Snowflake's domain fronting rendezvous was distinctive,
 and introduced the uTLS package that Snowflake
 now uses to protect~it.
 
@@ -1322,8 +1328,8 @@ using the bits of UDP datagrams directly as features,
 demonstrated approximately equal performance
 on the same DTLS handshake data set.
 Their automatically derived classifier assigned high feature importance
-to length fields in packets,
-and in fact did well even when deprived of DTLS payload features.
+to packet length fields,
+in~fact doing well even without DTLS payload features.
 
 Chen et~al.~\cite{Chen2023a}
 combined features
@@ -1331,41 +1337,38 @@ of rendezvous and DTLS
 in order to reduce false positives.
 Their classifier begins
 by looking for DNS queries for
-STUN servers and front domains typically used by Snowflake clients.
+STUN servers and front domains commonly used by Snowflake clients.
 They then apply a machine learning classifier
 to features of a subsequent DTLS handshake.
 The authors acknowledge that DTLS fingerprinting
-is fragile, as~the DTLS fingerprint is, in~principle,
+is fragile, as~the DTLS features are, in~principle,
 controllable by the application.
 The DNS prefilter may perhaps be mitigated
 by alternative rendezvous methods (\autoref{sec:rendezvous}),
 or~by smarter selection of STUN servers.
 
 Xie et~al.~\cite{Xie2023a} trained a decision tree to
-distinguish Snowflake's domain fronting rendezvous
-from certain other HTTPS exchanges.
-They achieved some success using
-packet size, direction, latency, and bandwidth features,
-though the lowest reported false positive rate of 0.25\%
-would translate into substantial overblocking
-at the scale of an international Internet connection.
+distinguish domain fronting rendezvous
+from certain other HTTPS exchanges,
+using
+packet size, direction, latency, and bandwidth features.
 Wails et~al.~\cite{Wails2024a}
 criticize past research on detecting circumvention systems,
 saying that accuracy claims do not hold up
-with the low base rates of circumvention traffic in practice.
+in light of the low base rates of circumvention traffic in practice.
 % IV-D: "Despite the prima facie acceptable performance of these
 % classifiers ... we argue that these results *do not* accurately
 % reflect a censor's ability to detect obfs4 under realistic conditions."
-They develop classifiers
+They developed classifiers
 for Snowflake and other circumvention protocols
-that improve on the state of the art,
-but find them still prohibitively imprecise at realistic base rates.
+that improved on the state of the art,
+but found them still to prohibitively imprecise at realistic base rates.
 % V-C: "While it is the case that deep learning improves performance,
 % the false positive rates are still prohibitively high to scale to
 % realistic base rates. Fig. 5 plots Prec^λ as a function of the base
 % rate λ. For more realistic base rates, such as λ > 1 × 10^6, the
 % precision attained by any of the classifiers is near-zero."
-They propose to reduce false positives by combining
+They propose reducing false positives by combining
 multiple observations per IP address---classifying hosts,
 not flows---and suggest that Snowflake's lack of
 fixed proxies mitigates against this enhancement.
@@ -1376,40 +1379,40 @@ fixed proxies mitigates against this enhancement.
 
 Related to protocol fingerprinting is \firstterm{traffic analysis}:
 classifying connections based on features like
-the sequence of packet lengths and transmission times,
-which may differ, in~circumvention use cases,
-from other uses of the cover protocol.
-The best classifiers in the works of the previous paragraph
-use traffic analysis features.
+packet lengths and transmission times---which
+may be different in a circumvention system
+that in other uses of the cover protocol.
+The best classifiers of Xie et~al.\ and Wails et~al.\ were of this nature.
 While traffic analysis attacks are worth thinking about,
 we~caution that academic audiences
-have historically overestimated how much they matter in practice.
-Tschantz et~al.~\cite[\S VII]{Tschantz2016a} have observed
+have historically overestimated their importance.
+Tschantz et~al.~\cite[\S VII]{Tschantz2016a} observed
 that censors are sensitive to costs
 and---particularly---false positives.
 They claim (and our experience bears it out)
-that censors prefer to traffic classification rules
+that censors prefer traffic classification rules
 that are simple, precise, and deterministic,
 and avoid ones that
-require keeping state,
+require managing state,
 are computationally expensive,
-or~have non-negligible false positive rates---all
-of which descriptors apply to traffic analysis classifiers.
+or~have non-negligible false positive rates---like
+those based in traffic analysis.
 % Traffic analysis attacks are hardly worth considering
 % until after taking care of the fundamentals
 % of endpoint and content blocking,
 % and even then, there is, as~yet, little evidence of their being used.
 Nevertheless, we~have tried to future-proof Snowflake in this regard:
 the protocol inside the WebRTC data channel supports
-arbitrary shaping of data units inside the tunnel,
+shaping of transmission sizes and timing,
 which ought to be sufficient to imitate the traffic fingerprint
-of other WebRTC applications, should that become necessary.
+of other WebRTC applications.
+% encapsulation.WritePadding https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/blob/38352b22ade217bd1372772b9cb69f8eff93e919/common/encapsulation/encapsulation.go#L153
 But the feature is currently unused.
 
 \begin{figure*}[t]
 \includegraphics{figures/users/users-global}
 \caption{
-Estimated average simultaneous Snowflake users and bandwidth by day.
+Estimated average concurrent Snowflake clients and consumed bandwidth by day.
 The values at the far left end of the graph,
 in~early July~2021, are about~200 users
 % > filter(filtered, abs(date - as.Date("2021-07-01")) < 3)
@@ -1479,8 +1482,18 @@ and 2.7~Mbit/s.
 Snowflake has now been in operation for a few years.
 In~lieu of a forward-looking evaluation,
 here we take a look back
-at the history of our deployment
+at the history of its deployment
 and reflect on the experience.
+Fielding a new circumvention system offers
+and opportunity to study experimentally
+its uptake and performance.
+In~this section we cover
+the number of clients over time and the bandwidth they use,
+the size and composition of the proxy pool,
+the variability of proxy IP addresses,
+and engineering considerations related to scaling.
+We~take up the topic of reactions by censors
+in \autoref{sec:block}.
 
 \subsection{Client counts and bandwidth}
 \label{sec:clients}
@@ -1527,21 +1540,58 @@ and reflect on the experience.
 % |2023-03-13 20:17:54|||snowflake|Restarted snowflake-01 bridge for a bugfix.|[comment](https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40262#note_2886041) [issue](https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40260)||
 % |2023-03-15|||snowflake|Release of Orbot for Android v17 BETA 2. First release of Orbot to include the snowflake-02 bridge along with the existing snowflake-01. Has a change to the Snowflake DTLS fingerprint (removes Hello Verify Request) to mitigate reported blocking in Russia.|[release](https://github.com/guardianproject/orbot/releases/tag/17.0.0-BETA-2-tor.0.4.7.11) [Orbot commit adding snowflake-02](https://github.com/guardianproject/orbot/commit/c3f6ee18f17770a5904ad19c3cd24b9c8dcb3885) [IPtProxy commit upgrading Snowflake](https://github.com/tladesignz/IPtProxy/commit/5d0654a6a1439c05d3ee52b2b351b5df1ff3f6dc)||
 
-Snowflake became available to end users gradually,
-reflecting a long development process.
-Development began in late 2015,
-% 2015-10-01 initial commit in go-webrtc https://github.com/keroserene/go-webrtc/commit/a044c5aaa6cd8b7c66ca7863e35e1f1931677fc6
-% 2015-12-22 initial commit in snowflake https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/commit/41c7613db85f6c1e8d13ea3639fb35d71f6ad942
-and deployment in~2017,
-but the system only really became usable in~2020.
-It~began to attract large numbers of users
-(enough to merit a censor's attention)
-in~2022, following
-network blocking events in Russia and Iran.
+As~a consequence of our use of a Tor bridge
+as the backend for the Snowflake bridge,
+we~can estimate client counts and bandwidth using
+the privacy-preserving
+techniques of Tor Metrics~\cite{tor-reproducible-metrics}.
+Tor bridges publish daily summaries of statistics,
+including client counts and bandwidth,
+as~well as the distribution of client countries
+inferred from a local geolocation database.
+\autoref{fig:client-counts} shows the number of clients
+and the amount of bandwidth consumed since 2021.
+The upper graph does not count unique clients,
+but rather the \emph{average number of concurrent clients} per day.
+% "The result is an average number of concurrent users, estimated from data collected over a day. We can't say how many distinct users there are."
+% https://metrics.torproject.org/reproducible-metrics.html#users
+% $ grep '^2022-02-04.*,snowflake,' figures/users/userstats-bridge-transport-multi.csv
+% 2022-02-04,5481936581E23D2D178105D44DB6915AB06BFB7F,snowflake,10124.23,4.00,4.00
+For example, the fact that the graph passes through 10,000 on \mbox{2022-02-04}
+means that there were, on~average, 10,000 clients using Snowflake
+at a given time on that day.
+The number of users is estimated by counting the ``directory requests''
+that Tor clients make periodically.
+The contribution of a client session depends on its duration,
+not on how many temporary proxies it used;
+a~client connected for two hours counts half as much
+as one connected for four hours.
+Bandwidth is computed as the
+average of incoming and outgoing bytes
+(which are approximately equal anyway),
+after subtracting
+bytes spent processing directory requests
+(which are less than 1\% of total bandwidth).
+% 2024-01-30,5481936581E23D2D178105D44DB6915AB06BFB7F,dirreq-read,9010514338.54,12.00,12.00
+% 2024-01-30,5481936581E23D2D178105D44DB6915AB06BFB7F,dirreq-write,183779650063.64,12.00,12.00
+% 2024-01-30,5481936581E23D2D178105D44DB6915AB06BFB7F,read,27658592171042.61,12.00,12.00
+% 2024-01-30,5481936581E23D2D178105D44DB6915AB06BFB7F,write,27638803440777.79,12.00,12.00
+% 2024-01-30,91DA221A149007D0FD9E5515F5786C3DD07E4BB0,dirreq-read,2878113136.53,12.00,12.00
+% 2024-01-30,91DA221A149007D0FD9E5515F5786C3DD07E4BB0,dirreq-write,69434558541.69,12.00,12.00
+% 2024-01-30,91DA221A149007D0FD9E5515F5786C3DD07E4BB0,read,9925612576857.30,12.00,12.00
+% 2024-01-30,91DA221A149007D0FD9E5515F5786C3DD07E4BB0,write,9851906962576.33,12.00,12.00
+% >>> 9010514338.54 / 27658592171042.61 * 100
+% 0.03257763187228898
+% >>> 183779650063.64 / 27658592171042.61 * 100
+% 0.6644577168900507
+% >>> 2878113136.53 / 9925612576857.30 * 100
+% 0.028996831321430473
+% >>> 69434558541.69 / 9925612576857.30 * 100
+% 0.6995493527884072
 
 Snowflake shipped in the alpha release series of Tor Browser
-before graduating to the stable series.
-The first releases of Snowflake were
+for years before entering the stable series.
+The first releases were
 for GNU/Linux
 in Tor Browser~7.0a1 on \mbox{2017-01-24}\,\urlfootnote{
 % "Add snowflake pt to alpha linux builds"
@@ -1555,15 +1605,12 @@ https://bugs.torproject.org/tpo/applications/tor-browser/22831
 % "mac reproducible build" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/19001
 % "[tbb-dev] Please check reproducibility of mac build with Snowflake (e084e83418)" https://lists.torproject.org/pipermail/tbb-dev/2017-July/000579.html
 }.
-But we hit a roadblock in attempting to prepare releases for other platforms:
-the Chromium-derived WebRTC library we had used to that point
-presented major difficulties
-in Tor Browser's
-cross-compiling, reproducible build environment.
-What let us resume making progress was a switch to
+It~was at this point we encountered difficulties with
+the Chromium-derived WebRTC library we had been using
+that prevented us from preparing releases for other platforms.
+We~were able to resume making progress after switching to
 Pion WebRTC~\cite{pion-webrtc} in~2019.
-With it, we~were able to release
-Snowflake for Windows
+Snowflake for Windows was released
 in Tor Browser~9.0a7 on \mbox{2019-10-01}\,\urlfootnote{
 % "Windows reproducible build of snowflake"
 https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/25483
@@ -1575,17 +1622,17 @@ https://bugs.torproject.org/tpo/applications/tor-browser/30318
 % "Android reproducible build of Snowflake" https://bugs.torproject.org/tpo/applications/tor-browser/28672
 }.
 
-While at this point Snowflake was available
+While Snowflake was then available
 on every platform supported by Tor Browser,
-it was not yet comfortably usable.
+it~was not yet comfortably usable.
 Two important parts were missing:
-no~NAT type matching (\autoref{sec:connection})
+a~lack of NAT type matching (\autoref{sec:connection})
 meant that a client could not always connect to its assigned proxy;
-and a lack of persistent session state (\autoref{sec:data-transfer})
-meant that even if a proxy connection was successful,
-the client's session would end once that proxy disappeared.
-For these reasons, by early 2020,
-the average number of concurrent users
+and no persistent session state (\autoref{sec:data-transfer})
+meant that even if a proxy connection were successful,
+the client's session would end once their first proxy disappeared.
+By~early 2020,
+the number of concurrent users
 had not risen above~40.
 % > library("tidyverse")
 % > WANTED_FINGERPRINTS <- c(
@@ -1648,30 +1695,8 @@ https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/4
 % "after merging snowflake-webext!9 (merged), this is finally working" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40013#note_2716071
 % https://archive.org/details/snowflake-webextension-0.5.2
 }.
-With these changes, Snowflake became practical for daily browsing,
-and the number of users began to grow into~2021.
-
-This brings us to \autoref{fig:client-counts}, which
-shows the Snowflake users and daily bandwidth since July 2021.
-Be aware: the chart does not show a count of unique clients,
-but rather the \emph{average number of concurrent clients} per day~\cite{tor-tr-2012-10-001}.
-% "The result is an average number of concurrent users, estimated from data collected over a day. We can't say how many distinct users there are."
-% https://metrics.torproject.org/reproducible-metrics.html#users
-% $ grep '^2022-05-01.*,snowflake,' figures/users/userstats-bridge-transport-multi.csv
-% 2022-05-01,5481936581E23D2D178105D44DB6915AB06BFB7F,snowflake,12235.62,100.00
-For example, the value of 12,000 on \mbox{2022-05-01}
-means that, on~average, 12,000 clients were using the service
-at any point in time on that day.
-The contribution of a client depends on how long it uses the system each day,
-not how many temporary proxies it uses. The average concurrent client count is
-estimated from the number of directory requests that are published in the descriptors
-sent by Tor bridges to the bridge authority and archived by CollecTor.\urlfootnote{
-https://metrics.torproject.org/collector.html\#type-extra-info
-}
-This method of estimating usage metrics was developed specifically to
-preserve user anonymity. We discuss the techniques and challenges of
-obtaining country-specific usage counts more in \autoref{sec:block} where we provide measurements
-of Snowflake usage in response to censorship events.
+With these changes, Snowflake became practical to use for daily browsing,
+and the number of clients began to grow into~2021.
 
 Snowflake's growth began in earnest
 when it became part of default installations.
@@ -1690,33 +1715,35 @@ https://blog.torproject.org/new-release-tor-browser-105
 },
 becoming a third built-in circumvention option
 alongside meek and obfs4.
+This is the first event marked in \autoref{fig:client-counts}.
 % https://gitlab.torproject.org/tpo/applications/tor-browser-build/-/blob/tbb-10.5-build1/projects/tor-browser/Bundle-Data/PTConfigs/bridge_prefs.js
-Being part of a stable release meant that it was
+Being in the stable release series meant it was
 easily available to all Tor users,
-not just a self-selected group of alpha testers.
-The number of users steadily increased
+not only a self-selected group of alpha testers.
+The number of clients increased steadily
 over the next five months,
-reaching almost~2,000 by December~2021.
+reaching almost 2,000 by December~2021.
 
-A~network censorship event may have the effect
-of either increasing or decreasing the number of users
+Censorship events may have the contrary effects
+of decreasing or increasing usage
 of a circumvention system.
-The user count decreases
-when the system is not robust enough and falls to blocking;
-but increases when it remains one
-of a diminished number of ways to reach the outside world.
-Two such censorship events,
+Usage decreases
+when the system itself succumbs to blocking;
+but increases when only other, less robust
+systems are blocked,
+which has the effect of concentrating users
+onto the reduced number of systems that remain working.
+Two censorship events,
 one in Russia and one in Iran,
-had the effect of increasing the number of Snowflake users
-by multiples.
+resulted in great increases in the number of Snowflake users.
 
 On \mbox{2021-12-01}, some ISPs in Russia
-deployed measures to block
-most forms of access to Tor,
+instituted measures to block
+most ways of accessing Tor,
 including Snowflake~\cite{ooni-2021-russia-blocks-tor}.
 The measures varied in their effectiveness;
 in~the case of Snowflake,
-blocking was triggered by a particular feature of the DTLS handshake
+blocking was triggered by a feature of the DTLS handshake,
 which we were able to mitigate in new releases within a few weeks.\urlfootnote{
 % "Point to a forked version of pion/dtls with fingerprinting fix"
 https://bugs.torproject.org/tpo/applications/tor-browser-build/40393
@@ -1724,8 +1751,8 @@ https://bugs.torproject.org/tpo/applications/tor-browser-build/40393
 % https://blog.torproject.org/new-release-tor-browser-115a1/
 % https://blog.torproject.org/new-release-tor-browser-1103/
 }
-Over the next two months the total number of Snowflake users quadrupled.
-By~May 2022,
+Over the next two months, the number of clients quadrupled;
+by~May 2022,
 about 70\% of Snowflake users were in Russia.
 % > library("tidyverse")
 % > WANTED_FINGERPRINTS <- c(
@@ -1752,32 +1779,30 @@ about 70\% of Snowflake users were in Russia.
 % 4 2022-05-20 snowflake de       256.  258.  257.    1.94
 % 5 2022-05-20 snowflake by       200.  202.  201.    1.52
 % 6 2022-05-20 snowflake gb       184.  186.  185.    1.40
-The user count in Russia got an additional small boost,
-visible in the graph,
+The client count in Russia got an additional small boost
 starting on \mbox{2022-07-14},
-when Tor Browser~11.5 added the Connection Assist feature,
-which automatically enables circumvention options when needed.\urlfootnote{
+when Tor Browser~11.5 added a feature
+to automatically enable circumvention options when needed.\urlfootnote{
 https://blog.torproject.org/new-release-tor-browser-115/
 % Graph showing boost going mostly to Russia: https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake-webext/82#note_2891387
 }
-We~will present more details of blocking actions in Russia
-and their effect on usage in \autoref{sec:block-ru}.
+We~will look at Russia in more detail in \autoref{sec:block-ru}.
 
 % "Shutdowns, intensified blocking in Iran since 2022-09-21" https://github.com/net4people/bbs/issues/125
 % "Need to increase number of tor instances on snowflake-01 bridge, increased usage since yesterday [2022-09-21]" https://lists.torproject.org/pipermail/anti-censorship-team/2022-September/000247.html
 % "Graphs of user counts from Iran since the onset of shutdowns" https://forum.torproject.net/t/graphs-of-user-counts-from-iran-since-the-onset-of-shutdowns/4843
-The next event to have a major effect on Snowflake usage
-was the nationwide protests that started in Iran on \mbox{2022-09-16}.
-The government imposed network shutdowns
-and additional network blocking,
+In~reaction to protests that began on \mbox{2022-09-16}
+after the death of Mahsa Amini,
+the government of Iran imposed network shutdowns
+and additional blocking,
 severe even by the standards of a country already notorious
 for censorship~\cite{ooni-2022-iran-blocks-social-media-mahsa-amini-protests}.
-Users turned to the few circumvention systems
-that continued working in the face of the new restrictions,
-one of which was Snowflake.
+Users turned to the circumvention systems
+that continued working despite the new restrictions,
+Snowflake among them.
 Adoption was rapid:
-on~\mbox{2022-09-20}, Iran accounted for only~1\% of Snowflake users;
-by~\mbox{2022-09-24} it was 67\%.
+on~\mbox{2022-09-20}, Iran accounted for 1\% of Snowflake users;
+by \mbox{2022-09-24} it was~67\%.
 % > library("tidyverse")
 % > WANTED_FINGERPRINTS <- c(
 %     "7659DA0F96B156C322FBFF3ACCC9B9DC01C27C73" = "snowman",
@@ -1804,45 +1829,46 @@ by~\mbox{2022-09-24} it was 67\%.
 % 5 2022-09-23 snowflake ir      48467. 48427. 48447.   62.8
 % 6 2022-09-24 snowflake ir      49130. 49083. 49107.   66.0
 % 7 2022-09-25 snowflake ir      59517. 59470. 59493.   67.4
-The influx of users had us scrambling for a few days
+The sudden influx of users had us scrambling for a few days
 to implement performance improvements.
 Two weeks later, on \mbox{2022-10-04},
 usage dropped almost as quickly as it had risen---the
-cause was the blocking of a TLS fingerprint
+cause was the blocking, in~Iran, of~a TLS fingerprint
 used by the Snowflake client.\urlfootnote{
 % "Sudden reduction in snowflake-01 bridge bandwidth, 2022-10-04 17:15"
 https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40207
 }
 After we released fixes for the TLS fingerprinting issue,
-the user count began to recover going into 2023.
-But in our haste to deploy optimizations in September,
-we~had introduced a bug that harmed performance,
-getting worse with more users\urlfootnote{
+the client count began to recover.
+But in our haste to deploy performance optimizations in September,
+we~inadvertently introduced a bug that actually harmed performance,
+becoming more severe at higher client counts.\urlfootnote{
 % "Weird KCP packets received by the client"
 https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40260
-},
-which dragged the count down again,
-until the bug was fixed in mid-March.
-Umayya et~al.\ happened to do performance tests of Snowflake
-during this time~\cite[\S 4.6]{Umayya2023a}---their results
-bear out the lessened reliability of connections
-before the performance bug was fixed\urlfootnote{
+}
+This dragged the count down again,
+until we fixed the bug in mid-March 2023.
+(Umayya et~al.\ happened to be doing performance tests of Snowflake
+and other circumvention systems
+at this time~\cite[\S 4.6]{Umayya2023a}---their results
+independently confirm the reduced reliability of Snowflake
+before the performance bug was fixed.\urlfootnote{
 % "Deploy snowflake-server for QueuePacketConn buffer reuse fix (#40260)"
 https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40262
-}.
-More details on blocking actions in Iran
-will appear in \autoref{sec:block-ir}.
+})
+We~will say more about Iran
+in \autoref{sec:block-ir}.
 
 For most of this history,
-we ran the backend bridge on a single server,
-upgrading and optimizing it as needed.
-But as the bridge reached its hardware capacity,
+the Snowflake bridge was a single server,
+which we upgraded and optimized as needed.
+As~the bridge reached its hardware capacity,
 and performance improvements got harder to achieve,
-we deployed a second bridge to share the load.
-We discuss the challenges and design considerations of doing so in \autoref{sec:multi-bridge}.
+we~deployed a second bridge to share the load.
+The challenges and design considerations of doing so are discussed in \autoref{sec:multi-bridge}.
 The new bridge was made available in
 Tor Browser~12.0 on \mbox{2022-12-07}.
-By~July, it~supported about
+By~July, it~had taken on
 18\% of users and
 20\% of bandwidth.
 % > library("tidyverse")
@@ -1916,8 +1942,8 @@ By~July, it~supported about
 % 29  2024     2 snowflake snowflake-01   72876.  5.73e13         85.1       73.6
 % 30  2024     2 snowflake snowflake-02   12764.  2.06e13         14.9       26.4
 
-The drop in users by about half on \mbox{2023-09-20}
-was not caused by censor action:
+The drop in users on \mbox{2023-09-20}
+was not caused by any censor action;
 rather, it~was an unexpected change in the cloud
 infrastructure we used for domain fronting rendezvous.
 The front domain we had been using
@@ -1927,18 +1953,18 @@ which caused client rendezvous messages to fail to reach the broker.\urlfootnote
 https://forum.torproject.org/t/9346
 % "[anti-censorship-team] Trying to understand multi-bridge dynamics post after Fastly/Cloudflare domain front change" https://lists.torproject.org/pipermail/anti-censorship-team/2023-September/000317.html
 }
-The user count began
-to recover after we made releases
-with alternative front domains.\urlfootnote{
+We~made releases
+with alternative front domains\urlfootnote{
 % "Use foursquare as domain front for snowflake"
 https://bugs.torproject.org/tpo/applications/tor-browser/42120
 % "Randomly select front domain from comma-separated list" https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/merge_requests/182
 % 2023-09-24 "New Alpha Release: Tor Browser 13.0a5 (Android, Windows, macOS, Linux)" https://blog.torproject.org/new-alpha-release-tor-browser-130a5/
 % 2023-09-26 "New Release: Tor Browser 12.5.5" https://blog.torproject.org/new-release-tor-browser-1255/
-}
+},
+but it took time for users to adjust.
 
 As~of \mbox{2024-02-01},
-Snowflake had transferred 13.9~PB of circumvention data.
+Snowflake had transferred a lifetime total of 13.9~PB of circumvention data.
 % > library("tidyverse")
 % > WANTED_FINGERPRINTS <- c(
 %     "7659DA0F96B156C322FBFF3ACCC9B9DC01C27C73" = "snowman",
@@ -1975,13 +2001,13 @@ Snowflake had transferred 13.9~PB of circumvention data.
 %   date       read     write    `dirreq-read` `dirreq-write` good_read good_write good_avg
 %   <date>     <chr>    <chr>    <chr>         <chr>          <chr>     <chr>      <chr>
 % 1 2024-01-31 14.00 PB 14.03 PB 9.75 TB       181.10 TB      13.99 PB  13.85 PB   13.92 PB
-We~are referring to goodput: Tor TLS traffic inside the tunnel,
+Here we mean goodput: Tor TLS traffic inside the tunnel,
 ignoring WebRTC, WebSocket, and KCP/\allowbreak smux overhead.
-At~that time, about 0.7\% of all Tor users
+At~that time, around 0.7\% of Tor users
 % It was a higher fraction before the addition of about 2 M users
 % from Germany in June 2023:
 % https://bugs.torproject.org/tpo/network-health/analysis/59
-(24\%~of bridge users) used Snowflake to connect to Tor.
+(24\%~of bridge users) used Snowflake.
 % > library("tidyverse")
 % > WANTED_FINGERPRINTS <- c(
 %     "7659DA0F96B156C322FBFF3ACCC9B9DC01C27C73" = "snowman",
@@ -2022,6 +2048,53 @@ At~that time, about 0.7\% of all Tor users
 
 \subsection{Number and type of proxies}
 \label{sec:proxies}
+
+Snowflake's effectiveness depends on its proxies,
+of~which there are several types.
+The primary type is the web browser extension,
+% "Creating a Snowflake WebExtension addon" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/23888
+which runs in the background in volunteers' browser
+and quietly serves clients.
+There is ``web badge'' version of the proxy that does not require installation.
+It~uses the same JavaScript code as the extension, but runs in an ordinary web page.
+Some people leave a browser tab idling on the web badge,
+rather than installing a browser extension.
+There is also a command-line implementation of the proxy
+that does not require a browser.
+% "Golang implementation of standalone snowflake proxy" https://github.com/keroserene/snowflake/pull/41
+This version is convenient to install on a rented VPS, for example.
+Long-term proxies running at fixed IP addresses
+are somewhat at odds with Snowflake's goal of proxy address diversity,
+but these standalone proxies are valuable because
+they tend to have less restrictive NATs,
+making them compatible with more clients.
+Finally, Orbot,
+as~well as being able to \emph{use} Snowflake for circumvention,
+can also \emph{provide} Snowflake proxy service to others,
+a~feature called ``kindness mode.''
+% Only so called in Orbot v17+, which should be current by the time the paper is submitted.
+% As of 2024-02-09, according to Nathan in #guardianproject:matrix.org:
+% Q: do you have a sense for what percentage of users are on the v16 track vs. v17?
+% > A: 70% on v16, 30% on v17 out of 1.5 to 2M total active users
+
+We worked with the Tor Project's network health team to collect privacy-preserving metrics
+of client and proxy rendezvous interactions at the broker,
+and publish them in the same way as the bridge metrics of \autoref{sec:clients}.\urlfootnote{
+https://bugs.torproject.org/tpo/network-health/metrics/collector/29461
+}
+The metrics represent counts of proxy types,
+unique proxy IP addresses and geolocated country codes,
+NAT types (\autoref{sec:connection}), and
+success rates of matching clients with proxies.
+Aggregate metrics
+are published at 24-hour intervals.\urlfootnote{
+https://metrics.torproject.org/collector.html\#snowflake-stats
+}
+The broker does not record nor publish the IP addresses
+of clients or proxies.
+Metrics concerning client polls are rounded to multiples of~8,
+in~accordance with established Tor Metrics practice.
+% "With relays and bridges, we round the counts up to the nearest multiple of 8." https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/21315#note_2591581
 
 \begin{figure}
 \includegraphics{figures/proxies/proxy-type}
@@ -2064,53 +2137,8 @@ Unknown proxy types (fewer than~50 instances) are not shown.
 % "easy access to Snowflake proxy 'kindness' mode"
 \end{figure}
 
-Snowflake's effectiveness depends on its proxies,
-of~which there are several types.
-The primary type is the web browser extension,
-% "Creating a Snowflake WebExtension addon" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/23888
-which, once installed, works in the background
-while the browser is running.
-There is also a ``web badge'' version of the proxy that does not require installation.
-It~uses the same JavaScript code as the extension, but runs in an ordinary web page.
-Some people leave a browser tab idling on the web badge page,
-rather than install a browser extension.
-Apart from the web-based proxies,
-we~provide a standalone, command-line proxy
-that does not require a browser.
-% "Golang implementation of standalone snowflake proxy" https://github.com/keroserene/snowflake/pull/41
-This version is convenient to install on a rented VPS, for example.
-Running a long-term proxy at a fixed IP address
-is somewhat at odds with Snowflake's goal of proxy address diversity and agility,
-but these standalone proxies are valuable because
-they tend to have less restrictive NATs,
-making them compatible with more clients.
-Finally, Orbot, a mobile app for accessing Tor,
-besides being able to \emph{use} Snowflake for circumvention,
-can also \emph{provide} Snowflake proxy service to others,
-a~feature called ``kindness mode.''
-% Only so called in Orbot v17+, which should be current by the time the paper is submitted.
-% As of 2024-02-09, according to Nathan in #guardianproject:matrix.org:
-% Q: do you have a sense for what percentage of users are on the v16 track vs. v17?
-% > A: 70% on v16, 30% on v17 out of 1.5 to 2M total active users
-
-We coordinated with the Tor Project's network health team to collect privacy-preserving metrics at the broker
-during the client and proxy polls of the Snowflake rendezvous.\urlfootnote{
-https://bugs.torproject.org/tpo/network-health/metrics/collector/29461
-}
-The resulting metrics
-are published at the end of every 24-hour collection period\urlfootnote{
-https://metrics.torproject.org/collector.html\#snowflake-stats
-}
-in aggregate and we do not publish or store
-client or proxy IP addresses. Metrics concerning client polls are rounded up to the nearest multiple
-of~8 to prevent individual participation patterns from becoming visible in the aggregate counts.
-The collected metrics allow us to determine daily unique proxy IP counts,
-along with the associated country
-codes, proxy types, NAT behavior types (restricted, unrestricted, or unknown), and how many times
-a proxy was matched with a client.
-\autoref{fig:proxy-type} shows the daily counts
-of each proxy type.
-Browser extension proxies predominate,
+\autoref{fig:proxy-type} shows the number of proxies by type.
+Web browser extension proxies predominate,
 representing about 80\%
 of 140,000 daily IP addresses.
 % > library("tidyverse")
@@ -2145,20 +2173,19 @@ of running a Snowflake proxy versus a Tor bridge---though
 the comparison is not quite direct,
 because Tor bridges have better defenses
 against enumeration than do Snowflake proxies.
-\todo{Find a place to talk about proxy geolocation and how proxies are measured.}
 
 It~was not clear, at the outset,
 that it would even be possible to attract
-enough proxies to make Snowflake meaningfully blocking resistant
-and support a reasonable number of users.
+enough proxies to support a reasonable number of users
+with meaningful blocking resistance.
 % "Start producing snowflakes" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/20813
 Lowering the technical barriers to running a proxy was only part of~it;
-getting there also took intentional advocacy and outreach.
+it~also took intentional advocacy and outreach.
 In~the early days, circa~2017,
-the only round-the-clock proxy support was
-a few standalone proxies,
+the only consistent proxy support was
+a few command-line proxies,
 % 2018 "The three fallback proxy-go instances..." https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/25688
-run by us for the benefit of alpha tester clients.
+run by us for the benefit of alpha testers.
 The browser extension became available in mid-2019.\urlfootnote{
 % |2019-06-26|||snowflake|Deployed version 0.0.1 of the Snowflake WebExtension for Firefox.|[comment](https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/30931#note_2593598)||
 https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/30931\#note_2593598
@@ -2167,7 +2194,7 @@ https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/3
 \urlfootnote{
 https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/30999\#note_2593718
 }
-In~the latter half of 2019,
+Later in 2019,
 % |2019-07-26|||flashproxy snowflake|Cupcake 2.0 is released, now working with Snowflake rather than flash proxy.|[Chrome Web Store page](https://chrome.google.com/webstore/detail/cupcake/dajjbehmbnbppjkcnpdkaniapgdppdnc)||
 % Cupcake stopped working when we changed the proxy–broker protocol:
 % |2019-11-13 16:47:02|||snowflake|Restarted the broker with a new proxy–broker protocol.|[comment](https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/issues/29207#note_2592849)||
@@ -2178,7 +2205,7 @@ was repurposed for Snowflake.\urlfootnote{
 https://github.com/glamrock/cupcake/issues/24
 % "Link Cupcake from snowflake.torproject.org"https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/31497
 }
-Orbot's Snowflake proxy feature was added in version 16.4.1 in February~2021.\urlfootnote{
+Orbot's proxy feature was added in version 16.4.1 in February~2021.\urlfootnote{
 % 2021-02-23
 https://github.com/guardianproject/orbot/releases/tag/16.4.1-BETA-2-tor.0.4.4.6
 % https://github.com/guardianproject/orbot/releases/tag/16.4.1-RC-1-tor.0.4.4.6 2021-04-09
@@ -2187,15 +2214,15 @@ https://github.com/guardianproject/orbot/releases/tag/16.4.1-BETA-2-tor.0.4.4.6
 % 16.4.1-BETA-2-tor.0.4.4.6 was released and promoted first, and had a visible effect on proxy counts,
 % though 16.4.1-RC-1-tor.0.4.4.6 was the "real" 16.4.1 release.
 }
-(In~\autoref{fig:proxy-type}, Orbot is counted among the standalone proxies
+(In~\autoref{fig:proxy-type}, Orbot is counted with command-line proxies
 until January~2022, when it got its own proxy type designation.)
 % See history in figures/proxies/proxy-type.r.
 
 It~is worth reflecting
-on the greater popularity of the browser extension
-compared to the web badge.
-The latter had been envisioned
-as the primary source of proxies in flash proxy,
+on the popularity of the browser extension
+as compared to the web badge.
+A~web badge had been envisioned
+as the main source of proxies in flash proxy,
 % By the end of its run, flash proxy had also gained
 % https://www.bamsoftware.com/talks/ee380-flashproxy/index.html#s15
 % browser extensions including Cupcake
@@ -2205,9 +2232,9 @@ as the primary source of proxies in flash proxy,
 % "Node.js standalone flash proxy" https://bugs.torproject.org/legacy/trac/7944
 the idea being that people's browsers
 would automatically become proxies
-while reading sites that had the flash proxy badge installed,
+while on sites that had the flash proxy badge installed,
 unless they checked an option to prevent~it.
-We~decided, early on, that flash proxy's opt-out permission had been a mistake,
+We~decided, early~on, that flash proxy's opt-out permission had been a mistake,
 % Date: Tue, 6 Dec 2016 18:38:40 -0800
 % From: David Fifield <dcf@torproject.org>
 % To: Arlo Breault <arlo@torproject.org>
@@ -2222,12 +2249,12 @@ We~decided, early on, that flash proxy's opt-out permission had been a mistake,
 % trouble for us if Snowflake becomes popular. So I'd like to see
 % Snowflake use opt-in badges (and Cupcake) only.
 and that Snowflake would be opt-in.
-In~order to run a proxy, a person must take a positive action
+To~run a proxy, a person must take a positive action
 such as installing a browser extension
 or activating a toggle on a web page.
 % "Prepare a Snowflake 'options' page, like in flashproxy" https://github.com/keroserene/snowflake/issues/21
 Our initial worry that this policy
-would reduce the number of proxies turned out to be unfounded.
+would limit the number of proxies turned out to be unfounded.
 People find an informative, interactive proxy control panel more appealing
 than a nondescript badge graphic,
 and install the browser extension in greater numbers
@@ -2491,7 +2518,7 @@ This is no paradox:
 as~censorship intensifies,
 users are displaced from less resilient
 to more resilient systems.
-Snowflake's blocking resistance has not in every case been a success,
+Snowflake's blocking resistance has not always been a success,
 though, and here we also reflect on missteps
 and persistent challenges.
 The examples are taken from
@@ -2502,33 +2529,32 @@ with affected users is invaluable in quickly understanding and reacting to block
 and that blocking resistance is relative to a given censor,
 because every censor's cost calculus is different.
 
-Snowflake is blockable by a censor that is willing to block WebRTC.
-We~would not argue otherwise.
-Indeed, we~believe this is how a circumvention system
-should be presented:
-not by arguing its unblockability in absolute terms,
-but by laying out
+Client count estimates come from the
+Tor Metrics descriptors described in \autoref{sec:clients}.
+Country code assignments use the same IP geolocation database
+used by ordinary Tor relays and bridges,
+and the caveats of IP geolocation apply to the per-country estimates in this section.
+In~particular, we~have noticed that a fraction of clients
+that geolocate to the United States are likely actually to be in Iran,
+based on correlation of their dynamics with other clients that geolocate to Iran,
+and with the timing of known political events.\urlfootnote{
+https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40207\#note_2844116
+}
+The graphs of this section use the raw geolocation results,
+with no attempt to adjust for errors.
+
+Snowflake is blockable by any censor that is willing to block WebRTC.
+We~would not try to argue otherwise.
+Indeed, we~believe that the way to present a circumvention system is
+not to argue for its absolute unblockability,
+but to lay out
 what actions by a censor would suffice to block~it---or~more
 to the point,
 \emph{what sacrifices a censor would have to make}
 in order to block~it.
 Advancing the state of the art of censorship circumvention
 consists in pushing blocking
-beyond the capabilities of more and more censors.
-
-Tor bridges report aggregate binned counts by country code of connected unique IP addresses per day in the
-descriptors uploaded to the bridge authority. We use the Tor Metrics method of
-combining the distribution of counts by country code with the number of directory requests to obtain
-an estimate of the average number of concurrent clients per day for each location~\cite{tor-tr-2012-10-001}. The mapping of IP
-addresses to country codes is not without flaws. During the time of the measurements shown here, Tor uses
-the IPFire location database.\urlfootnote{
-https://www.ipfire.org/projects/location/
-}
-There is at least one instance where we were able to detect geolocation inaccuracies after noting
-a significant drop in Snowflake users thought to be located in the US that correlated directly with
-a blocking event in Iran.\urlfootnote{
-https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40207\#note_2844116
-}
+out of reach of more and more censors.
 
 \subsection{Blocking in Russia}
 \label{sec:block-ru}
@@ -3172,7 +3198,7 @@ and distributed nature.
 Our measurements indicate a high degree of address churn; the large
 and ever-changing pool of proxy IP addresses is itself a deterrent to enumeration and blocking.
 However, significant enumeration attacks are still possible, and it is worth considering
-both the impact of and possible defences to such attacks.
+both the impact of and possible defenses to such attacks.
 
 \paragraph{What is a good (family of) traffic shapes?}
 
@@ -3182,70 +3208,53 @@ shaping traffic to imitate popular WebRTC applications. While traffic analysis a
 extensively covered in academia, frameworks for proposing and evaluating
 traffic shaping techniques have been under-explored.
 
-\paragraph{What is the design space of alternative models of Snowflake deployment?}
+\paragraph{What do alternative Snowflake deployments look like?}
 
 A~natural extension of Snowflake would be
-to have it access systems other than Tor---ordinary
-VPNs, for example.
+to have it access systems other than Tor, such as ordinary
+VPNs.
 Tor has its benefits:
 an~existing user base,
 a~standard (pluggable transports) for integrating
 circumvention modules,
 and exit nodes separate from entry nodes,
-which relieve the circumvention developer of the concerns associated
-with actually exiting traffic to its destination.
-But Tor has drawbacks as well,
-notably its lower speed and
-lack of support for UDP and other non-TCP protocols.
-Nothing inherently ties Snowflake to Tor,
-and it might easily be adapted to other systems.
-One question is whether every Snowflake-like deployment
-should manage its own pool of proxies,
-or~if proxies can somehow be shared.
+which avoids the need for an exit policy at the proxies.
+However, Tor has low speeds and lacks
+support for UDP and other non-TCP protocols.
+One consideration for a world with multiple Snowflake deployments
+is the management of the pool of proxies.
 Building Snowflake's population of proxies
 has been a substantial undertaking in itself---for
 every project to have to repeat the process from scratch
 would be a regrettable duplication of effort.
-There is no reason why one proxy might not
-serve multiple projects,
+A~next-generation proxy pool might be designed
+from the ground up with multiple cooperating projects in mind.
+Proxies in this pool could serve multiple projects,
 the client expressing its preference
-in the same way it now signals which Tor bridge to use (\autoref{sec:multi-bridge}).
-But there would be design issues to work out.
+in the same way it now signals which Tor bridge to use (\autoref{sec:multi-bridge}),
+and similar to Mass Browser's content policy~\cite{Nasr2020a}.
 While some proxy operators may be happy to donate
 bandwidth to a free-to-use project like Tor,
-they may need more incentive than altruism to help a commercial VPN.
-A~shared deployment would impose additional friction on development
-(making it harder to alter the proxy protocol, for example).
-Rather than retrofit the current Tor-based proxies
-with support for other systems,
-a~next-generation proxy pool might be designed
-from the ground up with multiple cooperating projects in mind.
-If~it proved successful,
-the Tor deployment could migrate to~it.
+they may need more incentive to help a commercial VPN.
+Another challenge of a~shared deployment is the increase in
+development friction (e.g., the difficulty of altering the proxy protocol).
 
 \paragraph{Can traffic splitting improve performance or blocking resistance?}
 
 % "Multiplex - one client splits traffic across multiple proxies" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/25723
 % "I'm thinking of 'striping' packets across multiple snowflake proxies simultaneously." https://lists.torproject.org/pipermail/anti-censorship-team/2020-February/000059.html
 The Turbo Tunnel reliability layer of \autoref{sec:data-transfer}
-was necessary for providing a continuous session abstraction
-over a sequence of unreliable proxies.
-But it might do even more:
-in~particular, it should be possible
-for a client to multiplex its traffic
+makes possible the multiplexing of client traffic
 over multiple proxies not just sequentially, but in parallel.
 (Something like multipath~TCP.)
 Sequence numbers in the inner reliability layer
 would ensure a reliable stream, even when proxies
 have different lifetimes and performance characteristics.
-Multiplexing could increase performance by using the sum
-of the bandwidths of the individual proxies,
-and reduce variability by hedging against the
-client being assigned one very slow proxy.
-Using two or more proxies at once would
+Multiplexing could reduce the performance impact of
+a slow proxy, and
 eliminate the brief pause for re-rendezvous
 between consecutive proxies that now occurs.
-Our experiments with multiplexing have so far
+Our initial experiments with multiplexing have
 not shown enough benefit to justify the change,
 though it may be a matter of tuning.\urlfootnote{
 % "...the multiplexing patch in !11 makes no difference in throughput (and in some cases seems to make throughput worse)"
