@@ -1413,7 +1413,7 @@ But the feature is currently unused.
 \begin{figure*}[t]
 \includegraphics{figures/users/users-global}
 \caption{
-Estimated average simultaneous Snowflake users and bandwidth by day.
+Estimated average concurrent Snowflake clients and consumed bandwidth by day.
 The values at the far left end of the graph,
 in~early July~2021, are about~200 users
 % > filter(filtered, abs(date - as.Date("2021-07-01")) < 3)
@@ -1483,8 +1483,18 @@ and 2.7~Mbit/s.
 Snowflake has now been in operation for a few years.
 In~lieu of a forward-looking evaluation,
 here we take a look back
-at the history of our deployment
+at the history of its deployment
 and reflect on the experience.
+Fielding a new circumvention system offers
+and opportunity to study experimentally
+its uptake and performance.
+In~this section we cover
+the number of clients over time and the bandwidth they use,
+the size and composition of the proxy pool,
+the variability of proxy IP addresses,
+and engineering considerations related to scaling.
+We~take up the topic of reactions by censors
+in \autoref{sec:block}.
 
 \subsection{Client counts and bandwidth}
 \label{sec:clients}
@@ -1531,21 +1541,58 @@ and reflect on the experience.
 % |2023-03-13 20:17:54|||snowflake|Restarted snowflake-01 bridge for a bugfix.|[comment](https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40262#note_2886041) [issue](https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40260)||
 % |2023-03-15|||snowflake|Release of Orbot for Android v17 BETA 2. First release of Orbot to include the snowflake-02 bridge along with the existing snowflake-01. Has a change to the Snowflake DTLS fingerprint (removes Hello Verify Request) to mitigate reported blocking in Russia.|[release](https://github.com/guardianproject/orbot/releases/tag/17.0.0-BETA-2-tor.0.4.7.11) [Orbot commit adding snowflake-02](https://github.com/guardianproject/orbot/commit/c3f6ee18f17770a5904ad19c3cd24b9c8dcb3885) [IPtProxy commit upgrading Snowflake](https://github.com/tladesignz/IPtProxy/commit/5d0654a6a1439c05d3ee52b2b351b5df1ff3f6dc)||
 
-Snowflake became available to end users gradually,
-reflecting a long development process.
-Development began in late 2015,
-% 2015-10-01 initial commit in go-webrtc https://github.com/keroserene/go-webrtc/commit/a044c5aaa6cd8b7c66ca7863e35e1f1931677fc6
-% 2015-12-22 initial commit in snowflake https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/commit/41c7613db85f6c1e8d13ea3639fb35d71f6ad942
-and deployment in~2017,
-but the system only really became usable in~2020.
-It~began to attract large numbers of users
-(enough to merit a censor's attention)
-in~2022, following
-network blocking events in Russia and Iran.
+As~a consequence of our use of a Tor bridge
+as the backend for the Snowflake bridge,
+we~can estimate client counts and bandwidth using
+the privacy-preserving
+techniques of Tor Metrics~\cite{tor-reproducible-metrics}.
+Tor bridges publish daily summaries of statistics,
+including client counts and bandwidth,
+as~well as the distribution of client countries
+inferred from a local geolocation database.
+\autoref{fig:client-counts} shows the number of clients
+and the amount of bandwidth consumed since 2021.
+The upper graph does not count unique clients,
+but rather the \emph{average number of concurrent clients} per day.
+% "The result is an average number of concurrent users, estimated from data collected over a day. We can't say how many distinct users there are."
+% https://metrics.torproject.org/reproducible-metrics.html#users
+% $ grep '^2022-02-04.*,snowflake,' figures/users/userstats-bridge-transport-multi.csv
+% 2022-02-04,5481936581E23D2D178105D44DB6915AB06BFB7F,snowflake,10124.23,4.00,4.00
+For example, the fact that the graph passes through 10,000 on \mbox{2022-02-04}
+means that there were, on~average, 10,000 clients using Snowflake
+at a given time on that day.
+The number of users is estimated by counting the ``directory requests''
+that Tor clients make periodically.
+The contribution of a client session depends on its duration,
+not on how many temporary proxies it used;
+a~client connected for two hours counts half as much
+as one connected for four hours.
+Bandwidth is computed as the
+average of incoming and outgoing bytes
+(which are approximately equal anyway),
+after subtracting
+bytes spent processing directory requests
+(which are less than 1\% of total bandwidth).
+% 2024-01-30,5481936581E23D2D178105D44DB6915AB06BFB7F,dirreq-read,9010514338.54,12.00,12.00
+% 2024-01-30,5481936581E23D2D178105D44DB6915AB06BFB7F,dirreq-write,183779650063.64,12.00,12.00
+% 2024-01-30,5481936581E23D2D178105D44DB6915AB06BFB7F,read,27658592171042.61,12.00,12.00
+% 2024-01-30,5481936581E23D2D178105D44DB6915AB06BFB7F,write,27638803440777.79,12.00,12.00
+% 2024-01-30,91DA221A149007D0FD9E5515F5786C3DD07E4BB0,dirreq-read,2878113136.53,12.00,12.00
+% 2024-01-30,91DA221A149007D0FD9E5515F5786C3DD07E4BB0,dirreq-write,69434558541.69,12.00,12.00
+% 2024-01-30,91DA221A149007D0FD9E5515F5786C3DD07E4BB0,read,9925612576857.30,12.00,12.00
+% 2024-01-30,91DA221A149007D0FD9E5515F5786C3DD07E4BB0,write,9851906962576.33,12.00,12.00
+% >>> 9010514338.54 / 27658592171042.61 * 100
+% 0.03257763187228898
+% >>> 183779650063.64 / 27658592171042.61 * 100
+% 0.6644577168900507
+% >>> 2878113136.53 / 9925612576857.30 * 100
+% 0.028996831321430473
+% >>> 69434558541.69 / 9925612576857.30 * 100
+% 0.6995493527884072
 
 Snowflake shipped in the alpha release series of Tor Browser
-before graduating to the stable series.
-The first releases of Snowflake were
+for years before entering the stable series.
+The first releases were
 for GNU/Linux
 in Tor Browser~7.0a1 on \mbox{2017-01-24}\,\urlfootnote{
 % "Add snowflake pt to alpha linux builds"
@@ -1559,15 +1606,12 @@ https://bugs.torproject.org/tpo/applications/tor-browser/22831
 % "mac reproducible build" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/19001
 % "[tbb-dev] Please check reproducibility of mac build with Snowflake (e084e83418)" https://lists.torproject.org/pipermail/tbb-dev/2017-July/000579.html
 }.
-But we hit a roadblock in attempting to prepare releases for other platforms:
-the Chromium-derived WebRTC library we had used to that point
-presented major difficulties
-in Tor Browser's
-cross-compiling, reproducible build environment.
-What let us resume making progress was a switch to
+It~was at this point we encountered difficulties with
+the Chromium-derived WebRTC library we had been using
+that prevented us from preparing releases for other platforms.
+We~were able to resume making progress after switching to
 Pion WebRTC~\cite{pion-webrtc} in~2019.
-With it, we~were able to release
-Snowflake for Windows
+Snowflake for Windows was released
 in Tor Browser~9.0a7 on \mbox{2019-10-01}\,\urlfootnote{
 % "Windows reproducible build of snowflake"
 https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/25483
@@ -1579,17 +1623,17 @@ https://bugs.torproject.org/tpo/applications/tor-browser/30318
 % "Android reproducible build of Snowflake" https://bugs.torproject.org/tpo/applications/tor-browser/28672
 }.
 
-While at this point Snowflake was available
+While Snowflake was then available
 on every platform supported by Tor Browser,
-it was not yet comfortably usable.
+it~was not yet comfortably usable.
 Two important parts were missing:
-no~NAT type matching (\autoref{sec:connection})
+a~lack of NAT type matching (\autoref{sec:connection})
 meant that a client could not always connect to its assigned proxy;
-and a lack of persistent session state (\autoref{sec:data-transfer})
-meant that even if a proxy connection was successful,
-the client's session would end once that proxy disappeared.
-For these reasons, by early 2020,
-the average number of concurrent users
+and no persistent session state (\autoref{sec:data-transfer})
+meant that even if a proxy connection were successful,
+the client's session would end once their first proxy disappeared.
+By~early 2020,
+the number of concurrent users
 had not risen above~40.
 % > library("tidyverse")
 % > WANTED_FINGERPRINTS <- c(
@@ -1652,30 +1696,8 @@ https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/4
 % "after merging snowflake-webext!9 (merged), this is finally working" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40013#note_2716071
 % https://archive.org/details/snowflake-webextension-0.5.2
 }.
-With these changes, Snowflake became practical for daily browsing,
-and the number of users began to grow into~2021.
-
-This brings us to \autoref{fig:client-counts}, which
-shows the Snowflake users and daily bandwidth since July 2021.
-Be aware: the chart does not show a count of unique clients,
-but rather the \emph{average number of concurrent clients} per day~\cite{tor-tr-2012-10-001}.
-% "The result is an average number of concurrent users, estimated from data collected over a day. We can't say how many distinct users there are."
-% https://metrics.torproject.org/reproducible-metrics.html#users
-% $ grep '^2022-05-01.*,snowflake,' figures/users/userstats-bridge-transport-multi.csv
-% 2022-05-01,5481936581E23D2D178105D44DB6915AB06BFB7F,snowflake,12235.62,100.00
-For example, the value of 12,000 on \mbox{2022-05-01}
-means that, on~average, 12,000 clients were using the service
-at any point in time on that day.
-The contribution of a client depends on how long it uses the system each day,
-not how many temporary proxies it uses. The average concurrent client count is
-estimated from the number of directory requests that are published in the descriptors
-sent by Tor bridges to the bridge authority and archived by CollecTor.\urlfootnote{
-https://metrics.torproject.org/collector.html\#type-extra-info
-}
-This method of estimating usage metrics was developed specifically to
-preserve user anonymity. We discuss the techniques and challenges of
-obtaining country-specific usage counts more in \autoref{sec:block} where we provide measurements
-of Snowflake usage in response to censorship events.
+With these changes, Snowflake became practical to use for daily browsing,
+and the number of clients began to grow into~2021.
 
 Snowflake's growth began in earnest
 when it became part of default installations.
@@ -1694,33 +1716,35 @@ https://blog.torproject.org/new-release-tor-browser-105
 },
 becoming a third built-in circumvention option
 alongside meek and obfs4.
+This is the first event marked in \autoref{fig:client-counts}.
 % https://gitlab.torproject.org/tpo/applications/tor-browser-build/-/blob/tbb-10.5-build1/projects/tor-browser/Bundle-Data/PTConfigs/bridge_prefs.js
-Being part of a stable release meant that it was
+Being in the stable release series meant it was
 easily available to all Tor users,
-not just a self-selected group of alpha testers.
-The number of users steadily increased
+not only a self-selected group of alpha testers.
+The number of clients increased steadily
 over the next five months,
-reaching almost~2,000 by December~2021.
+reaching almost 2,000 by December~2021.
 
-A~network censorship event may have the effect
-of either increasing or decreasing the number of users
+Censorship events may have the contrary effects
+of decreasing or increasing usage
 of a circumvention system.
-The user count decreases
-when the system is not robust enough and falls to blocking;
-but increases when it remains one
-of a diminished number of ways to reach the outside world.
-Two such censorship events,
+Usage decreases
+when the system itself succumbs to blocking;
+but increases when only other, less robust
+systems are blocked,
+which has the effect of concentrating users
+onto the reduced number of systems that remain working.
+Two censorship events,
 one in Russia and one in Iran,
-had the effect of increasing the number of Snowflake users
-by multiples.
+resulted in great increases in the number of Snowflake users.
 
 On \mbox{2021-12-01}, some ISPs in Russia
-deployed measures to block
-most forms of access to Tor,
+instituted measures to block
+most ways of accessing Tor,
 including Snowflake~\cite{ooni-2021-russia-blocks-tor}.
 The measures varied in their effectiveness;
 in~the case of Snowflake,
-blocking was triggered by a particular feature of the DTLS handshake
+blocking was triggered by a feature of the DTLS handshake,
 which we were able to mitigate in new releases within a few weeks.\urlfootnote{
 % "Point to a forked version of pion/dtls with fingerprinting fix"
 https://bugs.torproject.org/tpo/applications/tor-browser-build/40393
@@ -1728,8 +1752,8 @@ https://bugs.torproject.org/tpo/applications/tor-browser-build/40393
 % https://blog.torproject.org/new-release-tor-browser-115a1/
 % https://blog.torproject.org/new-release-tor-browser-1103/
 }
-Over the next two months the total number of Snowflake users quadrupled.
-By~May 2022,
+Over the next two months, the number of clients quadrupled;
+by~May 2022,
 about 70\% of Snowflake users were in Russia.
 % > library("tidyverse")
 % > WANTED_FINGERPRINTS <- c(
@@ -1756,32 +1780,30 @@ about 70\% of Snowflake users were in Russia.
 % 4 2022-05-20 snowflake de       256.  258.  257.    1.94
 % 5 2022-05-20 snowflake by       200.  202.  201.    1.52
 % 6 2022-05-20 snowflake gb       184.  186.  185.    1.40
-The user count in Russia got an additional small boost,
-visible in the graph,
+The client count in Russia got an additional small boost
 starting on \mbox{2022-07-14},
-when Tor Browser~11.5 added the Connection Assist feature,
-which automatically enables circumvention options when needed.\urlfootnote{
+when Tor Browser~11.5 added a feature
+to automatically enable circumvention options when needed.\urlfootnote{
 https://blog.torproject.org/new-release-tor-browser-115/
 % Graph showing boost going mostly to Russia: https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake-webext/82#note_2891387
 }
-We~will present more details of blocking actions in Russia
-and their effect on usage in \autoref{sec:block-ru}.
+We~will look at Russia in more detail in \autoref{sec:block-ru}.
 
 % "Shutdowns, intensified blocking in Iran since 2022-09-21" https://github.com/net4people/bbs/issues/125
 % "Need to increase number of tor instances on snowflake-01 bridge, increased usage since yesterday [2022-09-21]" https://lists.torproject.org/pipermail/anti-censorship-team/2022-September/000247.html
 % "Graphs of user counts from Iran since the onset of shutdowns" https://forum.torproject.net/t/graphs-of-user-counts-from-iran-since-the-onset-of-shutdowns/4843
-The next event to have a major effect on Snowflake usage
-was the nationwide protests that started in Iran on \mbox{2022-09-16}.
-The government imposed network shutdowns
-and additional network blocking,
+In~reaction to protests that began on \mbox{2022-09-16}
+after the death of Mahsa Amini,
+the government of Iran imposed network shutdowns
+and additional blocking,
 severe even by the standards of a country already notorious
 for censorship~\cite{ooni-2022-iran-blocks-social-media-mahsa-amini-protests}.
-Users turned to the few circumvention systems
-that continued working in the face of the new restrictions,
-one of which was Snowflake.
+Users turned to the circumvention systems
+that continued working despite the new restrictions,
+Snowflake among them.
 Adoption was rapid:
-on~\mbox{2022-09-20}, Iran accounted for only~1\% of Snowflake users;
-by~\mbox{2022-09-24} it was 67\%.
+on~\mbox{2022-09-20}, Iran accounted for 1\% of Snowflake users;
+by \mbox{2022-09-24} it was~67\%.
 % > library("tidyverse")
 % > WANTED_FINGERPRINTS <- c(
 %     "7659DA0F96B156C322FBFF3ACCC9B9DC01C27C73" = "snowman",
@@ -1808,45 +1830,46 @@ by~\mbox{2022-09-24} it was 67\%.
 % 5 2022-09-23 snowflake ir      48467. 48427. 48447.   62.8
 % 6 2022-09-24 snowflake ir      49130. 49083. 49107.   66.0
 % 7 2022-09-25 snowflake ir      59517. 59470. 59493.   67.4
-The influx of users had us scrambling for a few days
+The sudden influx of users had us scrambling for a few days
 to implement performance improvements.
 Two weeks later, on \mbox{2022-10-04},
 usage dropped almost as quickly as it had risen---the
-cause was the blocking of a TLS fingerprint
+cause was the blocking, in~Iran, of~a TLS fingerprint
 used by the Snowflake client.\urlfootnote{
 % "Sudden reduction in snowflake-01 bridge bandwidth, 2022-10-04 17:15"
 https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40207
 }
 After we released fixes for the TLS fingerprinting issue,
-the user count began to recover going into 2023.
-But in our haste to deploy optimizations in September,
-we~had introduced a bug that harmed performance,
-getting worse with more users\urlfootnote{
+the client count began to recover.
+But in our haste to deploy performance optimizations in September,
+we~inadvertently introduced a bug that actually harmed performance,
+becoming more severe at higher client counts.\urlfootnote{
 % "Weird KCP packets received by the client"
 https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40260
-},
-which dragged the count down again,
-until the bug was fixed in mid-March.
-Umayya et~al.\ happened to do performance tests of Snowflake
-during this time~\cite[\S 4.6]{Umayya2023a}---their results
-bear out the lessened reliability of connections
-before the performance bug was fixed\urlfootnote{
+}
+This dragged the count down again,
+until we fixed the bug in mid-March 2023.
+(Umayya et~al.\ happened to be doing performance tests of Snowflake
+and other circumvention systems
+at this time~\cite[\S 4.6]{Umayya2023a}---their results
+independently confirm the reduced reliability of Snowflake
+before the performance bug was fixed.\urlfootnote{
 % "Deploy snowflake-server for QueuePacketConn buffer reuse fix (#40260)"
 https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40262
-}.
-More details on blocking actions in Iran
-will appear in \autoref{sec:block-ir}.
+})
+We~will say more about Iran
+in \autoref{sec:block-ir}.
 
 For most of this history,
-we ran the backend bridge on a single server,
-upgrading and optimizing it as needed.
-But as the bridge reached its hardware capacity,
+the Snowflake bridge was a single server,
+which we upgraded and optimized as needed.
+As~the bridge reached its hardware capacity,
 and performance improvements got harder to achieve,
-we deployed a second bridge to share the load.
-We discuss the challenges and design considerations of doing so in \autoref{sec:multi-bridge}.
+we~deployed a second bridge to share the load.
+The challenges and design considerations of doing so are discussed in \autoref{sec:multi-bridge}.
 The new bridge was made available in
 Tor Browser~12.0 on \mbox{2022-12-07}.
-By~July, it~supported about
+By~July, it~had taken on
 18\% of users and
 20\% of bandwidth.
 % > library("tidyverse")
@@ -1920,8 +1943,8 @@ By~July, it~supported about
 % 29  2024     2 snowflake snowflake-01   72876.  5.73e13         85.1       73.6
 % 30  2024     2 snowflake snowflake-02   12764.  2.06e13         14.9       26.4
 
-The drop in users by about half on \mbox{2023-09-20}
-was not caused by censor action:
+The drop in users on \mbox{2023-09-20}
+was not caused by any censor action;
 rather, it~was an unexpected change in the cloud
 infrastructure we used for domain fronting rendezvous.
 The front domain we had been using
@@ -1931,18 +1954,18 @@ which caused client rendezvous messages to fail to reach the broker.\urlfootnote
 https://forum.torproject.org/t/9346
 % "[anti-censorship-team] Trying to understand multi-bridge dynamics post after Fastly/Cloudflare domain front change" https://lists.torproject.org/pipermail/anti-censorship-team/2023-September/000317.html
 }
-The user count began
-to recover after we made releases
-with alternative front domains.\urlfootnote{
+We~made releases
+with alternative front domains\urlfootnote{
 % "Use foursquare as domain front for snowflake"
 https://bugs.torproject.org/tpo/applications/tor-browser/42120
 % "Randomly select front domain from comma-separated list" https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/merge_requests/182
 % 2023-09-24 "New Alpha Release: Tor Browser 13.0a5 (Android, Windows, macOS, Linux)" https://blog.torproject.org/new-alpha-release-tor-browser-130a5/
 % 2023-09-26 "New Release: Tor Browser 12.5.5" https://blog.torproject.org/new-release-tor-browser-1255/
-}
+},
+but it took time for users to adjust.
 
 As~of \mbox{2024-02-01},
-Snowflake had transferred 13.9~PB of circumvention data.
+Snowflake had transferred a lifetime total of 13.9~PB of circumvention data.
 % > library("tidyverse")
 % > WANTED_FINGERPRINTS <- c(
 %     "7659DA0F96B156C322FBFF3ACCC9B9DC01C27C73" = "snowman",
@@ -1979,13 +2002,13 @@ Snowflake had transferred 13.9~PB of circumvention data.
 %   date       read     write    `dirreq-read` `dirreq-write` good_read good_write good_avg
 %   <date>     <chr>    <chr>    <chr>         <chr>          <chr>     <chr>      <chr>
 % 1 2024-01-31 14.00 PB 14.03 PB 9.75 TB       181.10 TB      13.99 PB  13.85 PB   13.92 PB
-We~are referring to goodput: Tor TLS traffic inside the tunnel,
+Here we mean goodput: Tor TLS traffic inside the tunnel,
 ignoring WebRTC, WebSocket, and KCP/\allowbreak smux overhead.
-At~that time, about 0.7\% of all Tor users
+At~that time, around 0.7\% of Tor users
 % It was a higher fraction before the addition of about 2 M users
 % from Germany in June 2023:
 % https://bugs.torproject.org/tpo/network-health/analysis/59
-(24\%~of bridge users) used Snowflake to connect to Tor.
+(24\%~of bridge users) used Snowflake.
 % > library("tidyverse")
 % > WANTED_FINGERPRINTS <- c(
 %     "7659DA0F96B156C322FBFF3ACCC9B9DC01C27C73" = "snowman",
