@@ -783,7 +783,7 @@ assuming the use of STUN only
 (no~fallback to TURN).
 Variations are labelled as (\(\mathit{mapping}\),~\(\mathit{filtering}\)) behavior pairs.
 The possible behaviors are: Endpoint-Independent (EI), Address-Dependent (AO),
-and Address and Port-Dependent (AP). We introduce the shorthand Endpoint-Dependent (ED)
+and Address- and Port-Dependent (AP). We introduce the shorthand Endpoint-Dependent (ED)
 to indicate either AO or AP behavior.
 The incompatible cases,
 which the broker tries to avoid when matching,
@@ -798,14 +798,14 @@ in client and proxy.
 
 \autoref{tab:nat-matching}
 shows the pairwise compatibility of possible NAT variations~\cite{rfc5780}.
-Endpoint-dependent NAT mapping behaviour
-(be it address-dependent or both address and port-dependent),
+Endpoint-dependent NAT mapping behaviour\todo{Cite RFC for these.}
+(be~it address-dependent only, or both address- and port-dependent),
 indicates that the address a local endpoint is translated to depends on
 the remote endpoint's address (or both address and port). Endpoint-dependent NAT
 filtering indicates that incoming packets from a remote endpoint are
 allowed only if outgoing packets have already been sent to that remote.
 As~the incompatible cases always involve endpoint-dependent NAT mapping
-(sometimes referred to as symmetric NATs),
+(sometimes referred to as symmetric NAT),
 we further categorize the variations into the two types
 \firstterm{unrestricted} (works with most other NATs) and
 \firstterm{restricted} (works only with more permissive NATs).
@@ -2260,10 +2260,9 @@ or alternatively,
 how quickly a momentarily complete blocklist
 would lose effectiveness.
 
-We ran an experiment\urlfootnote{
+We ran an experiment to measure churn.\urlfootnote{
 https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/34075
 }
-to measure churn.
 Every hour, the broker logged a record of
 the proxy IP addresses it had seen in the past hour.
 To~avoid storing real proxy IP addresses,
@@ -2405,7 +2404,7 @@ as~long as the set of bridges does not change too frequently.
 
 There is another difficulty that is harder to work around.
 A~Tor bridge is identified
-by a long-term identity public key.
+by its long-term identity public key.
 If,~on connecting to a bridge,
 the client finds that the bridge's identity is not the expected one,
 the client will terminate the connection~\cite[\S 4.2]{tor-spec}.
@@ -3204,7 +3203,7 @@ a~standard (pluggable transports) for integrating
 circumvention modules,
 and exit nodes separate from entry nodes,
 which avoids the need for an exit policy at the proxies.
-However, Tor has low speeds and lacks
+However, Tor has relatively low speed and lacks
 support for UDP and other non-TCP protocols.
 One consideration for a world with multiple Snowflake deployments
 is the management of the pool of proxies.
