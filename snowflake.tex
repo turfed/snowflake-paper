@@ -2263,57 +2263,67 @@ would lose effectiveness.
 We ran an experiment to measure churn.\urlfootnote{
 https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/34075
 }
-Every hour, the broker logged a record of
-the proxy IP addresses it had seen in the past hour.
-To~avoid storing real proxy IP addresses,
-each record was not a transparent list,
+The technique was to record the set of proxy IP addresses
+seen by the broker over an interval of time,
+then compute the size of the intersection with other sets
+in nearby intervals (up~to 40 hours later).
+Every hour, the broker recorded a snapshot of
+proxy IP addresses it had seen in the past hour.
+To~avoid the risk of storing real proxy IP addresses,
+each snapshot was not a transparent list,
 but a HyperLogLog++ sketch~\cite{Heule2013a},
 a~probabilistic data structure for estimating
 the number of distinct elements in a multiset.
-We~additionally hashed proxy IP addresses with a secret string
-before adding them to a sketch,
-to prevent their recovery from our published data.
+Proxy IP addresses were hashed with a secret string
+(discarded at the end of the experiment)
+before being added to a sketch,
+to~prevent their being recovered from our published data.
 A~sketch supports two basic operations: count and merge.
 Given a sketch~\(X\),
-we may compute an approximate count \(|X|\)
+we~may compute an approximate count \(|X|\)
 of its unique elements,
 and given two sketches \(X\) and~\(Y\),
 we~may merge them into a new sketch
 representing the union \(X \cup Y\).
 The quantity we are interested in,
+namely
 the size of the intersection of two sketches,
 is~computed using the formula
 \(|X| + |Y| - |X \cup Y|\).
-Such a computation estimates
-how many IP addresses are shared across
-two samples of the proxy pool.
+This computation estimates
+how many proxy IP addresses are shared between
+two samples.
 
 \begin{figure}
 \includegraphics{figures/proxy-churn/proxy-count-decay}
 \caption{
-Proxy pool churn in January 2023.
+Proxy churn in January 2023.
 The dark upper line shows the number
-of unique proxy IP addresses in a 24-hour window
-starting at the point indicated.
-The lighter descending lines show
-how many of the same IP addresses remain in the pool,
-at 1-hour intervals up to 40 hours later.
+of unique proxy IP addresses in overlapping 24-hour windows.
+The lighter, descending lines indicate
+how many of the same IP addresses were in later 24-hour windows,
+at~1-hour increments up to 40 hours later.
 It~takes about 20~hours for 50\% of the proxy pool to turn over.
 }
 \label{fig:proxy-count-decay}
 \end{figure}
 
+The broker recorded churn logs between
+\mbox{2022-07-22} and
+\mbox{2023-10-16}.
 \autoref{fig:proxy-count-decay}
-visualizes the results of the churn experiment.
-We merged consecutive sketches over a 24-hour window
-to serve as a reference,
-then computed the size of its intersection
-with other windows of the same size,
-offset by \(+1, +2, \ldots, +40\) hours.
+shows results from January 2023,
+which are representative.
+Starting from a given snapshot,
+we~merged sketches over the prior 24 hours
+to serve as a reference.
+We~similarly merged other 24-hour windows,
+offset by \(+1, +2, \ldots, +40\) hours,
+and computed the size of their intersection with the reference.
 After 1~hour, the shifted window still has, on average,
 97.3\% of addresses in common with the reference;
 after 12~hours the fraction has fallen to 68.8\%;
-by the time 24~hours have elapsed,
+and after 24~hours,
 only 38.2\% of proxy IP addresses
 are ones that had been seen in the previous day.
 % > library("tidyverse")
