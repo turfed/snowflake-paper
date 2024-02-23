@@ -4,7 +4,7 @@ proxy-count-decay.pdf: proxy-churn-windows.csv
 
 proxy-churn-windows.csv: .EXTRA_PREREQS = proxy-churn-windows.go
 proxy-churn-windows.csv: metrics-ip-salted.jsonl
-	go run proxy-churn-windows.go -duration 24h5m -before 10h5m -after 40h5m < "$<" > "$@"
+	go run proxy-churn-windows.go -duration 24h5m -before 5m -after 40h5m < "$<" > "$@"
 
 # metrics-ip-salted.jsonl is distributed separately.
 metrics-ip-salted.jsonl: ;

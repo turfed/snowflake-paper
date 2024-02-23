@@ -149,11 +149,10 @@ func windowEnding(records []record, i int, duration time.Duration) (l, r int) {
 
 // Function windowSurrounding returns the left and right endpoint indices of a
 // window of records such that the earliest Start is within beforeDuration of
-// record i's End on the left, and the latest End is within afterDuration of
-// record i's End on the right. The window will not include record i itself if
-// record i's Start is too far back.
+// record i's Start on the left, and the latest End is within afterDuration of
+// record i's End on the right.
 func windowSurrounding(records []record, i int, beforeDuration, afterDuration time.Duration) (l, r int) {
-	for l = i; l >= 0 && records[i].End.Sub(records[l].Start) <= beforeDuration; l-- {
+	for l = i; l >= 0 && records[i].Start.Sub(records[l].Start) <= beforeDuration; l-- {
 	}
 	l++
 	for r = i + 1; r < len(records) && records[r].End.Sub(records[i].End) <= afterDuration; r++ {
@@ -360,7 +359,7 @@ windows in a metrics-ip-salted.jsonl file.
 
 	const tolerance = 5 * time.Minute
 	windowDuration := flag.Duration("duration", 24*time.Hour+tolerance, "window duration")
-	beforeDuration := flag.Duration("before", 10*time.Hour+tolerance, "maximum sample time distance before reference")
+	beforeDuration := flag.Duration("before", 0*time.Hour+tolerance, "maximum sample time distance before reference")
 	afterDuration := flag.Duration("after", 40*time.Hour+tolerance, "maximum sample time distance after reference")
 	concurrency := flag.Int("concurrency", runtime.NumCPU(), "number of concurrent processing threads")
 
