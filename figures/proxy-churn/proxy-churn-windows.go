@@ -149,9 +149,9 @@ func windowEnding(records []record, i int, duration time.Duration) (l, r int) {
 
 // Function windowSurrounding returns the left and right endpoint indices of a
 // window of records such that the earliest Start is within beforeDuration of
-// record i's End on the left, the lastest End is within afterDuration of record
-// i's End on the right. The window will not include record i itself if record
-// i's Start is too far back.
+// record i's End on the left, and the latest End is within afterDuration of
+// record i's End on the right. The window will not include record i itself if
+// record i's Start is too far back.
 func windowSurrounding(records []record, i int, beforeDuration, afterDuration time.Duration) (l, r int) {
 	for l = i; l >= 0 && records[i].End.Sub(records[l].Start) <= beforeDuration; l-- {
 	}
@@ -260,7 +260,7 @@ func process(
 
 	// The processOne function does the processing for one reference window,
 	// the one that ends at index i, and all its nearby sample windows. It
-	// returns a list of formatting rows ready to be written to CSV.
+	// returns a list of formatted rows ready to be written to CSV.
 	processOne := func(i int) [][]string {
 		// Compute the reference window that ends at i.
 		wl, wr := windowEnding(records, i, windowDuration)
