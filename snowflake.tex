@@ -2364,135 +2364,104 @@ are ones that had been seen in the previous day.
 % "Distributed Snowflake Server Support" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40129
 % Ancient history from flash proxy: "allow the client to pick a specific relay for its registration" https://bugs.torproject.org/legacy/trac/10196
 
-In the abstract model of \autoref{fig:architecture}, the bridge
+In the conceptual model of \autoref{fig:architecture}, the bridge
 is a single, centralized entity.
 It~\emph{can} be centralized
 because it is never accessed directly,
 but only via temporary proxies.
 Unlike more traditional static proxy systems,
-Snowflake does not benefit, in terms of blocking resistance,
+Snowflake does not benefit, in~terms of blocking resistance,
 from having multiple bridges.
-For scalability reasons, though,
-it~is useful for ``the'' bridge to be realized as
-multiple servers, each handling a fraction of client traffic.
-
+For reasons of scalability and performance, though,
+it~can be useful for ``the'' bridge to be realized as
+multiple servers.
 Our deployment now uses two bridges.
-Generalizing from one bridge to two
-required changes to the messages exchanged between
-clients, proxies, and the broker.
-Unfortunately, the fact of multiple bridges
-cannot be made fully transparent to clients,
-for technical reasons related to Tor.
-In~our design, the client informs the broker
-of what bridge it wants to use,
-the broker conveys the choice to the proxy,
-and the proxy connects to the client's chosen bridge.
-This is in contrast to other imaginable designs
-where the choice of bridge is made
-by the broker or the proxy.
-We~will discuss design considerations and tradeoffs.
 
-One minor difficulty is distributing the Turbo Tunnel layer.
+There are many ways a multi-bridge system
+might be designed.
+In~ours,
+the client tells the broker
+what bridge it wants to use
+(in~its rendezvous message).
+The broker conveys the choice to the proxy,
+and the proxy connects to the client's chosen bridge.\urlfootnote{
+https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/28651\#note_2786323
+}
+This may be compared to alternative designs
+in which the decision of what bridge to use
+is made by the broker or proxy.
+Our design was largely dictated by technical constraints
+related to interfacing with Tor.
+A~different design may make sense with other deployments.
+
+One minor consideration is the Turbo Tunnel layer.
 Recall from \autoref{sec:data-transfer} that Snowflake
-has the notion of an end-to-end session
-between a client and the bridge,
-independent of temporary proxy connections that carry~it.
-This is made possible by extensive state stored at the bridge:
+maintains a virtual end-to-end session
+between the client and the bridge,
+independent of the temporary proxies.
+This is made possible by state stored at the bridge:
 a~table of clients, reassembly buffers,
 transmission queues, timers, and so~on.
 % `type KCP` https://github.com/xtaci/kcp-go/blob/03b584b84eddd95cc03dbff65fc9cc5cbdf80c6b/kcp.go#L132
 % `type UDPSession` https://github.com/xtaci/kcp-go/blob/03b584b84eddd95cc03dbff65fc9cc5cbdf80c6b/sess.go#L61
-While it is certainly possible to instantiate one such
-bundle of state variables per bridge,
-a~session begun in one instance must remain with that instance---no other
-has the context necessary to make the packets
+The state variables are not synchronized between bridges,
+which means a client session begun on one bridge
+must remain with that bridge,
+because no other
+has the context to make the packets
 of the session meaningful.
-This difficulty might be resolved by hashing
-the client's session identifier string to index
-a consistent bridge per session,
+When the client chooses the bridge,
+this is easy to deal with:
+the client keeps its choice consistent
+in all rendezvous messages throughout a session.
+If~the choice were instead made by the broker or proxy,
+it~might be done by hashing
+the client's session identifier string to an index,
 as~long as the set of bridges does not change too frequently.
 
-There is another difficulty that is harder to work around.
+Another difficulty, harder to work around,
+has to do with Tor bridge authentication.
 A~Tor bridge is identified
-by its long-term identity public key.
+by a long-term identity public key.
 If,~on connecting to a bridge,
 the client finds that the bridge's identity is not the expected one,
-the client will terminate the connection~\cite[\S 4.2]{tor-spec}.
-% "As soon as it gets the CERTS cell, the initiator knows whether the responder is correctly authenticated." https://gitlab.torproject.org/tpo/core/torspec/-/blob/33308845cec54bfc0096b8ea0339a8ff183aa1b1/tor-spec.txt#L640
+the client terminates the connection~\cite{tor-spec-negotiating-channels}.
+% https://lists.torproject.org/pipermail/tor-dev/2024-February/014886.html "Re: Fact-checking a claim about relay/bridge fingerprint authentication"
+% "The initiator checks whether the CERTS cell is correct, and decides whether to authenticate." https://gitlab.torproject.org/tpo/core/torspec/-/blob/29e445bd6e9efe82367b8a2b09a6c6aa0bc92b7b/spec/tor-spec/negotiating-channels.md#L23
 % connection_or_client_learned_peer_id https://gitlab.torproject.org/tpo/core/tor/-/blob/tor-0.4.7.13/src/core/or/connection_or.c#L1897
 % [warn] Tried connecting to router at 192.0.2.3:80 ID=<none> RSA_ID=2B280B23E1107BB62ABFC40DDCC8824814F80A71, but RSA + ed25519 identity keys were not as expected: wanted 1111111111111111111111111111111111111111 + no ed25519 key but got 2B280B23E1107BB62ABFC40DDCC8824814F80A72 + 1zOHpg+FxqQfi/6jDLtCpHHqBTH8gjYmCKXkus1D5Ko.
 % [warn] Problem bootstrapping. Stuck at 14% (handshake): Handshaking with a relay. (Unexpected identity in router certificate; IDENTITY; count 1; recommendation warn; host 1111111111111111111111111111111111111111 at 192.0.2.3:80)
 The Tor client can configure at most one identity per bridge;
-there is no way to indicate (with a certificate, for example)
-that multiple identities should be considered equivalent.
+there is nothing like a certificate, for example,
+to indicate that multiple identities should be considered equivalent.
 This constraint leaves two options:
-either all Snowflake bridges must share the same cryptographic identity,
-or~else it must be the client that makes the choice of what bridge to use.
-While the former option is possible to do
-(by~synchronizing identity keys across servers),
-every added bridge would increase the risk of compromising
-the all-important identity keys.
-Our vision was that different bridge sites
-would run in different locations
-with their own management teams,
-and that any compromise of a bridge site
-should affect that site only.
+either all Snowflake bridges must share the same cryptographic identity;
+or~else it must be the client that chooses the bridge
+(and therefore knows what bridge identity to expect).
+While sharing Tor identity keys across all bridges would be possible,
+we~preferred to keep the keys independent,
+so~that the effect of a security compromise
+at a bridge would be limited to that bridge only.
 
-These considerations led us to a multi-bridge design
-in which clients have awareness of (at~least a subset~of) all bridges,
-and it is the client that chooses which bridge will be used
-for a particular session.\urlfootnote{
-https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/28651\#note_2786323
-}
-The client includes a bridge identity string
-in its rendezvous message to the broker (\autoref{sec:rendezvous});
-then the broker maps the identity to the WebSocket URL
-of the corresponding bridge,
-and conveys that URL to the proxy
-that's chosen to serve the client.
-We~rely on clients choosing uniformly
-to equalize load across bridges.
-A~consequence is that
-every bridge must meet a minimum performance standard:
-we cannot, say,
-centrally assign 20\% of clients to one and 80\% to another
-according to their relative capacity.\todo{
-Think about this more: snowflake-02
-in fact has a consistent 15\% of users and 25\% of bandwidth.
-}
-Another drawback is that there is currently no way to instruct Tor
-to connect to only one of the bridges it knows about
-(short of rewriting the configuration file):
-% "Let bridge users choose to only reach their first working bridge" https://bugs.torproject.org/tpo/core/tor/40578
-if~two bridges are configured, Tor starts two sessions through Snowflake,
-each doing its own rendezvous,
-which is wasteful and makes for a more conspicuous network fingerprint.
-Still, this is the best solution we have found, given the constraints.
-A~deployment not based on Tor
-would have more flexibility.
-
-A~client-chooses design risks
-misuse by clients, if~not handled carefully.
-Clients should only be able to select from
-a limited set of known bridges,
-not cause proxies to connect to arbitrary destinations---otherwise
-the tens of thousands of Snowflake proxies might be weaponized
-to attack third parties.
+A~client-chooses design risks misuse, if~not handled carefully.
+Clients must not be able to
+cause proxies to connect to arbitrary destinations---otherwise
+proxies might be used in denial-of-service attacks, for example.
 % "Clients cannot cause a proxy to attack or even connect to an arbitrary web site or relay..." https://forum.torproject.net/t/anyone-experiencing-problems-with-snowflake-proxy/6938/15
 % An alternative vision: "(More) Distributed servers" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40248
 % Flash proxy: "Remove 'facilitator', 'client', 'relay' query string parameters. ... These could be used to send unsolicited WebSocket connection attempts." https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/flashproxy/-/compare/7c7acc14638a3e9346c99defa6d4dd80b4f437aa...d518f2615d977475dabaf4a46fbbe83c5a52801c
-The client's bridge selection
-in its rendezvous message is represented
-not as an IP address or hostname,
-but as a hash of the bridge's public identity key.
+To~enforce this restriction,
+the client indicates its choice of bridge
+not by an IP address or hostname,
+but by an identity public key.
 The broker maps the identity to a WebSocket URL
-by consulting its own local database of known bridges,
-and rejects rendezvous messages that refer to an unknown bridge.
+using its own database of known bridges,
+and rejects rendezvous messages that ask for an unknown bridge.
 % https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/blob/8e5ea8261110e97a8df56cfc9c83028081d902fb/broker/ipc.go#L187
 After the broker tells the proxy what WebSocket URL to connect~to,
 % https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/blob/8e5ea8261110e97a8df56cfc9c83028081d902fb/broker/ipc.go#L144
 the proxy does its own check,
-verifying that the hostname in the URL is a subdomain of
+verifying that the hostname in the URL has
 a known suffix reserved for Snowflake bridges.
 So~there are two independent safeguards against misuse.
 
