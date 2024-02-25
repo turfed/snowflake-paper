@@ -778,14 +778,15 @@ that would require TURN.
 Compatibility of NAT variations,
 assuming the use of STUN only
 (no~fallback to TURN).
-Variations are labeled as (\(\mathit{mapping}\),~\(\mathit{filtering}\)) behavior pairs.
-The possible behaviors are: Endpoint-Independent (EI), Address-Dependent (AO),
-and Address- and Port-Dependent (AP). We introduce the shorthand Endpoint-Dependent (ED)
-to indicate either AO or AP behavior.
-The incompatible cases,
-which the broker tries to avoid when matching,
-are when one peer's NAT has ED mapping
-and the other's has ED mapping or
+Variations are represented by (\(\mathit{mapping}\),~\(\mathit{filtering}\)) behavior pairs.
+The table uses codes to indicate behaviors:
+EI~(endpoint-independent),
+AO~(address-dependent),
+AP~(address- and port-dependent), and
+ED~(either AO or~AP).
+The incompatible cases
+are when one peer has ED mapping
+and the other has ED mapping or
 AP filtering.
 Note the asymmetry in what NAT variations are considered ``restricted''
 in client and proxy.
@@ -794,15 +795,19 @@ in client and proxy.
 \end{table}
 
 \autoref{tab:nat-matching}
-shows the pairwise compatibility of possible NAT variations~\cite{rfc5780}.
-Endpoint-dependent NAT mapping behavior\todo{Cite RFC for these.}
-(be~it address-dependent only, or both address- and port-dependent),
-indicates that the address a local endpoint is translated to depends on
-the remote endpoint's address (or both address and port). Endpoint-dependent NAT
-filtering indicates that incoming packets from a remote endpoint are
-allowed only if outgoing packets have already been sent to that remote.
-As~the incompatible cases always involve endpoint-dependent NAT mapping
-(sometimes referred to as symmetric NAT),
+shows the compatibility of NAT variations.
+A~NAT variation is defined by its combination
+of address mapping and filtering behaviors~\cite[\S 3]{rfc5780}.
+% RFC 4787 "Address and Port Mapping" https://datatracker.ietf.org/doc/html/rfc4787#section-4.1
+% would be the best citation for this, but it would require an additional bib entry.
+Endpoint-dependent mapping
+means that the address a local endpoint is translated to depends on
+the remote endpoint's IP address (and possibly port).
+Endpoint-dependent filtering
+means that incoming packets from a remote endpoint are
+allowed only if outgoing packets have already been sent to that endpoint.
+As~the incompatible cases always involve endpoint-dependent address mapping
+(sometimes called symmetric NAT),
 we further categorize the variations into the two types
 \firstterm{unrestricted} (works with most other NATs) and
 \firstterm{restricted} (works only with more permissive NATs).
