@@ -781,7 +781,7 @@ that would require TURN.
 Compatibility of NAT variations,
 assuming the use of STUN only
 (no~fallback to TURN).
-Variations are labelled as (\(\mathit{mapping}\),~\(\mathit{filtering}\)) behavior pairs.
+Variations are labeled as (\(\mathit{mapping}\),~\(\mathit{filtering}\)) behavior pairs.
 The possible behaviors are: Endpoint-Independent (EI), Address-Dependent (AO),
 and Address- and Port-Dependent (AP). We introduce the shorthand Endpoint-Dependent (ED)
 to indicate either AO or AP behavior.
@@ -798,7 +798,7 @@ in client and proxy.
 
 \autoref{tab:nat-matching}
 shows the pairwise compatibility of possible NAT variations~\cite{rfc5780}.
-Endpoint-dependent NAT mapping behaviour\todo{Cite RFC for these.}
+Endpoint-dependent NAT mapping behavior\todo{Cite RFC for these.}
 (be~it address-dependent only, or both address- and port-dependent),
 indicates that the address a local endpoint is translated to depends on
 the remote endpoint's address (or both address and port). Endpoint-dependent NAT
@@ -2263,7 +2263,7 @@ would lose effectiveness.
 We ran an experiment to measure churn.\urlfootnote{
 https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/34075
 }
-The technique was to record the set of proxy IP addresses
+Our technique was to record the set of proxy IP addresses
 seen by the broker over an interval of time,
 then compute the size of the intersection with other sets
 in nearby intervals (up~to 40 hours later).
@@ -2320,12 +2320,11 @@ to serve as a reference.
 We~similarly merged other 24-hour windows,
 offset by \(+1, +2, \ldots, +40\) hours,
 and computed the size of their intersection with the reference.
-After 1~hour, the shifted window still has, on average,
+After 1~hour, the shifted window had, on average,
 97.3\% of addresses in common with the reference;
-after 12~hours the fraction has fallen to 68.8\%;
-and after 24~hours,
-only 38.2\% of proxy IP addresses
-are ones that had been seen in the previous day.
+after 12~hours, the fraction had fallen to 68.8\%;
+after 24~hours, 38.2\%;
+and after 40~hours, 27.6\%.
 % > library("tidyverse")
 % > options(width = 200)
 % > DATE_RANGE <- as.Date(c("2023-01-01", "2023-02-01"))
