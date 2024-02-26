@@ -29,8 +29,18 @@ snowflake.pdf: snowflake.tex snowflake.bib snowflake.bst usenix-2020-09.sty $(FI
 %.pdf: %.tmp.pdf
 	gs -q -dSAFER -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile="$@" -dEmbedAllFonts=true "$<"
 
+.PHONY: bundle snowflake-paper.bundle snowflake-paper.zip
+bundle: snowflake-paper.bundle snowflake-paper.zip snowflake.pdf
+
+snowflake-paper.bundle:
+	git bundle create "$@" main usenix2024 sec24fall-submission
+
+snowflake-paper.zip:
+	git archive --format=zip --output="$@" --prefix=snowflake-paper/ main
+
 .PHONY: clean
 clean:
-	rm -f $(addprefix snowflake,.aux .ent .log .pdf .bbl .blg .out)
+	rm -f $(addprefix snowflake,.aux .ent .log .pdf .bbl .blg .out) \
+		snowflake-paper.bundle snowflake-paper.zip
 
 .DELETE_ON_ERROR:
