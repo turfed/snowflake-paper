@@ -2373,9 +2373,14 @@ but only via temporary proxies.
 Unlike more traditional static proxy systems,
 Snowflake does not benefit, in~terms of blocking resistance,
 from having multiple bridges.
-For reasons of scalability and performance, though,
+For reasons of scaling and performance, though,
 it~can be useful for ``the'' bridge to be realized as
 multiple servers.
+Even with hardware upgrades and software optimizations,
+our single bridge began to hit performance limits
+in late 2022 (after the events in Iran of \autoref{sec:clients}),
+and we had to find ways of distributing bridge capacity
+to permit continued scaling.
 Our deployment now uses two bridges.
 
 There are many ways a multi-bridge system
