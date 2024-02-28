@@ -3155,23 +3155,6 @@ The uniqueness and scale of Snowflake's current deployment provides an
 interesting context for the exploration of several open research questions
 in the anti-censorship space:
 
-\paragraph{How might proxy enumeration attacks be inhibited?}
-
-Snowflake draws much of its circumvention strength from its diffuse
-and distributed nature.
-Our measurements indicate a high degree of address churn; the large
-and ever-changing pool of proxy IP addresses is itself a deterrent to enumeration and blocking.
-However, significant enumeration attacks are still possible, and it is worth considering
-both the impact of and possible defenses to such attacks.
-
-\paragraph{What is a good (family of) traffic shapes?}
-
-We discuss at the end of \autoref{sec:fingerprinting} the yet-unused feature of the WebRTC-encapsulated
-protocol in Snowflake for
-shaping traffic to imitate popular WebRTC applications. While traffic analysis attacks have been
-extensively covered in academia, frameworks for proposing and evaluating
-traffic shaping techniques have been under-explored.
-
 \paragraph{What do alternative Snowflake deployments look like?}
 
 A~natural extension of Snowflake would be
@@ -3202,6 +3185,23 @@ bandwidth to a free-to-use project like Tor,
 they may need more incentive to help a commercial VPN.
 Another challenge of a~shared deployment is the increase in
 development friction (e.g., the difficulty of altering the proxy protocol).
+
+\paragraph{How might proxy enumeration attacks be inhibited?}
+
+Snowflake draws much of its circumvention strength from its diffuse
+and distributed nature.
+Our measurements indicate a high degree of address churn; the large
+and ever-changing pool of proxy IP addresses is itself a deterrent to enumeration and blocking.
+However, significant enumeration attacks are still possible, and it is worth considering
+both the impact of and possible defenses to such attacks.
+
+\paragraph{What is a good (family of) traffic shapes?}
+
+We discuss at the end of \autoref{sec:fingerprinting} the yet-unused feature of the WebRTC-encapsulated
+protocol in Snowflake for
+shaping traffic to imitate popular WebRTC applications. While traffic analysis attacks have been
+extensively covered in academia, frameworks for proposing and evaluating
+traffic shaping techniques have been under-explored.
 
 \paragraph{Can traffic splitting improve performance or blocking resistance?}
 
