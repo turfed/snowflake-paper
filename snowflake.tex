@@ -2316,12 +2316,11 @@ The broker recorded churn logs between
 \autoref{fig:proxy-count-decay}
 shows results from January 2023,
 which are representative.
-Starting from a given snapshot,
-we~merged sketches over the prior 24 hours
-to serve as a reference.
-We~similarly merged other 24-hour windows,
-offset by \(+1, +2, \ldots, +40\) hours,
-and computed the size of their intersection with the reference.
+Proxy activity has a daily cycle,
+so~we merged consecutive sketches into 24-hour windows.
+Starting from a reference window,
+we~computed the size of its intersection with other 24-hour windows,
+offset by \(+1, +2, \ldots, +40\) hours relative to the reference.
 After 1~hour, the shifted window had, on average,
 97.3\% of addresses in common with the reference;
 after 12~hours, the fraction had fallen to 68.8\%;
