@@ -39,7 +39,7 @@ snowflake-paper.zip:
 	git archive --format=zip --output="$@" --prefix=snowflake-paper/ main
 
 ORIG = a653e7c0285529c8f2502ab2cb74e73660cf4dc9
-PREV = 5403843cbda02fad46a37b4309ea6306b0d161d8
+PREV = 089128f6b7c89c94ad66d0a202da7cea6b8643cd
 STAMP = $(shell git log -1 --pretty=format:%ad --date=format:%Y%m%d HEAD).$(shell git rev-parse --short=8 HEAD)
 .PHONY: diff
 diff: sec24fall-paper1998.$(STAMP).pdf \
