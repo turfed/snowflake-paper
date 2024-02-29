@@ -3151,73 +3151,74 @@ that a richer, more capable censor cannot.
 \section{Future work}
 \label{sec:future}
 
-The uniqueness and scale of Snowflake's current deployment provides an
-interesting context for the exploration of several open research questions
-in the anti-censorship space:
+We~designed Snowflake to be useful today,
+as~well as resilient to anticipated future censorship attacks.
+Here we list some research questions that affect Snowflake
+and circumvention more broadly.
+The uniqueness and scale of Snowflake's deployment
+provides a platform to help explore these questions.
 
-\paragraph{What do alternative Snowflake deployments look like?}
+\paragraph{What could alternative Snowflake deployments look like?}
 
 A~natural extension of Snowflake would be
-to have it access systems other than Tor, such as ordinary
-VPNs.
-Tor has its benefits:
-an~existing user base,
-a~standard (pluggable transports) for integrating
-circumvention modules,
-and exit nodes separate from entry nodes,
-which avoids the need for an exit policy at the proxies.
-However, Tor has relatively low speed and lacks
-support for UDP and other non-TCP protocols.
-One consideration for a world with multiple Snowflake deployments
-is the management of the pool of proxies.
+to base it on a system other than Tor, such as an ordinary VPN.
+Tor has attractive privacy benefits
+and a convenient framework for developing circumvention modules,
+but it also has relatively low speed and lacks
+support for non-TCP applications.
+The prospect of multiple Snowflake deployments
+raises the question of
+how the proxy pool is to be managed.
 Building Snowflake's population of proxies
-has been a substantial undertaking in itself---for
-every project to have to repeat the process from scratch
-would be a regrettable duplication of effort.
-A~next-generation proxy pool might be designed
+has been an undertaking in itself---it~would
+be a regrettable duplication of effort
+if every project had to repeat the process from scratch.
+Rather than retrofit existing Tor-based proxies,
+a~next-generation proxy pool might be designed
 from the ground up with multiple cooperating projects in mind.
-Proxies in this pool could serve multiple projects,
-the client expressing its preference
-in the same way it now signals which Tor bridge to use (\autoref{sec:multi-bridge}),
-and similar to Mass Browser's content policy~\cite{Nasr2020a}.
-While some proxy operators may be happy to donate
+There is also the issue of incentives:
+while some proxy operators may be happy to donate
 bandwidth to a free-to-use project like Tor,
-they may need more incentive to help a commercial VPN.
-Another challenge of a~shared deployment is the increase in
-development friction (e.g., the difficulty of altering the proxy protocol).
+they may need more motivation to help a commercial VPN,
+for example.
 
 \paragraph{How might proxy enumeration attacks be inhibited?}
+% "TTP-03-001 WP1: Snowflake broker vulnerability" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40329
 
-Snowflake draws much of its circumvention strength from its diffuse
-and distributed nature.
-Our measurements indicate a high degree of address churn; the large
-and ever-changing pool of proxy IP addresses is itself a deterrent to enumeration and blocking.
-However, significant enumeration attacks are still possible, and it is worth considering
-both the impact of and possible defenses to such attacks.
+The size (\autoref{sec:proxies}) and churn (\autoref{sec:proxy-churn})
+of the Snowflake proxy pool
+are obstacles to comprehensive blocking.
+However, it~is worth considering
+the maximum impact of enumeration attacks,
+and ways to mitigate them while preserving usability.
 
 \paragraph{What is a good (family of) traffic shapes?}
 
-We discuss at the end of \autoref{sec:fingerprinting} the yet-unused feature of the WebRTC-encapsulated
-protocol in Snowflake for
-shaping traffic to imitate popular WebRTC applications. While traffic analysis attacks have been
-extensively covered in academia, frameworks for proposing and evaluating
-traffic shaping techniques have been under-explored.
+Snowflake does not yet attempt to shape its
+traffic analysis features (\autoref{sec:fingerprinting});
+but if it were~to, what shape should it use?
+This consideration goes beyond just Snowflake.
+Frameworks for proposing and evaluating
+traffic shaping techniques are under-explored.
 
-\paragraph{Can traffic splitting improve performance or blocking resistance?}
+\paragraph{Can traffic splitting benefit performance or resistance to blocking?}
 
 % "Multiplex - one client splits traffic across multiple proxies" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/25723
 % "I'm thinking of 'striping' packets across multiple snowflake proxies simultaneously." https://lists.torproject.org/pipermail/anti-censorship-team/2020-February/000059.html
 The Turbo Tunnel reliability layer of \autoref{sec:data-transfer}
-makes possible the multiplexing of client traffic
-over multiple proxies not just sequentially, but in parallel.
-(Something like multipath~TCP.)
-Sequence numbers in the inner reliability layer
+lets us join multiple sequential proxies into a session.
+In~principle,
+it~also makes it possible to split traffic
+over many proxies simultaneously, not just sequentially---something
+like multipath~TCP.
+Sequence numbers, retransmissions, and reassembly
 would ensure a reliable stream, even when proxies
 have different lifetimes and performance characteristics.
 Multiplexing could reduce the performance impact of
 a slow proxy, and
 eliminate the brief pause for re-rendezvous
-between consecutive proxies that now occurs.
+that now occurs
+between consecutive proxies.
 Our initial experiments with multiplexing have
 not shown enough benefit to justify the change,
 though it may be a matter of tuning.\urlfootnote{
