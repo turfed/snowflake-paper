@@ -29,11 +29,14 @@ snowflake.pdf: snowflake.tex snowflake.bib snowflake.bst usenix-2020-09.sty $(FI
 %.pdf: %.tmp.pdf
 	gs -q -dSAFER -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile="$@" -dEmbedAllFonts=true "$<"
 
-# Create a custom BibTeX style that sets urlintro to an empty string, in
-# order to remove "URL: " prefixes from URLs. This should be roughly the
-# same as the plainurl style, just without the prefixes.
-snowflake.bst:
-	urlbst --noeprint --nodoi --nopubmed --literal urlintro="" /usr/share/texlive/texmf-dist/bibtex/bst/base/plain.bst > "$@"
+.PHONY: bundle snowflake-paper.bundle snowflake-paper.zip
+bundle: snowflake-paper.bundle snowflake-paper.zip snowflake.pdf
+
+snowflake-paper.bundle:
+	git bundle create "$@" main usenix2024 sec24fall-submission
+
+snowflake-paper.zip:
+	git archive --format=zip --output="$@" --prefix=snowflake-paper/ main
 
 ORIG = a653e7c0285529c8f2502ab2cb74e73660cf4dc9
 PREV = 5403843cbda02fad46a37b4309ea6306b0d161d8
@@ -56,6 +59,7 @@ sec24fall-paper1998.$(STAMP).cumul.tex: sec24fall-paper1998.orig.tex sec24fall-p
 
 .PHONY: clean
 clean:
-	rm -f $(addprefix snowflake,.aux .ent .log .pdf .bbl .blg .out)
+	rm -f $(addprefix snowflake,.aux .ent .log .pdf .bbl .blg .out) \
+		snowflake-paper.bundle snowflake-paper.zip
 
 .DELETE_ON_ERROR:

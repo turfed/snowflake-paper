@@ -14,7 +14,7 @@ DATE_LIMITS <- lubridate::ymd_hms(c(
 	"2023-01-31 23:59:59"
 ))
 
-DECAY_COLOR <- "saddlebrown"
+DECAY_COLOR <- "slateblue"
 
 (function() {
 	args <- commandArgs(trailingOnly = TRUE)
@@ -62,14 +62,14 @@ p <- ggplot() +
 	) +
 	annotate("text",
 		x = lubridate::ymd_hms("2023-01-02 06:00:00"),
-		y = 142000,
-		label = "Unique proxy IP addresses over the preceding 24 hours",
+		y = 141000,
+		# \u00ad (soft hyphen) avoids the hyphen turning into a minus sign: https://stackoverflow.com/a/48510383
+		label = "Unique proxy IP addresses per 24\u00adhour window",
 		size = 3, lineheight = 0.7, hjust = 0, vjust = 0) +
 	annotate("text",
-		x = lubridate::ymd_hms("2023-01-06 12:00:00"),
-		y = 29000,
-		# \u00ad (soft hyphen) avoids the hyphen turning into a minus sign: https://stackoverflow.com/a/48510383
-		label = "Shared IP addresses in later\n(overlapping) 24\u00adhour windows",
+		x = lubridate::ymd_hms("2023-01-05 12:00:00"),
+		y = 23000,
+		label = "Shared IP addresses 1, 2, …, 40 hours later",
 		color = DECAY_COLOR,
 		size = 3, lineheight = 0.7, hjust = 0, vjust = 1) +
 	scale_y_continuous(
