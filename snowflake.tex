@@ -373,7 +373,7 @@ is that blocking resistance
 can be meaningfully understood only in relation to particular censor
 and its resources, costs, and motivations.
 
-As~of February 2024, Snowflake supports an estimated 42,000 average concurrent users
+As~of March 2024, Snowflake supports an estimated 50,000 average concurrent users\todo{Update for 2024-03-01 domain front issue.}
 % > library("tidyverse")
 % > WANTED_FINGERPRINTS <- c(
 %     "7659DA0F96B156C322FBFF3ACCC9B9DC01C27C73" = "snowman",
@@ -382,21 +382,21 @@ As~of February 2024, Snowflake supports an estimated 42,000 average concurrent u
 %   )
 % > read_csv("figures/users/userstats-bridge-transport-multi.csv") %>%
 %     filter(transport == "snowflake" & fingerprint %in% names(WANTED_FINGERPRINTS)) %>%
-%     filter(date < "2024-02-01") %>%
+%     filter(date < "2024-03-01") %>%
 %     mutate(users = users / (coverage / pmax(num_instances, coverage))) %>%
 %     group_by(date, transport) %>% summarize(users = sum(users, na.rm = TRUE), .groups = "drop") %>%
 %     tail()
 % # A tibble: 6 × 3
 %   date       transport  users
 %   <date>     <chr>      <dbl>
-% 1 2024-01-26 snowflake 41763.
-% 2 2024-01-27 snowflake 43015.
-% 3 2024-01-28 snowflake 43146.
-% 4 2024-01-29 snowflake 42820.
-% 5 2024-01-30 snowflake 41927.
-% 6 2024-01-31 snowflake 42281.
-at an average total transfer rate of 3.5~Gbit/s,
-which works out to around 38~TB of circumvention traffic per day.
+% 1 2024-02-24 snowflake 49291.
+% 2 2024-02-25 snowflake 50395.
+% 3 2024-02-26 snowflake 50015.
+% 4 2024-02-27 snowflake 49377.
+% 5 2024-02-28 snowflake 49816.
+% 6 2024-02-29 snowflake 49140.
+at an average total transfer rate of 3.6~Gbit/s,
+which works out to around 39~TB of circumvention traffic per day.
 % > library("tidyverse")
 % > WANTED_FINGERPRINTS <- c(
 %     "7659DA0F96B156C322FBFF3ACCC9B9DC01C27C73" = "snowman",
@@ -424,7 +424,7 @@ which works out to around 38~TB of circumvention traffic per day.
 %     mutate(across(c(read, write, `dirreq-read`, `dirreq-write`, good_read, good_write, good_avg), ~ .x * users / sum(users))) %>%
 %     ungroup() %>%
 %     filter(transport == "snowflake") %>%
-%     filter(date < "2024-02-01") %>%
+%     filter(date < "2024-03-01") %>%
 %     group_by(date) %>%
 %     summarize(
 %       date = last(date),
@@ -438,12 +438,12 @@ which works out to around 38~TB of circumvention traffic per day.
 % # A tibble: 6 × 9
 %   date       read     write    `dirreq-read` `dirreq-write` good_read good_write good_avg good_avg_bps
 %   <date>     <chr>    <chr>    <chr>         <chr>          <chr>     <chr>      <chr>    <chr>
-% 1 2024-01-26 35.81 TB 35.68 TB 11.10 GB      221.14 GB      35.79 TB  35.46 TB   35.63 TB 3.30 Gbit
-% 2 2024-01-27 37.01 TB 36.90 TB 11.34 GB      234.62 GB      37.00 TB  36.67 TB   36.84 TB 3.41 Gbit
-% 3 2024-01-28 38.55 TB 38.46 TB 11.58 GB      251.62 GB      38.54 TB  38.20 TB   38.37 TB 3.55 Gbit
-% 4 2024-01-29 38.15 TB 38.06 TB 11.67 GB      252.27 GB      38.14 TB  37.80 TB   37.97 TB 3.52 Gbit
-% 5 2024-01-30 37.57 TB 37.48 TB 11.89 GB      253.14 GB      37.56 TB  37.23 TB   37.39 TB 3.46 Gbit
-% 6 2024-01-31 38.31 TB 38.19 TB 10.87 GB      226.36 GB      38.30 TB  37.97 TB   38.13 TB 3.53 Gbit
+% 1 2024-02-24 38.65 TB 38.59 TB 14.63 GB      311.24 GB      38.63 TB  38.28 TB   38.46 TB 3.56 Gbit
+% 2 2024-02-25 39.86 TB 39.79 TB 14.08 GB      307.90 GB      39.84 TB  39.48 TB   39.66 TB 3.68 Gbit
+% 3 2024-02-26 39.87 TB 39.84 TB 17.00 GB      337.91 GB      39.85 TB  39.50 TB   39.68 TB 3.68 Gbit
+% 4 2024-02-27 39.25 TB 39.18 TB 12.84 GB      288.56 GB      39.24 TB  38.89 TB   39.06 TB 3.62 Gbit
+% 5 2024-02-28 39.89 TB 39.82 TB 13.27 GB      299.37 GB      39.87 TB  39.52 TB   39.70 TB 3.68 Gbit
+% 6 2024-02-29 39.74 TB 39.66 TB 13.13 GB      286.72 GB      39.72 TB  39.37 TB   39.55 TB 3.66 Gbit
 
 \section{How it works}
 \label{sec:mechanics}
@@ -880,12 +880,12 @@ The broker counts the number of matched \((M)\)
 and unmatched \((U)\) client rendezvous requests per day.
 If~we assume that clients attempt rendezvous repeatedly until getting a match,
 then the number of attempts per success is \((U + M) / M\).
-Under this assumption, as~of February 2024,
+Under this assumption, as~of March 2024,
 the average client needs 1.01 rendezvous attempts
 to find a compatible proxy.
 % > library(tidyverse)
 % > read_csv("figures/proxies/client-match.csv") %>%
-%     filter(date < "2024-02-01") %>%
+%     filter(date < "2024-03-01") %>%
 %     mutate(
 %       attempts_per_success = (matched_count + unrestricted_denied_count + restricted_denied_count) / matched_count,
 %     ) %>%
@@ -898,16 +898,16 @@ to find a compatible proxy.
 % # A tibble: 10 × 3
 %    month   mean_attempts_per_success sd_attempts_per_success
 %    <chr>                       <dbl>                   <dbl>
-%  1 2023-04                      1.15                 0.152
-%  2 2023-05                      1.23                 0.114
-%  3 2023-06                      1.23                 0.0734
-%  4 2023-07                      1.07                 0.0498
-%  5 2023-08                      1.02                 0.0568
-%  6 2023-09                      1.00                 0.0148
-%  7 2023-10                      1.01                 0.0137
-%  8 2023-11                      1.00                 0.00499
-%  9 2023-12                      1.00                 0.0121
-% 10 2024-01                      1.01                 0.0168
+%  1 2023-05                      1.23                 0.114
+%  2 2023-06                      1.23                 0.0734
+%  3 2023-07                      1.07                 0.0498
+%  4 2023-08                      1.02                 0.0568
+%  5 2023-09                      1.00                 0.0148
+%  6 2023-10                      1.01                 0.0137
+%  7 2023-11                      1.00                 0.00499
+%  8 2023-12                      1.00                 0.0121
+%  9 2024-01                      1.01                 0.0168
+% 10 2024-02                      1.00                 0.0170
 
 As~the proxy negotiates the WebRTC connection with its client,
 % "At the same time": https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40228
@@ -1953,8 +1953,8 @@ https://bugs.torproject.org/tpo/applications/tor-browser/42120
 but it took time for users to adjust.
 \todo{Mention \href{https://bugs.torproject.org/tpo/anti-censorship/team/135}{second occurrence 2024-03-01}.}
 
-As~of \mbox{2024-02-01},
-Snowflake had transferred a lifetime total of 13.9~PB of circumvention data.
+As~of \mbox{2024-03-01},
+Snowflake had transferred a lifetime total of 15~PB of circumvention data.
 % > library("tidyverse")
 % > WANTED_FINGERPRINTS <- c(
 %     "7659DA0F96B156C322FBFF3ACCC9B9DC01C27C73" = "snowman",
@@ -1981,7 +1981,7 @@ Snowflake had transferred a lifetime total of 13.9~PB of circumvention data.
 %     mutate(across(c(read, write, `dirreq-read`, `dirreq-write`, good_read, good_write, good_avg), ~ .x * users / sum(users))) %>%
 %     ungroup() %>%
 %     filter(transport == "snowflake") %>%
-%     filter(date < "2024-02-01") %>%
+%     filter(date < "2024-03-01") %>%
 %     summarize(
 %       date = last(date),
 %       across(c(read, write, `dirreq-read`, `dirreq-write`, good_read, good_write, good_avg), sum, na.rm = TRUE)
@@ -1990,21 +1990,21 @@ Snowflake had transferred a lifetime total of 13.9~PB of circumvention data.
 % # A tibble: 1 × 8
 %   date       read     write    `dirreq-read` `dirreq-write` good_read good_write good_avg
 %   <date>     <chr>    <chr>    <chr>         <chr>          <chr>     <chr>      <chr>
-% 1 2024-01-31 14.00 PB 14.03 PB 9.75 TB       181.10 TB      13.99 PB  13.85 PB   13.92 PB
+% 1 2024-02-29 15.12 PB 15.16 PB 10.12 TB      188.88 TB      15.11 PB  14.97 PB   15.04 PB
 Here we mean goodput: Tor TLS traffic inside the tunnel,
 ignoring WebRTC, WebSocket, and KCP/\allowbreak smux overhead.
-At~that time, around 0.7\% of Tor users
+At~that time, around 1.2\% of Tor users
 % It was a higher fraction before the addition of about 2 M users
 % from Germany in June 2023:
 % https://bugs.torproject.org/tpo/network-health/analysis/59
-(24\%~of bridge users) were using Snowflake.
+(25\%~of bridge users) were using Snowflake.
 % > library("tidyverse")
 % > WANTED_FINGERPRINTS <- c(
 %     "7659DA0F96B156C322FBFF3ACCC9B9DC01C27C73" = "snowman",
 %     "5481936581E23D2D178105D44DB6915AB06BFB7F" = "snowflake-01",
 %     "91DA221A149007D0FD9E5515F5786C3DD07E4BB0" = "snowflake-02"
 %   )
-% > DATE_RANGE <- as.Date(c("2024-01-25", "2024-02-01"))
+% > DATE_RANGE <- as.Date(c("2024-02-23", "2024-03-01"))
 % > userstats <- bind_rows(
 %     read_csv("figures/users/userstats-relay-country.csv", comment = "#") %>%
 %       mutate(mode = "relay"),
@@ -2026,15 +2026,15 @@ At~that time, around 0.7\% of Tor users
 % # A tibble: 3 × 4
 %   mode   transport         users percent
 %   <chr>  <chr>             <dbl>   <dbl>
-% 1 bridge non-snowflake  1049214    2.14
-% 2 bridge snowflake       335879.   0.684
-% 3 relay  NA            47701971   97.2
+% 1 bridge non-snowflake  1137811     3.50
+% 2 bridge snowflake       389453.    1.20
+% 3 relay  NA            30939204    95.3
 % > userstats %>% filter(mode == "bridge") %>% mutate(percent = 100 * users / sum(users))
 % # A tibble: 2 × 4
 %   mode   transport        users percent
 %   <chr>  <chr>            <dbl>   <dbl>
-% 1 bridge non-snowflake 1049214     75.8
-% 2 bridge snowflake      335879.    24.2
+% 1 bridge non-snowflake 1137811     74.5
+% 2 bridge snowflake      389453.    25.5
 
 \subsection{Number and type of proxies}
 \label{sec:proxies}
@@ -2134,32 +2134,33 @@ Web browser extension proxies predominate,
 representing about 80\%
 of 140,000 daily IP addresses.
 % > library("tidyverse")
-% > proxy_type <- read_csv("figures/proxies/proxy-type.csv", col_types = cols()) %>% filter("2024-01-01" <= date & date < "2024-02-01")
+% > proxy_type <- read_csv("figures/proxies/proxy-type.csv", col_types = cols()) %>% filter("2024-02-01" <= date & date < "2024-03-01")
 % > proxy_type %>% group_by(type) %>% summarize(unique_ips = sum(unique_ips / coverage)) %>% mutate(percent = 100 * unique_ips / sum(unique_ips)) %>% ungroup()
-% # A tibble: 4 × 3
-%   type       unique_ips percent
-%   <chr>           <dbl>   <dbl>
-% 1 badge          23016.   0.510
-% 2 iptproxy      722234.  16.0
-% 3 standalone    136748.   3.03
-% 4 webext       3634973.  80.5
+% # A tibble: 5 × 3
+%   type       unique_ips    percent
+%   <chr>           <dbl>      <dbl>
+% 1 badge          19517.  0.473
+% 2 iptproxy      652048. 15.8
+% 3 standalone    126034.  3.05
+% 4 webext       3332056. 80.7
+% 5 NA                 1   0.0000242
 % > proxy_type %>% group_by(date) %>% summarize(unique_ips = sum(unique_ips / coverage)) %>% tail()
 % # A tibble: 6 × 2
 %   date       unique_ips
 %   <date>          <dbl>
-% 1 2024-01-26    147480.
-% 2 2024-01-27    137645.
-% 3 2024-01-28    139509.
-% 4 2024-01-29    151370.
-% 5 2024-01-30    152597.
-% 6 2024-01-31    129535.
+% 1 2024-02-24    131969.
+% 2 2024-02-25    133617.
+% 3 2024-02-26    146474.
+% 4 2024-02-27    147986.
+% 5 2024-02-28    147488.
+% 6 2024-02-29    146640.
 For comparison, there were about 1,900
 of the more traditional style of Tor bridge at this time.
-% https://metrics.torproject.org/networksize.csv?start=2024-01-01&end=2024-01-31
+% https://metrics.torproject.org/networksize.csv?start=2024-02-01&end=2024-02-29
 % date,relays,bridges
-% 2024-01-29,7838,1950
-% 2024-01-30,7851,1932
-% 2024-01-31,7858,1931
+% 2024-02-27,7478,1952
+% 2024-02-28,7506,1946
+% 2024-02-29,7518,1940
 The difference is attributable to the relative ease
 of running a Snowflake proxy versus a Tor bridge---though
 the comparison is not quite direct,
