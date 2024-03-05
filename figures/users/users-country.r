@@ -146,5 +146,5 @@ plots <- lapply(PLOT_INFO, function(g) {
 # Make the horizontal axis the same size in each graph.
 plots <- align_plots(plotlist = plots, align = "v", axis = "lr")
 for (i in 1:length(plots)) {
-	ggsave(sprintf("users-%s.pdf", PLOT_INFO[[i]]$country), plots[[i]], width = DOCUMENT_LINEWIDTH, height = HEIGHT)
+	ggsave(sprintf("users-%s.tmp.pdf", PLOT_INFO[[i]]$country), plots[[i]], width = DOCUMENT_LINEWIDTH, height = HEIGHT)
 }

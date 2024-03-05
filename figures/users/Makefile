@@ -11,12 +11,17 @@ all: \
 	$(COUNTRY_GRAPHS)
 .PHONY: all
 
-users-global.pdf: .EXTRA_PREREQS = users-global.r ../common.r
-users-global.pdf: userstats-bridge-transport-multi.csv bandwidth-multi.csv
+users-global.tmp.pdf: .EXTRA_PREREQS = users-global.r ../common.r
+users-global.tmp.pdf: userstats-bridge-transport-multi.csv bandwidth-multi.csv
 	Rscript users-global.r $^ "$@"
 
-$(COUNTRY_GRAPHS): .EXTRA_PREREQS = users-country.r ../common.r
-$(COUNTRY_GRAPHS)&: userstats-bridge-combined-multi.csv
+$(COUNTRY_GRAPHS:.pdf=.tmp.pdf): .EXTRA_PREREQS = users-country.r ../common.r
+$(COUNTRY_GRAPHS:.pdf=.tmp.pdf)&: userstats-bridge-combined-multi.csv
 	Rscript users-country.r "$<"
+
+# Embed fonts.
+.INTERMEDIATE: users-global.tmp.pdf $(COUNTRY_GRAPHS:.pdf=.tmp.pdf)
+%.pdf: %.tmp.pdf
+	gs -q -dSAFER -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile="$@" -dEmbedAllFonts=true -c '<</NeverEmbed []>> setdistillerparams' -f "$<"
 
 .DELETE_ON_ERROR:

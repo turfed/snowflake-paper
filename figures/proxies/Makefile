@@ -6,12 +6,17 @@ all: \
 	proxy-nat-type.pdf
 .PHONY: all
 
-proxy-type.pdf: .EXTRA_PREREQS = proxy-type.r ../common.r
-proxy-type.pdf: proxy-type.csv
+proxy-type.tmp.pdf: .EXTRA_PREREQS = proxy-type.r ../common.r
+proxy-type.tmp.pdf: proxy-type.csv
 	Rscript proxy-type.r "$<" "$@"
 
-proxy-nat-type.pdf: .EXTRA_PREREQS = proxy-nat-type.r ../common.r
-proxy-nat-type.pdf: proxy-nat-type.csv
+proxy-nat-type.tmp.pdf: .EXTRA_PREREQS = proxy-nat-type.r ../common.r
+proxy-nat-type.tmp.pdf: proxy-nat-type.csv
 	Rscript proxy-nat-type.r "$<" "$@"
+
+# Embed fonts.
+.INTERMEDIATE: proxy-type.tmp.pdf proxy-nat-type.tmp.pdf
+%.pdf: %.tmp.pdf
+	gs -q -dSAFER -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile="$@" -dEmbedAllFonts=true -c '<</NeverEmbed []>> setdistillerparams' -f "$<"
 
 .DELETE_ON_ERROR:
