@@ -106,13 +106,13 @@ The temporary proxies are simple enough to be implemented in JavaScript,
 in~a web page or browser extension,
 making them much cheaper to run than
 a traditional proxy or VPN server.
-The large and constantly changing pool
+The large and changing pool
 of proxy addresses resists enumeration and blocking by a censor.
-The system is built on the assumption
-that proxies may appear or disappear at any time:
-clients discover live proxies dynamically
-using a secure rendezvous protocol;
-when an \mbox{in-use} proxy goes offline,
+The system is designed with the assumption
+that proxies may appear or disappear at any time.
+Clients discover proxies dynamically
+using a secure rendezvous protocol.
+When an \mbox{in-use} proxy goes offline,
 its client switches to another on the fly,
 invisibly to upper network layers.
 
