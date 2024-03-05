@@ -17,6 +17,6 @@ metrics-ip-salted.jsonl: ;
 # Embed fonts.
 .INTERMEDIATE: proxy-count-decay.tmp.pdf
 %.pdf: %.tmp.pdf
-	gs -q -dSAFER -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile="$@" -dEmbedAllFonts=true -c '<</NeverEmbed []>> setdistillerparams' -f "$<"
+	gs -q -dSAFER -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile="$@" -dCompatibilityLevel=1.5 -dEmbedAllFonts=true -c '<</NeverEmbed []>> setdistillerparams' -f "$<"
 
 .DELETE_ON_ERROR:
