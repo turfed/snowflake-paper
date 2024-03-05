@@ -553,21 +553,6 @@ and an acknowledgement to the proxy.
 At~this point rendezvous is finished:
 client and proxy have what they need to connect.
 
-\begin{figure}
-\includegraphics{figures/rendezvous/rendezvous}
-\caption{
-Information exchange in Snowflake rendezvous.
-When the broker makes a match,
-the proxy receives the client's SDP offer,
-then re-connects to send back its SDP answer.
-It~all happens during one round trip,
-from the client's point of view.
-Not shown is the indirect channel
-the client must use to access the broker.
-}
-\label{fig:rendezvous}
-\end{figure}
-
 Proxies are free to connect to the broker directly,
 because they are assumed to be uncensored.
 But clients must use an indirect,
@@ -587,6 +572,21 @@ for high-volume or interactive circumvention
 may yet be suited to rendezvous,
 because rendezvous happens infrequently
 and transmits only small amounts of data.
+
+\begin{figure}
+\includegraphics{figures/rendezvous/rendezvous}
+\caption{
+Information exchange in Snowflake rendezvous.
+When the broker makes a match,
+the proxy receives the client's SDP offer,
+then re-connects to send back its SDP answer.
+It~all happens during one round trip,
+from the client's point of view.
+Not shown is the indirect channel
+the client must use to access the broker.
+}
+\label{fig:rendezvous}
+\end{figure}
 
 The nice thing about rendezvous that it is modular and separable.
 More than one method may be used,
