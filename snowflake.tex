@@ -373,7 +373,7 @@ is that blocking resistance
 can be meaningfully understood only in relation to a particular censor
 and its resources, costs, and motivations.
 
-As~of March 2024, Snowflake supports an estimated 50,000 average concurrent users\todo{Update for 2024-03-01 domain front issue.}
+As~of March 2024, Snowflake supports an estimated 35,000 average concurrent users
 % > library("tidyverse")
 % > WANTED_FINGERPRINTS <- c(
 %     "7659DA0F96B156C322FBFF3ACCC9B9DC01C27C73" = "snowman",
@@ -382,21 +382,21 @@ As~of March 2024, Snowflake supports an estimated 50,000 average concurrent user
 %   )
 % > read_csv("figures/users/userstats-bridge-transport-multi.csv") %>%
 %     filter(transport == "snowflake" & fingerprint %in% names(WANTED_FINGERPRINTS)) %>%
-%     filter(date < "2024-03-01") %>%
+%     filter(date < "2024-03-04") %>%
 %     mutate(users = users / (coverage / pmax(num_instances, coverage))) %>%
 %     group_by(date, transport) %>% summarize(users = sum(users, na.rm = TRUE), .groups = "drop") %>%
 %     tail()
 % # A tibble: 6 × 3
 %   date       transport  users
 %   <date>     <chr>      <dbl>
-% 1 2024-02-24 snowflake 49291.
-% 2 2024-02-25 snowflake 50395.
-% 3 2024-02-26 snowflake 50015.
-% 4 2024-02-27 snowflake 49377.
-% 5 2024-02-28 snowflake 49816.
-% 6 2024-02-29 snowflake 49140.
-at an average total transfer rate of 3.6~Gbit/s,
-which works out to around 39~TB of circumvention traffic per day.
+% 1 2024-02-27 snowflake 49377.
+% 2 2024-02-28 snowflake 49816.
+% 3 2024-02-29 snowflake 49140.
+% 4 2024-03-01 snowflake 42784.
+% 5 2024-03-02 snowflake 35137.
+% 6 2024-03-03 snowflake 34141.
+at an average total transfer rate of 2.7~Gbit/s,
+which works out to around 29~TB of circumvention traffic per day.
 % > library("tidyverse")
 % > WANTED_FINGERPRINTS <- c(
 %     "7659DA0F96B156C322FBFF3ACCC9B9DC01C27C73" = "snowman",
@@ -424,7 +424,7 @@ which works out to around 39~TB of circumvention traffic per day.
 %     mutate(across(c(read, write, `dirreq-read`, `dirreq-write`, good_read, good_write, good_avg), ~ .x * users / sum(users))) %>%
 %     ungroup() %>%
 %     filter(transport == "snowflake") %>%
-%     filter(date < "2024-03-01") %>%
+%     filter(date < "2024-03-04") %>%
 %     group_by(date) %>%
 %     summarize(
 %       date = last(date),
@@ -438,12 +438,12 @@ which works out to around 39~TB of circumvention traffic per day.
 % # A tibble: 6 × 9
 %   date       read     write    `dirreq-read` `dirreq-write` good_read good_write good_avg good_avg_bps
 %   <date>     <chr>    <chr>    <chr>         <chr>          <chr>     <chr>      <chr>    <chr>
-% 1 2024-02-24 38.65 TB 38.59 TB 14.63 GB      311.24 GB      38.63 TB  38.28 TB   38.46 TB 3.56 Gbit
-% 2 2024-02-25 39.86 TB 39.79 TB 14.08 GB      307.90 GB      39.84 TB  39.48 TB   39.66 TB 3.68 Gbit
-% 3 2024-02-26 39.87 TB 39.84 TB 17.00 GB      337.91 GB      39.85 TB  39.50 TB   39.68 TB 3.68 Gbit
-% 4 2024-02-27 39.25 TB 39.18 TB 12.84 GB      288.56 GB      39.24 TB  38.89 TB   39.06 TB 3.62 Gbit
-% 5 2024-02-28 39.89 TB 39.82 TB 13.27 GB      299.37 GB      39.87 TB  39.52 TB   39.70 TB 3.68 Gbit
-% 6 2024-02-29 39.74 TB 39.66 TB 13.13 GB      286.72 GB      39.72 TB  39.37 TB   39.55 TB 3.66 Gbit
+% 1 2024-02-27 39.25 TB 39.18 TB 12.84 GB      288.56 GB      39.24 TB  38.89 TB   39.06 TB 3.62 Gbit
+% 2 2024-02-28 39.89 TB 39.82 TB 13.27 GB      299.37 GB      39.87 TB  39.52 TB   39.70 TB 3.68 Gbit
+% 3 2024-02-29 39.74 TB 39.66 TB 13.13 GB      286.72 GB      39.72 TB  39.37 TB   39.55 TB 3.66 Gbit
+% 4 2024-03-01 36.61 TB 36.48 TB 10.38 GB      204.50 GB      36.60 TB  36.28 TB   36.44 TB 3.38 Gbit
+% 5 2024-03-02 29.89 TB 29.77 TB 7.78 GB       145.68 GB      29.89 TB  29.63 TB   29.76 TB 2.76 Gbit
+% 6 2024-03-03 28.89 TB 28.78 TB 7.17 GB       136.40 GB      28.88 TB  28.64 TB   28.76 TB 2.66 Gbit
 
 \section{How it works}
 \label{sec:mechanics}
