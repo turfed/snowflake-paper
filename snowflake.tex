@@ -1469,7 +1469,7 @@ here we take a look back
 at the history of its deployment
 and reflect on the experience.
 Fielding a new circumvention system offers
-an opportunity for the experimental study of
+an opportunity to study experimentally
 its uptake and performance.
 In~this section we discuss
 the number of clients over time and the bandwidth they use,
@@ -1608,9 +1608,9 @@ https://bugs.torproject.org/tpo/applications/tor-browser/30318
 % "Android reproducible build of Snowflake" https://bugs.torproject.org/tpo/applications/tor-browser/28672
 }.
 
-While Snowflake was then available
+Snowflake was then available
 on every platform supported by Tor Browser,
-it~was not yet comfortably usable.
+but it was not yet comfortably usable.
 Two important parts were missing:
 a~lack of NAT type matching (\autoref{sec:connection})
 meant that a client could not always connect to its assigned proxy;
@@ -1958,7 +1958,7 @@ of domain fronting rendezvous
 stopped supporting domain fronting.\urlfootnote{
 https://bugs.torproject.org/tpo/anti-censorship/team/135
 }
-It~was just before the final deadline for this paper,
+It~happened just before the final deadline for this paper,
 so~we cannot yet comment on any long-term effects,
 but \autoref{fig:client-counts} shows an immediate decline in users and bandwidth
 of about~30\%.
@@ -2053,7 +2053,7 @@ Snowflake's effectiveness depends on its proxies,
 of~which there are several types.
 The primary type is the web browser extension,
 % "Creating a Snowflake WebExtension addon" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/23888
-which runs in the background in volunteers' browser
+which runs in the background in volunteers' browsers
 and quietly serves clients.
 There is a ``web badge'' version of the proxy that does not require installation.
 It~uses the same JavaScript code as the extension, but runs in an ordinary web page.
@@ -2393,7 +2393,7 @@ it~can be useful for ``the'' bridge to be realized as
 multiple servers.
 Even with hardware upgrades and software optimizations,
 our single bridge began to hit performance limits
-in late 2022 (especially after the events in Iran of \autoref{sec:clients}),
+in late 2022 (particularly after the events in Iran of \autoref{sec:clients}),
 and we had to find ways of distributing bridge capacity
 to permit continued scaling.
 Our deployment now uses two bridges.
@@ -2459,7 +2459,7 @@ This constraint leaves two options:
 either all Snowflake bridges must share the same cryptographic identity;
 or~else it must be the client that chooses the bridge
 (and therefore knows what bridge identity to expect).
-While synchronizing Tor identity keys across bridges would be possible,
+While it would be possible to synchronize Tor identity keys across bridges,
 we~preferred to keep keys independent,
 so~that the effect of a security compromise
 at a bridge would be limited to that bridge only.
