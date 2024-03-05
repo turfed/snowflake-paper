@@ -1949,7 +1949,16 @@ https://bugs.torproject.org/tpo/applications/tor-browser/42120
 % 2023-09-26 "New Release: Tor Browser 12.5.5" https://blog.torproject.org/new-release-tor-browser-1255/
 },
 but it took time for users to adjust.
-\todo{Mention \href{https://bugs.torproject.org/tpo/anti-censorship/team/135}{second occurrence 2024-03-01}.}
+Something similar happened on \mbox{2024-03-01},
+when the CDN we had been using in the default configuration
+of domain fronting rendezvous
+stopped supporting domain fronting.\urlfootnote{
+https://bugs.torproject.org/tpo/anti-censorship/team/135
+}
+This happened just before the deadline for this paper,
+so~we cannot comment on any long-term effects,
+but \autoref{fig:client-counts} shows a decline in users and bandwidth
+of about~30\%.
 
 As~of \mbox{2024-03-01},
 Snowflake had transferred a lifetime total of 15~PB of circumvention data.
