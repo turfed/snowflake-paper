@@ -1132,26 +1132,27 @@ leaving other uses of WebRTC undisturbed.
 Unfortunately for the circumvention developer,
 the richness of WebRTC protocols
 creates a large attack surface for fingerprinting.
+And then, there are fingerprinting considerations beyond WebRTC.
 
-The most prevalent implementations of WebRTC are those in web browsers.
+The most prevalent implementations of WebRTC are in web browsers.
 Snowflake originally used a WebRTC library extracted from Chromium\urlfootnote{
 https://github.com/keroserene/go-webrtc
 },
 but that proved to be difficult to maintain
 and build for multiple platforms.
-Since~2019, Snowflake uses the Pion~\cite{pion-webrtc},
+Since~2019, Snowflake uses the Pion~\cite{pion-webrtc}
 implementation of WebRTC.\urlfootnote{
 % "Evaluate pion WebRTC"
 https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/28942
 }
-It~is not tied to a browser,
+Pion is not tied to any browser,
 which is both good and bad.
 The good is less development friction,
 better memory safety
 (Pion is written in Go, Chromium WebRTC in C++),
-and a working relationship with the developers
+and a working relationship with upstream developers
 to have fingerprinting changes made when needed.
-The bad is that its protocol fingerprints
+The bad is that Pion's protocol fingerprints
 do not automatically match those of the mostly browser-originated
 WebRTC that Snowflake aims to blend in with.
 
@@ -1159,9 +1160,9 @@ The following is a list of the main fingerprinting concerns in Snowflake and
 what we have done to address them.
 A~fingerprinting vulnerability
 does not automatically disqualify a circumvention system:
-it~depends on whether it can be fixed
+it~depends on whether the vulnerability can be fixed
 without changing the basic nature of the system.
-The important thing is to have solid fundamentals;
+The important thing is to have solid fundamentals:
 minor flaws may be patched up as needed.
 
 \begin{description}
@@ -1207,11 +1208,10 @@ Because the rendezvous methods of
 are modular,
 each one needs a separate justification
 as to why it should be difficult to block.
-They must also be implemented in a way
+Each method must also be implemented in a way
 that does not expose accidental distinguishers.
-The domain fronting, AMP cache, and SQS rendezvous methods
+For example, the domain fronting, AMP cache, and SQS rendezvous methods
 use HTTPS,
-which is TLS,
 which means TLS fingerprinting is a concern~\cite[\S 5.1]{Fifield2015a}.
 
 Snowflake, like many circumvention systems,
@@ -1226,7 +1226,7 @@ The outermost layer of a WebRTC data connection,
 directly exposed to a censor,
 is~DTLS over UDP.
 DTLS is an adaptation of TLS~\cite[\S 1]{rfc9147} to the datagram setting,
-and therefore has the fingerprinting concerns of TLS~\cite{Frolov2019a}.
+and therefore shares the fingerprinting concerns of TLS~\cite{Frolov2019a}.
 
 Owing to practical considerations,
 Snowflake's defenses to DTLS fingerprinting are not very robust,
@@ -1291,13 +1291,13 @@ or TorKameleon~\cite[\S \mbox{III-D}]{Vilalonga2023a}.
 Most research on detecting Snowflake to date
 has focused on protocol fingerprinting.
 Fifield and Gil Epner~\cite{arxiv.1605.08805}
-studied the network traffic of WebRTC applications
-with the goal of finding fingerprinting pitfalls.
+studied the network traffic of WebRTC applications,
+with the goal of finding pitfalls that could affect Snowflake.
 Frolov et~al.~\cite[\S \mbox{V-C}]{Frolov2019a}
 observed that the undisguised TLS fingerprint
 of Snowflake's domain fronting rendezvous was distinctive,
-and introduced the uTLS package that Snowflake
-now uses to protect~it.
+and introduced the uTLS package
+now used to protect~it.
 
 MacMillan et~al.~\cite{arxiv.2008.03254}
 focused on the DTLS handshake,
@@ -1363,10 +1363,10 @@ fixed proxies mitigates against this enhancement.
 
 Related to protocol fingerprinting is \firstterm{traffic analysis}:
 classifying connections based on features like
-packet lengths and transmission times---which
-may be different in a circumvention system
-than in other uses of the cover protocol.
-The best classifiers of Xie et~al.\ and Wails et~al.\ were of this nature.
+packet lengths and transmission times,
+which may differ, in a circumvention system,
+from other uses of the cover protocol.
+The best classifiers of Xie et~al.\ and Wails et~al.\ were of this type.
 While traffic analysis attacks are worth thinking about,
 we~caution that academic audiences
 have historically overestimated their importance.
@@ -1379,13 +1379,13 @@ that are simple, precise, and deterministic,
 and avoid ones that
 require managing state,
 are computationally expensive,
-or~have non-negligible false positive rates---like
-those based in traffic analysis.
+or~have non-negligible false positive rates, like
+those based on traffic analysis.
 % Traffic analysis attacks are hardly worth considering
 % until after taking care of the fundamentals
 % of endpoint and content blocking,
 % and even then, there is, as~yet, little evidence of their being used.
-Nevertheless, we~have tried to future-proof Snowflake in this regard:
+Nevertheless, we~have tried to future-proof Snowflake in this respect:
 the protocol inside the WebRTC data channel supports
 shaping of transmission sizes and timing,
 which ought to be sufficient to imitate the traffic fingerprint
