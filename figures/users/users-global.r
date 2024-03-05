@@ -347,7 +347,7 @@ p_bandwidth <- ggplot() +
 
 desired_heights <- c(
 	1.75,
-	0.45
+	0.55
 )
 
 p <- plot_grid(plotlist = align_plots(p_users, p_bandwidth, align = "v", axis = "lr"),
