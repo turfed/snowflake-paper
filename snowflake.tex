@@ -2060,7 +2060,7 @@ that does not require a browser.
 This version is convenient to install on a rented VPS, for example.
 Long-term proxies running at fixed IP addresses
 are somewhat at odds with Snowflake's goal of proxy address diversity,
-but these standalone proxies are valuable because
+but these standalone, command-line proxies are valuable because
 they tend to have less restrictive NATs,
 making them compatible with more clients.
 Finally, Orbot,
@@ -2505,21 +2505,22 @@ Russia, Iran, China, and Turkmenistan,
 and are selected for being significant and instructive.
 Common lessons are that communication
 with affected users is invaluable in quickly understanding and reacting to blocking;
-and that blocking resistance is relative to a given censor,
+and that blocking resistance needs to be understood
+relative to a censor,
 because every censor's cost calculus is different.
 
 Client count estimates come from the
 Tor Metrics descriptors described in \autoref{sec:clients}.
-Country code assignments use the same IP geolocation database
-used by ordinary Tor relays and bridges,
-and the caveats of IP geolocation apply to the per-country estimates in this section.
+Country code assignments are drawn from the same IP geolocation database
+used by ordinary Tor relays and bridges---and
+the caveats of IP geolocation apply to the per-country estimates in this section.
 In~particular, we~have noticed that a fraction of clients
 that geolocate to the United States are likely actually to be in Iran,
-based on correlation of their dynamics with other clients that geolocate to Iran,
-and with the timing of known political events.\urlfootnote{
+based on correlations of their dynamics with those of other clients that geolocate to Iran,
+and the timing of known political events.\urlfootnote{
 https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40207\#note_2844116
 }
-The graphs of this section use the raw geolocation results,
+The graphs of this section use raw geolocation results,
 with no attempt to adjust for errors.
 
 Snowflake is blockable by any censor that is willing to block WebRTC.
@@ -2667,19 +2668,19 @@ Snowflake among them.
 We~benefited from established relationships
 with developers and users in Russia,
 one of whom, through manual testing,
-found what traffic feature was being used to distinguish Snowflake.
-It~was DTLS fingerprinting,
-of~the kind cautioned about in \autoref{sec:fingerprinting}.\urlfootnote{
+found the traffic feature that was being used to distinguish Snowflake.
+It~was DTLS fingerprinting\urlfootnote{
 % "Russian DPI check supported_groups extension in ServerHello payload (byte 0x5a in udp packet)."
 https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40014\#note_2765074
-}
+},
+of~the kind cautioned about in \autoref{sec:fingerprinting}.
 Specifically, it~was the presence of a
 \mbox{supported\_groups} extension in the DTLS Server Hello message produced by Pion.
-The extension being present in Server Hello was a bug\urlfootnote{
+The extension's presence in Server Hello was in fact a bug\urlfootnote{
 % "Server Hello should not contain supported_groups extension (extension.SupportedEllipticCurves)"
 https://github.com/pion/dtls/issues/409
 }---but
-one that afforded the censor a feature
+in any case, it afforded the censor a feature
 to distinguish DTLS connections with a Pion implementation in the server role
 from other forms of DTLS.
 The process of finding the flaw, fixing it,
@@ -2689,8 +2690,8 @@ https://gitlab.torproject.org/tpo/applications/tor-browser-build/-/merge_request
 % 2021-12-14 https://blog.torproject.org/new-release-tor-browser-115a1/
 % 2021-12-20 https://blog.torproject.org/new-release-tor-browser-1103/
 },
-after which the user count rose quickly:
-from the beginning to the end of December~2021,
+after which the user count rose rapidly.
+From the beginning to the end of December~2021,
 the number of users in Russia grew from about 400 to over 4,000
 % > library("tidyverse")
 % > WANTED_FINGERPRINTS <- c(
@@ -2724,14 +2725,15 @@ already in~2020.
 We~might have avoided this blocking event by proactively fixing
 the known distinguisher---but
 it was not necessarily the wrong call not to have done~so.
-There is always more to do than time to do~it;
-one must consider the opportunity cost
+In~a project like Snowflake,
+there is always more to do than time to do~it,
+and one must consider the opportunity cost
 of preempting specific blocking that may not come to pass.
 In~this case, a~reactive approach by us was enough:
 the loss was minor, and we were able to patch the problem quickly.
 Even in ISPs where the blocking rule was present,
 it~did not block 100\% of Snowflake connections,
-because of the how it targeted a quirk in Pion,
+because of the way it targeted a quirk in Pion,
 and only in Server Hello.
 When the DTLS server role in the WebRTC data channel
 was played by a non-Pion peer,
@@ -2748,12 +2750,12 @@ In~May 2022 we got a report of a new detection rule,
 this time keying on not just the presence, but the \emph{contents}
 of the \mbox{supported\_groups} extension,
 at~a byte offset suggesting that
-it targeted the Client Hello message,
+it now targeted the Client Hello message,
 not Server Hello.\urlfootnote{
 % "IRC Tip about Signature used to block Snowflake in Russia, 2022-May-16"
 https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40030
 }
-The presence of a \mbox{supported\_groups} extension in Client Hello is not at all unusual,
+The presence of a \mbox{supported\_groups} extension in Client Hello is not unusual,
 but the specific groups offered by Pion's implementation
 differed from those of common browsers.
 Though we confirmed the existence of the blocking rule,
@@ -2773,38 +2775,39 @@ but by the time we prepared a testing release in July~2022,
 the new rule
 had apparently been removed
 and replaced by another.
-We~can only speculate as to reasons,
+We~can only speculate as to why,
 but it may be that the old rule
 had too many false positives,
-or~was just not effective enough.
+or~simply was not effective enough.
 
 % "Блокировку Сlient Hello убрали, теперь блокируют Hello Verify Request" https://ntc.party/t/in-case-snowflake-rendezvous-gets-blocked/1857/9
 % "They removed the blocking of Client Hello, now they block Hello Verify Request" https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40030#note_2823140
 
 The detection rule that replaced \mbox{supported\_groups} in Client Hello
-looked for the presence of a Hello Verify Request message.\urlfootnote{
+looked for the server sending a Hello Verify Request message.\urlfootnote{
 % "They removed the blocking of Client Hello, now they block Hello Verify Request"
 https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40030\#note_2823140
 }
 Hello Verify Request is an anti-denial-of-service feature in DTLS,
 in~which the server sends a random cookie to the client,
 and the client sends a second Client Hello message,
-this one containing a copy of the cookie~\cite[\S 5.1]{rfc9147}.
+this time containing a copy of the cookie~\cite[\S 5.1]{rfc9147}.
 It~is not an error to send Hello Verify Request
 (it~is a ``MAY'' in the RFC),
 but because the Pion implementation in Snowflake sent~it,
 and major browsers did not,
 it was a reliable indicator of Snowflake connections.
-(Those, at least, in which the DTLS server role was played by
-a Snowflake client or standalone proxy.)
+(At least, those in which
+a Snowflake client or command-line proxy
+took the DTLS server role.)
 This distinguisher, too, had been anticipated by
 MacMillan et~al. in 2020~\cite[\S 3]{arxiv.2008.03254}.
-The first reports of the blocking rule arrived in July~2022;
+The first reports of this blocking rule arrived in July~2022;
 but as you can see in \autoref{fig:client-counts-ru},
 it~had no apparent immediate effect.
 It~is hard to say whether the drastic decline in October 2022
 was a consequence of this rule,
-or some other, unidentified one.
+or~some other, unidentified one.
 That decline coincided with an explosion of users from Iran,
 which temporarily affected the usability of the whole system.
 We~deployed a mitigation to remove the Hello Verify Request message
@@ -2818,9 +2821,9 @@ after which the number of users in Russia began to recover.
 The case of Snowflake in Russia illustrates
 some of the complexity of censorship measurement.
 The~answer to a question like ``Does Snowflake work in Russia?''
-is not a simple yes or~no.
+is not always a simple yes or~no.
 It~may depend on the date, the ISP,
-and even such factors as which endpoint plays the DTLS server role.
+and even details such as which endpoint plays the DTLS server role.
 
 \subsection{Blocking in Iran}
 \label{sec:block-ir}
@@ -2841,30 +2844,31 @@ which stopped Snowflake rendezvous from working.
 The crypto/tls package of the Go programming language
 (in~which the Snowflake client is written)
 may produce several slightly different TLS fingerprints,
-depending on hardware capabilities and how it was compiled.\urlfootnote{
+depending on hardware capabilities and how it is compiled.\urlfootnote{
 % "...in native Go crypto/tls fingerprints since go1.17 is that the order of ciphersuites depends on whether the platform has support for accelerated AES-GCM"
 https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40207\#note_2844163
 % "There is strong evidence of an attempt to block the native Go crypto/tls fingerprint, but not all native fingerprints produced by Go programs are blocked." https://github.com/net4people/bbs/issues/125#issuecomment-1284602875
 }
 It~was one of these fingerprints that was blocked.
-Because the blocking rule was so specific,
-some users were affected and others were not.
+Because the blocking rule was specific to one fingerprint,
+only some users were affected.
 % "This all gives us a good hypothesis... It includes the fingerprints of go1.17+ crypto/tls without AES acceleration" https://github.com/net4people/bbs/issues/139#issuecomment-1280243079
 % "When I tested the desktop version, I did it in a VM that did not emulate support for accelerated AES-GCM..." https://github.com/net4people/bbs/issues/131#issuecomment-1280284051
 Why would a censor block only one (even if the most common)
-TLS fingerprint?
+of several TLS fingerprints?
 It~may have been a simple oversight.
-On~the other hand, it~is not certain that the blocking
+On~the other hand, it~is not certain that this instance of TLS fingerprinting
+in Iran
 was meant for Snowflake specifically.
 Go~is a popular language for implementing circumvention systems;
 Snowflake may have been caught up in blocking that was intended for another system.
 
 The fact that simple TLS fingerprinting worked to block Snowflake rendezvous
 was carelessness on our part.
-Aware of the possibility,
-we~had already implemented TLS camouflage using uTLS
-in the Snowflake client,
-but failed to turn it on by default.
+Having been aware of the possibility,
+we~previously implemented TLS camouflage
+in the Snowflake client using uTLS---but
+failed to turn it on by default.
 % "uTLS for broker negotiation" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40054
 Activating the feature required only a small configuration change\urlfootnote{
 % "Enable uTLS and use the full bridge line for snowflake"
@@ -2874,7 +2878,7 @@ but we had to wait for new releases of Tor Browser and Orbot
 to get it into the hands of users:
 see the September--November~2022 interval in \autoref{fig:client-counts-ir}.
 
-After repairing the TLS fingerprinting flaw,
+After we repaired the TLS fingerprinting flaw,
 the number of users from Iran gradually recovered
 to near its former peak.
 We~are aware of only minor disruptions after this time.
@@ -2887,7 +2891,7 @@ https://bugs.torproject.org/tpo/anti-censorship/team/115\#note_2873040
 which we confirmed using data from the censorship measurement platform OONI.
 A~reduction in users is visible at this time.
 AMP cache rendezvous continued to work.
-OONI measurements in the weeks after the block was lifted showed sporadic
+OONI measurements in the weeks after the block was lifted showed additional sporadic
 failures to connect to the front domain.
 If~these were further attempts at blocking,
 they did not have much of an effect.
@@ -2897,32 +2901,33 @@ they did not have much of an effect.
 
 % "Investigate Snowflake blocking in China" https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/32657
 
-The user count graph from China,
+The graph of users from China,
 \autoref{fig:client-counts-cn},
 does not show any drastic changes
 like others we have seen so far.
 There is a modest but respectable number of Snowflake users in China.
-Though there have been no singular, sustained events,
-we~have seen evidence of short-term or tentative
+Though there has been no sustained interference,
+we~have seen some evidence of short-term or tentative
 blocking attempts.
 
 In~May 2019, when Snowflake was still in alpha release,
 a~user in China reported a failure to connect.
-Investigation revealed that the cause was IP address blocking of
+Investigation revealed that the cause was blocking of the IP address of
 the few proxies that existed at the time.\urlfootnote{
 % 2019-05-01 "I'm going to say that this a proxy blocking problem"
 https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/30350\#note_2593274
 }
-Rendezvous happened, and the STUN exchange worked,
+The STUN exchange worked,
+and rendezvous completed successfully,
 but the client and proxy could not establish a connection.
 We~experimented with running a proxy
 at a previously unused IP address:
 clients in China could connect when they were assigned
 that proxy by the broker.
-This was back before the web browser extension proxy existed,
-and the only consistent proxy support was a few standalone proxies
-that we, the developers, ran at a static IP address.
-It~ceased to be an issue as the proxy pool grew in size.
+This was before the web browser extension proxy existed,
+when the only consistent proxy support was a few standalone proxies
+running at a static IP address.
+It~stopped being a problem as the proxy pool grew in size.
 
 That same month, we noticed blocking of
 the default STUN server,
@@ -2966,8 +2971,7 @@ https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/3
 
 % "Confirmed block of default Snowflake in China" https://github.com/net4people/bbs/issues/249
 % "Snowflake bridge does not work in China since days ago" https://forum.torproject.net/t/snowflake-bridge-does-not-work-in-china-since-days-ago/7635
-The next incidents we are aware of did not occur until 2023,
-recent enough to appear in \autoref{fig:client-counts-cn}.
+The next incidents we are aware of did not occur until 2023.
 On May~12, 13, and~14, a~few users reported problems
 with domain fronting rendezvous.\urlfootnote{
 % "Blocking of Snowflake in China, 2023-05-12"
@@ -2980,11 +2984,12 @@ with the same TLS SNI to certain IP addresses within a short time.
 It~is possible that Snowflake was not the target of this
 blocking behavior, and was affected only as a side effect.
 If~it indeed had to do with Snowflake,
-our best guess is that it was aimed at the multiple rendezvous
-mentioned in \autoref{sec:multi-bridge}---though such a
+our best guess is that it was aimed at rendezvous with multiple bridges
+(\autoref{sec:multi-bridge}), though such a
 policy would certainly also affect a large number of non-Snowflake connections.
-The user count from China was about halved during those three days.
-On~May~15, the blocking went away and user counts returned to normal.
+The user count from China was about halved during those three days,
+an~effect that is visible in \autoref{fig:client-counts-cn}.
+On~\mbox{2023-05-15}, the blocking went away and the user count returned to normal.
 % Reported at the same time, perhaps coincidental:
 % "GFW at the Edge: Latest Development of China's Distributed Censorship System" https://github.com/net4people/bbs/issues/248
 
@@ -2996,10 +3001,11 @@ based on packet size and timing features.\urlfootnote{
 https://github.com/net4people/bbs/issues/255
 }
 Such a policy would affect Snowflake,
-because it transports Tor TLS inside DTLS data channels.
-Reportedly, adding padding to the first few packets
-to disrupt the size and timing signature was enough
-to prevent throttling.
+because of the fact that it transports Tor TLS inside DTLS data channels.
+Reportedly,
+padding the first few packets
+would prevent throttling
+(a~possible counterexample to our claims about traffic analysis in \autoref{sec:fingerprinting}).
 Our own speed tests run at the time
 did not show evidence of throttling,
 with or without added padding.\urlfootnote{
@@ -3021,12 +3027,12 @@ that the number of users dropped suddenly to zero,
 as~shown in \autoref{fig:client-counts-tm}.
 We~found a variety of causes:
 domain name blocking
-by DNS and TCP RST injection;
+by DNS and TCP RST injection,
 and blocking of certain UDP port numbers
 commonly used for STUN.
 
 Turkmenistan is a particularly challenging environment for circumvention.
-Though relatively unsophisticated, censorship there
+Though relatively unsophisticated, the censorship there
 is more severe and indiscriminate
 than in the other places we have discussed.
 Only a small fraction of the population has access to the Internet at all,
@@ -3044,7 +3050,7 @@ https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40024
 We~determined this by
 taking advantage of the bidirectionality of the Turkmenistan firewall.
 Nourin et~al.~\cite[\S 2]{Nourin2023a} provide more details;
-we~will state just the essential information here.
+here we will state just the essentials.
 Among the censorship techniques used in Turkmenistan
 are DNS response injection and TCP RST injection.
 DNS queries for filtered hostnames receive an injected response
@@ -3079,15 +3085,16 @@ The increase in the number of users from May to August 2022
 was caused by
 a partial unblocking of the broker front domain on \mbox{2023-05-03}.
 We~realized this only in retrospect,
-from examination of data from Censored Planet~\cite{Raman2020c},
-a~censorship measurement platform that had continuous measurements
-of the domain at that time, in~one autonomous system in Turkmenistan.
+after examining data from Censored Planet~\cite{Raman2020c},
+a~censorship measurement platform that, at~that time,
+had continuous measurements
+of the domain from one autonomous system in Turkmenistan.
 % "@agix provided me with Censored Planet measurements of cdn.sstatic.net in Turkmenistan." https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40024#note_2930186
 % See also figures/turkmenistan/ in this paper's source code.
-There was a shift from RST responses to successful TLS connections on that date.
-DNS measurements did not catch the moment of the shift,
-but they also showed no signs of blocking after that date.
-Evidently, some users were then able to connect.
+On~that date, there was a shift from RST responses to successful TLS connections.
+DNS measurements were not available at the moment of the shift,
+but they, too, showed no signs of blocking after that date.
+Evidently, some users were able to reach the broker, in~those days.
 But the unblocking must not have been everywhere, because as late as \mbox{2022-08-18},
 users reported that RST injection was still in place for them
 (though DNS injection had stopped).
@@ -3110,13 +3117,13 @@ cannot find its ICE candidate addresses (\autoref{sec:connection}),
 without which most WebRTC proxy connections will fail.
 (The exceptions are proxies without NAT or ingress filtering.
 While there are some such proxies,
-censorship in Turkmenistan also outright blocks
+censorship in Turkmenistan also blocks
 large parts of IP address space,
-including data center address ranges where those proxies tend to run.)
+including the data center address ranges where those kinds of proxies tend to run.)
 % "Even if the user is unable to connect to any STUN servers and sends an SDP offer with no candidates, they should still be able to connect to proxies that are not behind a NAT or behind a full cone NAT" https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40024#note_2889789
-As~chance would have it, the NAT discovery feature we rely on
-for testing the NAT type of clients requires
-STUN servers to open a second, functionally equivalent listener
+As~chance would have it, the NAT behavior discovery feature we rely on
+for testing client NATs requires
+STUN servers to open a second, functionally equivalent listening socket
 on a different port~\cite[\S 6]{rfc5780}, commonly 3479.
 Changing to those alternative port numbers
 enabled some users to connect to Snowflake again.
@@ -3129,15 +3136,15 @@ where port~3479 was blocked.
 % "So the line where we switch to port 3479 only works for some people but not others?" https://bugs.torproject.org/tpo/anti-censorship/censorship-analysis/40024#note_2829235
 Though we do not have continuous measurements to be sure,
 we~suspect that the STUN port blocking began on \mbox{2022-08-03}
-and precipitated the drop seen on that date in \autoref{fig:client-counts-tm}.
+and is what precipitated the drop seen on that date in \autoref{fig:client-counts-tm}.
 % OONI stunreachability measurements cease on 2023-07-31.
 % https://explorer.ooni.org/search?since=2022-07-01&until=2022-10-31&failure=true&probe_cc=TM&test_name=stunreachability
 
 The blocking techniques described in this section are crude,
-and surely result in significant overblocking---but
+surely resulting in significant overblocking---but
 they nevertheless offer greater challenges to circumvention
-than the more considered blocking of Russia and Iran.
-We~highlight this to make the point that blocking resistance
+than the more considered blocking of, say, Russia and Iran.
+We~remark on this to make the point that blocking resistance
 cannot be defined in absolute terms,
 but only relative to a particular censor.
 Censors differ not only in resources
