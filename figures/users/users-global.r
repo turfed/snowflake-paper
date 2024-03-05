@@ -11,7 +11,7 @@ source("../common.r")
 
 DATE_LIMITS <- lubridate::ymd(c(
 	"2021-06-30",
-	"2024-02-29"
+	"2024-03-03"
 ))
 
 GAPS <- tribble(
@@ -79,14 +79,18 @@ EVENTS <- tribble(
 	"2023-09-20 14:00:00",102000, T, "Malfunction in\ndomain fronting rendezvous",          # https://forum.torproject.org/t/problems-with-snowflake-since-2023-09-20-broker-failure-unexpected-error-no-answer/9346
 	# "2023-11-21 04:10:46", 60000, T, "encapsulation.ReadData performance improvement",      # https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/-/merge_requests/154#note_2967886
 	"2024-02-09 00:00:00", 70000, T, "Release of Orbot 17",                           # https://github.com/guardianproject/orbot/releases/tag/17.2.1-RC-1-tor-0.4.8.7)
-	"2024-03-01 00:00:00", 90000, T, "Second malfunction in\ndomain fronting rendezvous", # https://bugs.torproject.org/tpo/anti-censorship/team/135#note_3002430
+	"2024-03-01 00:00:00", 96000, T, "Second malfunction in\ndomain fronting rendezvous", # https://bugs.torproject.org/tpo/anti-censorship/team/135
 ) %>%
 	mutate(date = lubridate::ymd_hms(date) %>% lubridate::as_date()) %>%
 	filter(lubridate::`%within%`(date, do.call(lubridate::interval, as.list(DATE_LIMITS))))
 
 # Return an abbreviation for the month, followed by a year for January only.
 date_labels <- function(breaks) {
-	strftime(breaks, ifelse(!is.na(breaks) & lubridate::month(breaks) == 1, "%b\n%Y", "%b"), tz = "UTC")
+	# Last-minute hack: remove the final x-axis tick label, which gets cut
+	# in half by the edge of the graph.
+	breaks[[length(breaks) - 1]] <- NA
+
+	ifelse(is.na(breaks), "", strftime(breaks, ifelse(!is.na(breaks) & lubridate::month(breaks) == 1, "%b\n%Y", "%b"), tz = "UTC"))
 }
 
 # For each element of `at`, returns the minimum element of `values` whose
