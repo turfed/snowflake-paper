@@ -15,7 +15,10 @@ theme_set(
 		base_family = FONT_FAMILY,
 		base_size = 9
 	) +
-	theme(plot.margin = margin(0, 0, 0, 0, "mm"))
+	theme(
+		plot.margin = margin(0, 0, 0, 0, "mm"),
+		plot.background = element_rect(color = "white")
+	)
 )
 # https://stackoverflow.com/a/48978417
 update_geom_defaults("text", aes(family = FONT_FAMILY))
