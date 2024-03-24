@@ -6,17 +6,18 @@ all: \
 	proxy-nat-type.pdf
 .PHONY: all
 
-proxy-type.tmp.pdf: .EXTRA_PREREQS = proxy-type.r ../common.r
-proxy-type.tmp.pdf: proxy-type.csv
+*.pdf *.tmp.pdf *.svg *.tmp.png: .EXTRA_PREREQS = proxy-type.r ../common.r
+proxy-type.tmp.pdf proxy-type.svg proxy-type.png: proxy-type.csv
 	Rscript proxy-type.r "$<" "$@"
 
-proxy-nat-type.tmp.pdf: .EXTRA_PREREQS = proxy-nat-type.r ../common.r
-proxy-nat-type.tmp.pdf: proxy-nat-type.csv
+proxy-nat-type.tmp.pdf proxy-nat-type.svg proxy-nat-type.tmp.png: proxy-nat-type.csv
 	Rscript proxy-nat-type.r "$<" "$@"
 
-# Embed fonts.
-.INTERMEDIATE: proxy-type.tmp.pdf proxy-nat-type.tmp.pdf
+.INTERMEDIATE: proxy-type.tmp.pdf proxy-nat-type.tmp.pdf proxy-type.tmp.png proxy-nat-type.tmp.png
 %.pdf: %.tmp.pdf
+# Embed fonts.
 	gs -q -dSAFER -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile="$@" -dCompatibilityLevel=1.5 -dEmbedAllFonts=true -c '<</NeverEmbed []>> setdistillerparams' -f "$<"
+%.png: %.tmp.png
+	zopflipng -y -m "$<" "$@"
 
 .DELETE_ON_ERROR:

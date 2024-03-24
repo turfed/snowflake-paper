@@ -125,4 +125,4 @@ p <- ggplot() +
 	# Make room for the margin labels added by geom_text above.
 	theme(plot.margin = unit(c(0.5, 13.0, 0, 0.5), "mm")) +
 	guides(color = "none")
-ggsave(output_path, p, width = DOCUMENT_LINEWIDTH, height = 1.25)
+ggsave(output_path, p, width = DOCUMENT_LINEWIDTH, height = 1.25, dpi = 300)
