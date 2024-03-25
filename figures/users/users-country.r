@@ -2,7 +2,7 @@
 # in various countries, around the time of respective blocking events.
 #
 # Usage:
-#   Rscript users-country.r userstats-bridge-combined-multi.csv
+#   Rscript users-country.r .pdf userstats-bridge-combined-multi.csv
 
 library("tidyverse")
 library("cowplot")
@@ -26,10 +26,11 @@ date_labels_abbrev <- function(breaks) {
 
 (function() {
 	args <- commandArgs(trailingOnly = TRUE)
-	if (length(args) != 1) {
-		stop("usage: Rscript users-country.r userstats-bridge-combined-multi.csv")
+	if (length(args) != 2) {
+		stop("usage: Rscript users-country.r extension userstats-bridge-combined-multi.csv")
 	}
-	bridge_combined_multi_csv_path <<- args[[1]]
+	output_filename_extension <<- args[[1]]
+	bridge_combined_multi_csv_path <<- args[[2]]
 })()
 
 bridge_combined_multi <- read_csv(bridge_combined_multi_csv_path, comment = "#") %>%
@@ -146,5 +147,5 @@ plots <- lapply(PLOT_INFO, function(g) {
 # Make the horizontal axis the same size in each graph.
 plots <- align_plots(plotlist = plots, align = "v", axis = "lr")
 for (i in 1:length(plots)) {
-	ggsave(sprintf("users-%s.tmp.pdf", PLOT_INFO[[i]]$country), plots[[i]], width = DOCUMENT_LINEWIDTH, height = HEIGHT)
+	ggsave(sprintf("users-%s%s", PLOT_INFO[[i]]$country, output_filename_extension), plots[[i]], width = DOCUMENT_LINEWIDTH, height = HEIGHT, dpi = 300)
 }

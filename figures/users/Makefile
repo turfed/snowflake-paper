@@ -11,17 +11,22 @@ all: \
 	$(COUNTRY_GRAPHS)
 .PHONY: all
 
-users-global.tmp.pdf: .EXTRA_PREREQS = users-global.r ../common.r
-users-global.tmp.pdf: userstats-bridge-transport-multi.csv bandwidth-multi.csv
+*.pdf *.tmp.pdf *.svg *.tmp.png: .EXTRA_PREREQS = users-global.r ../common.r
+users-global.tmp.pdf users-global.svg users-global.tmp.png: userstats-bridge-transport-multi.csv bandwidth-multi.csv
 	Rscript users-global.r $^ "$@"
 
-$(COUNTRY_GRAPHS:.pdf=.tmp.pdf): .EXTRA_PREREQS = users-country.r ../common.r
 $(COUNTRY_GRAPHS:.pdf=.tmp.pdf)&: userstats-bridge-combined-multi.csv
-	Rscript users-country.r "$<"
+	Rscript users-country.r .tmp.pdf "$<"
+$(COUNTRY_GRAPHS:.pdf=.svg)&: userstats-bridge-combined-multi.csv
+	Rscript users-country.r .svg "$<"
+$(COUNTRY_GRAPHS:.pdf=.tmp.png)&: userstats-bridge-combined-multi.csv
+	Rscript users-country.r .tmp.png "$<"
 
-# Embed fonts.
-.INTERMEDIATE: users-global.tmp.pdf $(COUNTRY_GRAPHS:.pdf=.tmp.pdf)
+.INTERMEDIATE: users-global.tmp.pdf $(COUNTRY_GRAPHS:.pdf=.tmp.pdf) users-global.tmp.png $(COUNTRY_GRAPHS:.pdf=.tmp.png)
 %.pdf: %.tmp.pdf
+# Embed fonts.
 	gs -q -dSAFER -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile="$@" -dCompatibilityLevel=1.5 -dEmbedAllFonts=true -c '<</NeverEmbed []>> setdistillerparams' -f "$<"
+%.png: %.tmp.png
+	zopflipng -y -m "$<" "$@"
 
 .DELETE_ON_ERROR:

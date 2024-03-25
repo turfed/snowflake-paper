@@ -353,4 +353,4 @@ desired_heights <- c(
 p <- plot_grid(plotlist = align_plots(p_users, p_bandwidth, align = "v", axis = "lr"),
 	ncol = 1, rel_heights = desired_heights)
 
-ggsave(output_path, p, width = DOCUMENT_TEXTWIDTH, height = sum(desired_heights))
+ggsave(output_path, p, width = DOCUMENT_TEXTWIDTH, height = sum(desired_heights), dpi = 300)
