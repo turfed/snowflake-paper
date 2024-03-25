@@ -6,8 +6,10 @@ all: \
 	proxy-nat-type.pdf
 .PHONY: all
 
-*.pdf *.tmp.pdf *.svg *.tmp.png: .EXTRA_PREREQS = proxy-type.r ../common.r
-proxy-type.tmp.pdf proxy-type.svg proxy-type.png: proxy-type.csv
+*.pdf *.tmp.pdf *.svg *.png *.tmp.png: .EXTRA_PREREQS = proxy-type.r ../common.r
+proxy-type.tmp.pdf: proxy-type.csv
+	Rscript proxy-type.r --hyphen-hack "$<" "$@"
+proxy-type.svg proxy-type.tmp.png: proxy-type.csv
 	Rscript proxy-type.r "$<" "$@"
 
 proxy-nat-type.tmp.pdf proxy-nat-type.svg proxy-nat-type.tmp.png: proxy-nat-type.csv

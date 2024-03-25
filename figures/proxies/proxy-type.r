@@ -2,8 +2,9 @@
 # day, by type.
 #
 # Usage:
-#   Rscript proxy-type.r proxy-type.csv proxy-type.pdf
+#   Rscript proxy-type.r [--hyphen-hack] proxy-type.csv proxy-type.pdf
 
+library("argparse")
 library("tidyverse")
 
 source("../common.r")
@@ -44,12 +45,14 @@ DATE_LIMITS <- lubridate::ymd(c(
 # https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40151
 
 (function() {
-	args <- commandArgs(trailingOnly = TRUE)
-	if (length(args) != 2) {
-		stop("usage: Rscript proxy-type.r proxy-type.csv proxy-type.pdf")
-	}
-	proxy_type_csv_path <<- args[[1]]
-	output_path <<- args[[2]]
+	parser <- ArgumentParser()
+	parser$add_argument("--hyphen-hack", action="store_true", default=FALSE, help="convert hyphen to soft hyphen")
+	parser$add_argument("proxy_type_csv_path", nargs=1)
+	parser$add_argument("output_path", nargs=1)
+	args <- parser$parse_args()
+	hyphen_hack <<- args$hyphen_hack
+	proxy_type_csv_path <<- args$proxy_type_csv_path
+	output_path <<- args$output_path
 })()
 
 proxy_type <- read_csv(proxy_type_csv_path, col_types = cols(
@@ -165,7 +168,7 @@ p <- ggplot() +
 			color = type,
 			# \u00ad (soft hyphen) is a hack to avoid the hypohen
 			# turning into a minus sign: https://stackoverflow.com/a/48510383.
-			label = gsub("-", "\u00ad", type)
+			label = if (hyphen_hack) gsub("-", "\u00ad", type) else type
 		),
 		position = position_nudge(x = 5),
 		size = 2.5,
