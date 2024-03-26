@@ -92,4 +92,4 @@ p <- ggplot() +
 		x = NULL,
 		y = NULL
 	)
-ggsave(output_path, p, width = DOCUMENT_LINEWIDTH, height = 1.4)
+ggsave(output_path, p, width = DOCUMENT_LINEWIDTH, height = 1.4, dpi = 300)
