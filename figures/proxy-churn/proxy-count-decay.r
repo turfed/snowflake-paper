@@ -3,8 +3,9 @@
 # windows in the near future.
 #
 # Usage:
-#   Rscript proxy-count-delay.r proxy-churn-windows.csv proxy-count-delay.pdf
+#   Rscript proxy-count-delay.r [--hyphen-hack] proxy-churn-windows.csv proxy-count-delay.pdf
 
+library("argparse")
 library("tidyverse")
 
 source("../common.r")
@@ -17,12 +18,14 @@ DATE_LIMITS <- lubridate::ymd_hms(c(
 DECAY_COLOR <- "slateblue"
 
 (function() {
-	args <- commandArgs(trailingOnly = TRUE)
-	if (length(args) != 2) {
-		stop("usage: Rscript proxy-count-delay.r proxy-churn-windows.csv proxy-count-delay.pdf")
-	}
-	proxy_churn_windows_csv_path <<- args[[1]]
-	output_path <<- args[[2]]
+	parser <- ArgumentParser()
+	parser$add_argument("--hyphen-hack", action="store_true", default=FALSE, help="convert hyphen to soft hyphen")
+	parser$add_argument("proxy_churn_windows_csv_path", nargs=1)
+	parser$add_argument("output_path", nargs=1)
+	args <- parser$parse_args()
+	hyphen_hack <<- args$hyphen_hack
+	proxy_churn_windows_csv_path <<- args$proxy_churn_windows_csv_path
+	output_path <<- args$output_path
 })()
 
 proxy_churn_windows <- read_csv(proxy_churn_windows_csv_path) %>%
@@ -64,7 +67,7 @@ p <- ggplot() +
 		x = lubridate::ymd_hms("2023-01-02 06:00:00"),
 		y = 141000,
 		# \u00ad (soft hyphen) avoids the hyphen turning into a minus sign: https://stackoverflow.com/a/48510383
-		label = "Unique proxy IP addresses per 24\u00adhour window",
+		label = gsub("-", if (hyphen_hack) "\u00ad" else "-", "Unique proxy IP addresses per 24-hour window"),
 		size = 3, lineheight = 0.7, hjust = 0, vjust = 0) +
 	annotate("text",
 		x = lubridate::ymd_hms("2023-01-05 12:00:00"),

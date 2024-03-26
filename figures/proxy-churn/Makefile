@@ -2,8 +2,10 @@ all: \
 	proxy-count-decay.pdf
 .PHONY: all
 
-*.pdf *.tmp.pdf *.svg *.tmp.png: .EXTRA_PREREQS = proxy-count-decay.r ../common.r
-proxy-count-decay.tmp.pdf proxy-count-decay.svg proxy-count-decay.png: proxy-churn-windows.csv
+*.pdf *.tmp.pdf *.svg *.png *.tmp.png: .EXTRA_PREREQS = proxy-count-decay.r ../common.r
+proxy-count-decay.tmp.pdf: proxy-churn-windows.csv
+	Rscript proxy-count-decay.r --hyphen-hack "$<" "$@"
+proxy-count-decay.svg proxy-count-decay.png: proxy-churn-windows.csv
 	Rscript proxy-count-decay.r "$<" "$@"
 
 proxy-churn-windows.csv: .EXTRA_PREREQS = proxy-churn-windows.go
