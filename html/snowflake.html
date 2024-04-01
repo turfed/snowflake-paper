@@ -193,21 +193,6 @@ aside ul {
 }
 </style>
 <script type=module>
-// Randomize order of author list.
-function shuffle(a) {
-	const b = [...a];
-	for (let i = 0; i < b.length; i++) {
-		const j = Math.floor(Math.random() * (i + 1));
-		[b[i], b[j]] = [b[j], b[i]];
-	}
-	return b;
-}
-const authorList = document.querySelector("#authors");
-const authors = authorList.querySelectorAll("li");
-authorList.replaceChildren(...shuffle(authors));
-document.querySelector("#authornote").textContent = "Authors are listed in random order.";
-</script>
-<script type=module>
 // Like https://gameprogrammingpatterns.com/script.js.
 function position_notes() {
 	let bottom = 0;
@@ -273,6 +258,20 @@ It has the same content as the version in the conference proceedings,
 with additional margin notes and links that did not fit in the print-oriented version.
 </p>
 </address>
+<script>
+// Randomize order of author list.
+function shuffle(a) {
+	const b = [...a];
+	for (let i = 0; i < b.length; i++) {
+		const j = Math.floor(Math.random() * (i + 1));
+		[b[i], b[j]] = [b[j], b[i]];
+	}
+	return b;
+}
+const authorList = document.querySelector("#authors");
+authorList.replaceChildren(...shuffle(authorList.querySelectorAll("li")));
+document.querySelector("#authornote").textContent = "Authors are listed in random order.";
+</script>
 <ul id=links>
 <li>USENIX Security 2024 page</li> <!-- TODO -->
 <li><a href="https://archive.org/details/snowflake-paper">Source code and data for this article</a></li>
