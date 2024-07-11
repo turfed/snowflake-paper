@@ -277,7 +277,7 @@ document.querySelector("#authornote").textContent = "Authors are listed in rando
 <li><a href="https://archive.org/details/snowflake-paper">Source code and data for this article</a></li>
 </ul>
 <p>
-Last updated <time id=lastupdated>2024-05-14</time>.
+Last updated <time id=lastupdated>2024-07-11</time>.
 </p>
 </header>
 
@@ -1830,7 +1830,7 @@ Owing to practical considerations,
 Snowflake’s defenses to DTLS fingerprinting are not very robust,
 and are reactive rather than proactive.
 In&nbsp;the realm of TLS one may use uTLS,
-but there is as yet no equivalent for DTLS.
+but there is as yet no equivalent for DTLS.<a class=mark href=#n-78>&bull;</a>
 The present way of altering DTLS fingerprints in Snowflake
 is to submit a patch to Pion
 when a feature used for fingerprinting is identified.<a class=mark href=#n-29>&bull;</a>
@@ -1875,6 +1875,20 @@ or TorKameleon&nbsp;<a href=#ref:Vilalonga2023a class=cite>[<span class=number>4
 
 <aside class=note id=n-28>
 <a href="https://bugs.torproject.org/tpo/anti-censorship/pluggable-transports/snowflake/40240">Investigate if STUN over TCP/TLS is beneficial to us</a>
+</aside>
+
+<aside class=note id=n-78>
+<p>
+<time>2024-07-11</time>:
+Not long after this paper was written,
+Theodor Signebøen Midtlien wrote a thesis
+about DTLS distinguishability especially as it relates to Snowflake,
+and a software package for controlling DTLS fingerprints.
+</p>
+<ul>
+<li><a href="https://theodorsm.net/thesis">“Reducing distinguishability of DTLS for usage in Snowflake”</a>, <time datetime=2024-06>June 2024</time></li>
+<li><a href="https://github.com/theodorsm/covert-dtls">covertDTLS</a></li>
+</ul>
 </aside>
 
 <aside class=note id=n-29>
